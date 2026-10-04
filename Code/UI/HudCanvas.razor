@@ -1,0 +1,33 @@
+@using Sandbox;
+@using Sandbox.UI;
+@namespace GoldSrc
+@inherits PanelComponent
+
+<root class="@(_client.GameUiActive || _client.VGuiCursorVisible ? "gameui" : "")">
+	<HudSurface Client=@_client />
+</root>
+
+@code
+{
+	private Client _client;
+
+	public static HudCanvas Create( Client client )
+	{
+		var gameObject = new GameObject( true, "hud" );
+
+		gameObject.NetworkMode = NetworkMode.Never;
+
+		var screen = gameObject.AddComponent<ScreenPanel>();
+
+		screen.AutoScreenScale = false;
+		screen.Scale = 1f;
+
+		var canvas = gameObject.AddComponent<HudCanvas>();
+
+		canvas._client = client;
+
+		return canvas;
+	}
+
+	protected override int BuildHash() => System.HashCode.Combine( _client, _client.GameUiActive, _client.VGuiCursorVisible );
+}
