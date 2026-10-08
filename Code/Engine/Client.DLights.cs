@@ -63,6 +63,8 @@ partial class Client
 
 	public void ClearLights()
 	{
+		FlashlightOff();
+
 		foreach ( var light in _dlights )
 			light.Clear( 0 );
 

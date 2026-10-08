@@ -79,6 +79,7 @@ public sealed class ViewEntity : Component
 
 			_renderer ??= AddComponent<SkinnedModelRenderer>();
 			_renderer.Model = renderModel;
+			_renderer.RenderType = ModelRenderer.ShadowRenderType.Off;
 		}
 
 		if ( _renderer is null )

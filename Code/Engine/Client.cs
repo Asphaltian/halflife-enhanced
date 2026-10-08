@@ -698,12 +698,21 @@ public sealed partial class Client : GameObjectSystem<Client>
 	{
 		var effects = player?.PacketEffects ?? default;
 
-		if ( (effects & (Effects.BrightLight | Effects.DimLight)) == 0 )
+		var sourceFlashlight = SourceFlashlight != 0f && (effects & Effects.BrightLight) == 0 && (effects & Effects.DimLight) == Effects.DimLight;
+
+		if ( !sourceFlashlight )
+			FlashlightOff();
+
+		if ( sourceFlashlight || (effects & (Effects.BrightLight | Effects.DimLight)) == 0 )
 		{
 			if ( _playerLight is { Key: 1 } )
 				_playerLight.Die = (float)ClientTime;
 
 			_playerLight = null;
+
+			if ( sourceFlashlight )
+				UpdateFlashlight( player.Origin + _viewHeight );
+
 			return;
 		}
 
