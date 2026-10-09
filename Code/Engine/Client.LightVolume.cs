@@ -1,5 +1,4 @@
 using System;
-using Sandbox.Mounting;
 
 namespace GoldSrc;
 
@@ -30,10 +29,9 @@ partial class Client
 
 		var path = Server.GetMountPath( modelName );
 
-		if ( WorldFile.Nodes.Length == 0 || WorldFile.Lighting.Length == 0 || MountUtility.FindLoader( $"{path}/relocation.vtex" ) is null )
+		if ( WorldFile.Nodes.Length == 0 || WorldFile.Lighting.Length == 0 || Texture.Find( $"{path}/relocation.vtex" ) is not { } relocation )
 			return;
 
-		var relocation = Texture.Load( $"{path}/relocation.vtex" );
 		var world = WorldFile.Models[0];
 		var bounds = new BBox( world.Mins, world.Maxs );
 		var counts = new Vector3Int( relocation.Width, relocation.Height, relocation.Depth );
@@ -53,7 +51,7 @@ partial class Client
 			volume.Bounds = bounds;
 			volume.ProbeDensity = density;
 			volume.IrradianceTexture = _irradiance;
-			volume.DistanceTexture = Texture.Load( $"{path}/distance.vtex" );
+			volume.DistanceTexture = Texture.Find( $"{path}/distance.vtex" );
 			volume.RelocationTexture = relocation;
 
 			return;
