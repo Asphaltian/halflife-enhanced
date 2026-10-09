@@ -108,8 +108,8 @@ public sealed partial class Client : GameObjectSystem<Client>
 		if ( _decalCamera.IsValid() )
 			_decalCamera.RemoveCommandList( _decalCommands );
 
-		_irradiance?.Dispose();
-		_irradiance = null;
+		ClearLightVolume();
+
 		_dynamicLightTexture?.Dispose();
 		_dynamicLightTexture = null;
 
@@ -701,19 +701,19 @@ public sealed partial class Client : GameObjectSystem<Client>
 	{
 		var effects = player?.PacketEffects ?? default;
 
-		var sourceFlashlight = SourceFlashlight != 0f && (effects & Effects.BrightLight) == 0 && (effects & Effects.DimLight) == Effects.DimLight;
+		var newFlashlight = NewFlashlight != 0f && (effects & Effects.BrightLight) == 0 && (effects & Effects.DimLight) == Effects.DimLight;
 
-		if ( !sourceFlashlight )
+		if ( !newFlashlight )
 			FlashlightOff();
 
-		if ( sourceFlashlight || (effects & (Effects.BrightLight | Effects.DimLight)) == 0 )
+		if ( newFlashlight || (effects & (Effects.BrightLight | Effects.DimLight)) == 0 )
 		{
 			if ( _playerLight is { Key: 1 } )
 				_playerLight.Die = (float)ClientTime;
 
 			_playerLight = null;
 
-			if ( sourceFlashlight )
+			if ( newFlashlight )
 				UpdateFlashlight( player.Origin + _viewHeight );
 
 			return;

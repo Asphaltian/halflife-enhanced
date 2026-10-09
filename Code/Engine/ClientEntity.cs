@@ -313,7 +313,7 @@ public sealed partial class ClientEntity : Component
 	{
 		var client = Client.Current;
 
-		if ( !client.InLevel )
+		if ( !client.InLevel || !Scene.Camera.IsValid() )
 			return;
 
 		var model = Model ?? client.GetModelByIndex( ModelIndex );
@@ -445,7 +445,6 @@ public sealed partial class ClientEntity : Component
 			FloorColor = floorColor;
 
 		renderer.Attributes.Set( "AmbientLight", (float)light.AmbientLight );
-		renderer.Attributes.Set( "StudioLight", Client.StudioLight );
 		renderer.Attributes.Set( "ShadeLight", (float)light.ShadeLight );
 		renderer.Attributes.Set( "LightVector", light.LightVector );
 		renderer.Attributes.Set( "LightColor", light.Color );

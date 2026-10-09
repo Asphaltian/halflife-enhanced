@@ -106,7 +106,6 @@ public sealed class ViewEntity : Component
 		var light = Client.Current.StudioDynamicLight( Effects, RenderFx.None, 0, Origin, header.Header.Flags );
 
 		_renderer.Attributes.Set( "AmbientLight", (float)light.AmbientLight );
-		_renderer.Attributes.Set( "StudioLight", Client.StudioLight );
 		_renderer.Attributes.Set( "ShadeLight", (float)light.ShadeLight );
 		_renderer.Attributes.Set( "LightVector", light.LightVector );
 		_renderer.Attributes.Set( "LightColor", light.Color );

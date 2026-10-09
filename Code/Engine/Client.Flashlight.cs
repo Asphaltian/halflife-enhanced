@@ -10,16 +10,16 @@ partial class Client
 	private const float FlashlightOffsetUp = -20f;
 	private const float FlashlightSwing = -12f;
 	private const float FlashlightLinearAttenuation = 0.00725f;
+	private const float FlashlightEpsilon = 0.1f;
 	private const float FlashlightDistCutoff = 128f;
 	private const float FlashlightDistDrag = 0.2f;
-	private const float FlashlightDragRate = 100f;
-	private const float FlashlightMaxCone = 60f;
+	private const float FlashlightLadderDist = 40f;
 
-	[ConVar( "r_flashlight", ConVarFlags.Saved )]
-	public static float SourceFlashlight { get; set; }
+	[ConVar( "r_newflashlight", ConVarFlags.Saved )]
+	public static float NewFlashlight { get; set; }
 
 	private SceneSpotLight _flashlight;
-	private float _flashlightCone;
+	private float _flashlightDistMod = 1f;
 
 	private void FlashlightOff()
 	{
@@ -38,6 +38,7 @@ partial class Client
 	{
 		MathLib.AngleVectors( _viewAngles, out var forward, out _, out var up );
 
+		var ladder = _pmove.MoveType == MoveType.Fly;
 		var offsetUp = FlashlightOffsetUp;
 		var swing = eye + (forward * FlashlightSwing);
 
@@ -46,7 +47,7 @@ partial class Client
 
 		var origin = eye + (up * offsetUp);
 
-		if ( _pmove.MoveType == MoveType.Fly || FlashlightTrace( eye, origin ).Fraction != 1f )
+		if ( ladder || FlashlightTrace( eye, origin ).Fraction != 1f )
 			origin = eye;
 
 		var target = eye + (forward * FlashlightFar);
@@ -55,31 +56,41 @@ partial class Client
 		up = (up - (direction * Vector3.Dot( direction, up ))).Normal;
 
 		var distance = (FlashlightTrace( origin, target ).EndPos - origin).Length;
-		var cone = FlashlightFov * 0.5f;
 
 		if ( distance < FlashlightDistCutoff )
-			cone = MathF.Min( MathF.Atan2( FlashlightDistCutoff * MathF.Tan( cone * (MathF.PI / 180f) ), distance ) * (180f / MathF.PI), FlashlightMaxCone );
-
-		if ( _flashlight is null )
 		{
-			_flashlightCone = cone;
+			var pullBack = ladder ? FlashlightLadderDist : FlashlightDistCutoff - distance;
 
-			_flashlight = new SceneSpotLight( Scene.SceneWorld, origin, Color.White )
+			_flashlightDistMod += (pullBack - _flashlightDistMod) * FlashlightDistDrag;
+
+			if ( !ladder )
 			{
-				Radius = FlashlightFar,
-				ConstantAttenuation = 0f,
-				LinearAttenuation = FlashlightLinearAttenuation,
-				QuadraticAttenuation = 0f,
-				FallOff = 1f,
-				ShadowsEnabled = true,
-				LightCookie = Texture.Load( FlashlightCookie )
-			};
+				var back = FlashlightTrace( origin, origin - (direction * (pullBack - FlashlightEpsilon)) );
+
+				if ( back.Fraction != 1f )
+					_flashlightDistMod = MathF.Min( _flashlightDistMod, (back.EndPos - origin).Length - FlashlightEpsilon );
+			}
+		}
+		else
+		{
+			_flashlightDistMod -= _flashlightDistMod * FlashlightDistDrag;
 		}
 
-		_flashlightCone += (cone - _flashlightCone) * (1f - MathF.Pow( 1f - FlashlightDistDrag, RealTime.Delta * FlashlightDragRate ));
+		origin -= direction * _flashlightDistMod;
 
-		_flashlight.ConeInner = _flashlightCone;
-		_flashlight.ConeOuter = _flashlightCone;
+		_flashlight ??= new SceneSpotLight( Scene.SceneWorld, origin, Color.White )
+		{
+			Radius = FlashlightFar,
+			ConeInner = FlashlightFov * 0.5f,
+			ConeOuter = FlashlightFov * 0.5f,
+			ConstantAttenuation = 0f,
+			LinearAttenuation = FlashlightLinearAttenuation,
+			QuadraticAttenuation = 0f,
+			FallOff = 1f,
+			ShadowsEnabled = true,
+			LightCookie = Texture.Load( FlashlightCookie )
+		};
+
 		_flashlight.Position = origin;
 		_flashlight.Rotation = Rotation.LookAt( direction, up );
 	}

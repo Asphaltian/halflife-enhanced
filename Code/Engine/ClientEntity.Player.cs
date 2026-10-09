@@ -460,7 +460,6 @@ partial class ClientEntity
 	private void StudioSetupLighting( Client client, SkinnedModelRenderer renderer, in StudioLight light )
 	{
 		renderer.Attributes.Set( "AmbientLight", (float)light.AmbientLight );
-		renderer.Attributes.Set( "StudioLight", Client.StudioLight );
 		renderer.Attributes.Set( "ShadeLight", (float)light.ShadeLight );
 		renderer.Attributes.Set( "LightVector", light.LightVector );
 		renderer.Attributes.Set( "LightColor", light.Color );

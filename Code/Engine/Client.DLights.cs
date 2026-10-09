@@ -37,7 +37,6 @@ partial class Client
 	public const int MaxELights = 64;
 
 	private const int MaxLocalLights = 3;
-	private const double SceneLightGamma = 2.2;
 
 	private readonly DLight[] _dlights = CreateLights( MaxDLights );
 	private readonly DLight[] _elights = CreateLights( MaxELights );
@@ -107,9 +106,9 @@ partial class Client
 			sceneLight.WorldPosition = light.Origin;
 			sceneLight.Radius = light.Radius;
 			sceneLight.LightColor = new Color(
-				MathF.Pow( light.R / 255f * peak, (float)SceneLightGamma ),
-				MathF.Pow( light.G / 255f * peak, (float)SceneLightGamma ),
-				MathF.Pow( light.B / 255f * peak, (float)SceneLightGamma ) );
+				ScreenToLinear( light.R / 255f * peak ),
+				ScreenToLinear( light.G / 255f * peak ),
+				ScreenToLinear( light.B / 255f * peak ) );
 		}
 	}
 

@@ -125,7 +125,6 @@ public sealed class ClientModelRenderer : Component
 		var light = Client.Current.StudioDynamicLight( (Effects)temp.Effects, temp.RenderFx, 0, temp.Origin, header.Header.Flags );
 
 		renderer.Attributes.Set( "AmbientLight", (float)light.AmbientLight );
-		renderer.Attributes.Set( "StudioLight", Client.StudioLight );
 		renderer.Attributes.Set( "ShadeLight", (float)light.ShadeLight );
 		renderer.Attributes.Set( "LightVector", light.LightVector );
 		renderer.Attributes.Set( "LightColor", light.Color );

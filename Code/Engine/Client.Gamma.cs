@@ -123,10 +123,23 @@ public sealed partial class Client
 		_ = Restart( reload );
 	}
 
+	private void ClearContent()
+	{
+		Sound?.StopAllSounds();
+		Sound = new SoundEngine();
+
+		ModelCache.Clear();
+
+		_muzzleFlash = null;
+		_rocketFlareSprite = null;
+		_ricochetSprite = null;
+	}
+
 	private static async Task Restart( bool reload )
 	{
 		Host.Disconnect();
 		Server.SetGameDirectory();
+		Current?.ClearContent();
 
 		if ( (Gamma != _uploadGamma || TexGamma != _uploadTexGamma) && Sandbox.Mounting.Directory.Get( Server.MountIdent ) is { } mount )
 		{
@@ -160,6 +173,11 @@ public sealed partial class Client
 			: light / threshold * 0.125f;
 
 		return Math.Clamp( (int)(MathF.Pow( light, 1f / Gamma ) * 1023f), 0, 1023 );
+	}
+
+	public static float ScreenToLinear( float value )
+	{
+		return value < 0.04045f ? value / 12.92f : MathF.Pow( (value + 0.055f) / 1.055f, 2.4f );
 	}
 
 	private void CheckGamma()

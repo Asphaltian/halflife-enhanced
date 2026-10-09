@@ -209,7 +209,7 @@ partial class Client
 		if ( RecursiveLightSample( nodeIndex, start, end ) is not { } sample )
 			return (0, 0, 0);
 
-		var (red, green, blue) = BlendLightSample( sample );
+		var (red, green, blue) = BlendLightSample( sample, _lightStyleValues );
 
 		red >>= 8;
 		green >>= 8;
@@ -221,7 +221,7 @@ partial class Client
 		return (red, green, blue);
 	}
 
-	private (int Red, int Green, int Blue) BlendLightSample( LightSample sample )
+	private (int Red, int Green, int Blue) BlendLightSample( LightSample sample, int[] styleValues )
 	{
 		var face = WorldFile.Faces[sample.Face];
 		var extents = WorldFile.SurfaceExtents[sample.Face];
@@ -234,7 +234,7 @@ partial class Client
 
 		for ( var map = 0; map < Face.MaxLightmaps && face.Styles[map] != 255; map++ )
 		{
-			var scale = _lightStyleValues[face.Styles[map]];
+			var scale = styleValues[face.Styles[map]];
 
 			red += WorldFile.Lighting[lightmap] * scale;
 			green += WorldFile.Lighting[lightmap + 1] * scale;

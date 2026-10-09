@@ -234,6 +234,10 @@ public static partial class Host
 		Cvar.SetValue( "deathmatch", 0f );
 		Cvar.SetValue( "coop", 0f );
 
+		server.MaxClients = 1;
+
+		Cvar.SetValue( "maxplayers", 1f );
+
 		Client.Current?.BeginLoadingPlaque();
 
 		_ = Map( server, header.MapName, true, shutdown: true );
