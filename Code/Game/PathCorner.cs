@@ -224,7 +224,7 @@ public class PathTrack : PointEntity
 
 			if ( deadCount > 9999 )
 			{
-				Log.Error( $"Bad sequence of path_tracks from {TargetName}" );
+				Util.Alert( AlertType.Error, $"Bad sequence of path_tracks from {TargetName}" );
 				return null;
 			}
 
@@ -255,7 +255,7 @@ public class PathTrack : PointEntity
 			}
 			else
 			{
-				Log.Info( $"Dead end link {Target}" );
+				Util.Alert( AlertType.Console, $"Dead end link {Target}" );
 			}
 		}
 

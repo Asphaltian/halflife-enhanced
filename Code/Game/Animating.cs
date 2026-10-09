@@ -74,7 +74,7 @@ public class BaseAnimating : BaseDelay
 
 		if ( model is null )
 		{
-			Log.Trace( "Gibbed monster is thinking!" );
+			Util.Alert( AlertType.AiConsole, "Gibbed monster is thinking!" );
 			return;
 		}
 

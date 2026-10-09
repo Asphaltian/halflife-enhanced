@@ -62,7 +62,7 @@ public class HalfLifeMultiplay : GameRules
 		if ( string.IsNullOrEmpty( configFile ) )
 			return;
 
-		Log.Info( "Executing listen server config file\n" );
+		Util.Alert( AlertType.Console, "Executing listen server config file\n" );
 
 		server.ServerCommand( $"exec {configFile}\n" );
 	}
@@ -696,7 +696,7 @@ public class HalfLifeMultiplay : GameRules
 
 				if ( !Server.IsMapValid( map ) )
 				{
-					Log.Info( $"Skipping {map} from mapcycle, not a valid map\n" );
+					Util.Alert( AlertType.Console, $"Skipping {map} from mapcycle, not a valid map\n" );
 					continue;
 				}
 
@@ -801,7 +801,7 @@ public class HalfLifeMultiplay : GameRules
 
 			if ( !ReloadMapCycleFile( mapCycleFile ) )
 			{
-				Log.Info( $"Unable to load map cycle file {mapCycleFile}\n" );
+				Util.Alert( AlertType.Console, $"Unable to load map cycle file {mapCycleFile}\n" );
 				doCycle = false;
 			}
 		}
@@ -870,13 +870,13 @@ public class HalfLifeMultiplay : GameRules
 
 		HalfLifeDll.GameOver = true;
 
-		Log.Info( $"CHANGE LEVEL: {nextMap}\n" );
+		Util.Alert( AlertType.Console, $"CHANGE LEVEL: {nextMap}\n" );
 
 		if ( minPlayers != 0 || maxPlayers != 0 )
-			Log.Info( $"PLAYER COUNT:  min {minPlayers} max {maxPlayers} current {currentPlayers}\n" );
+			Util.Alert( AlertType.Console, $"PLAYER COUNT:  min {minPlayers} max {maxPlayers} current {currentPlayers}\n" );
 
 		if ( rules.Length > 0 )
-			Log.Info( $"RULES:  {rules}\n" );
+			Util.Alert( AlertType.Console, $"RULES:  {rules}\n" );
 
 		Server.ChangeLevel( nextMap, null );
 

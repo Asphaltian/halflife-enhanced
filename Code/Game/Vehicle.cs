@@ -126,7 +126,7 @@ public class FuncVehicle : BaseEntity
 
 		Velocity *= 0.85f;
 
-		Log.Info( $"TRAIN({TargetName}): Blocked by {other.ClassName} (dmg:{Damage:F2})" );
+		Util.Alert( AlertType.Console, $"TRAIN({TargetName}): Blocked by {other.ClassName} (dmg:{Damage:F2})" );
 
 		var globals = Server.Globals;
 
@@ -407,7 +407,7 @@ public class FuncVehicle : BaseEntity
 				HitSurface( trace, true );
 
 				if ( trace.Ent is BaseEntity hit && hit.Classify() == ClassVehicle )
-					Log.Info( "I hit another vehicle" );
+					Util.Alert( AlertType.Console, "I hit another vehicle" );
 
 				return;
 			}
@@ -664,12 +664,12 @@ public class FuncVehicle : BaseEntity
 
 		if ( nearest is null )
 		{
-			Log.Info( "Can't find a nearby track !!!" );
+			Util.Alert( AlertType.Console, "Can't find a nearby track !!!" );
 			SetThink( null );
 			return;
 		}
 
-		Util.AiAlert( $"TRAIN: {TargetName}, Nearest track is {nearest.TargetName}" );
+		Util.Alert( AlertType.AiConsole, $"TRAIN: {TargetName}, Nearest track is {nearest.TargetName}" );
 
 		track = ((PathTrack)nearest).GetNext();
 
@@ -698,7 +698,7 @@ public class FuncVehicle : BaseEntity
 		if ( _sounds == 0 )
 			_sounds = 3;
 
-		Log.Info( $"M_speed = {_speed:F6}" );
+		Util.Alert( AlertType.Console, $"M_speed = {_speed:F6}" );
 
 		Speed = 0f;
 		Velocity = Vector3.Zero;
@@ -712,7 +712,7 @@ public class FuncVehicle : BaseEntity
 		Driver = null;
 
 		if ( string.IsNullOrEmpty( Target ) )
-			Log.Info( "Vehicle with no target" );
+			Util.Alert( AlertType.Console, "Vehicle with no target" );
 
 		Solid = (SpawnFlags & FuncTrackTrain.SpawnFlagPassable) != 0 ? Solid.Not : Solid.Bsp;
 		MoveType = MoveType.Push;
@@ -774,7 +774,7 @@ public class FuncVehicleControls : BaseEntity
 
 		if ( target is null )
 		{
-			Log.Info( $"No vehicle {Target}" );
+			Util.Alert( AlertType.Console, $"No vehicle {Target}" );
 			return;
 		}
 

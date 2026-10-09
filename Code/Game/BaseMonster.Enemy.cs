@@ -192,7 +192,7 @@ partial class BaseMonster
 		}
 		else
 		{
-			Util.AiAlert( $"{ClassName} has no sequence for act:{(int)activity}" );
+			Util.Alert( AlertType.AiConsole, $"{ClassName} has no sequence for act:{(int)activity}" );
 			Sequence = 0;
 		}
 
@@ -215,7 +215,7 @@ partial class BaseMonster
 		}
 		else
 		{
-			Util.AiAlert( $"{ClassName} has no sequence named:{name}" );
+			Util.Alert( AlertType.AiConsole, $"{ClassName} has no sequence named:{name}" );
 			Sequence = 0;
 		}
 	}

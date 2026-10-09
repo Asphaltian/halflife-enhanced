@@ -316,7 +316,7 @@ public partial class Player : BaseMonster
 		HackedGunPos = new Vector3( 0f, 32f, 0f );
 
 		if ( PlayerSound == SoundEnt.ListEmpty )
-			Log.Info( "Couldn't alloc player sound slot!" );
+			Util.Alert( AlertType.Console, "Couldn't alloc player sound slot!" );
 
 		_noPlayerSound = false;
 
@@ -350,9 +350,9 @@ public partial class Player : BaseMonster
 		if ( graph.GraphPresent && !graph.GraphPointersSet )
 		{
 			if ( !graph.SetGraphPointers() )
-				Log.Info( "**Graph pointers were not set!" );
+				Util.Alert( AlertType.Console, "**Graph pointers were not set!" );
 			else
-				Log.Info( "**Graph Pointers Set!" );
+				Util.Alert( AlertType.Console, "**Graph Pointers Set!" );
 		}
 
 		GeigerRange = 1000f;
@@ -381,7 +381,7 @@ public partial class Player : BaseMonster
 
 		if ( !saveData.UseLandmark )
 		{
-			Log.Info( $"No Landmark:{saveData.LandmarkName}" );
+			Util.Alert( AlertType.Console, $"No Landmark:{saveData.LandmarkName}" );
 
 			var spot = EntSelectSpawnPoint();
 
@@ -1175,7 +1175,7 @@ public partial class Player : BaseMonster
 
 		if ( spot is null )
 		{
-			Log.Error( "PutClientInServer: no info_player_start on level" );
+			Util.Alert( AlertType.Error, "PutClientInServer: no info_player_start on level" );
 			return Server.GetEdict( 0 );
 		}
 

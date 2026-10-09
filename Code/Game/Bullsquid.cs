@@ -325,7 +325,7 @@ public class Bullsquid : BaseMonster
 				return true;
 		}
 
-		Util.AiAlert( "Couldn't validate hint type" );
+		Util.Alert( AlertType.AiConsole, "Couldn't validate hint type" );
 		return false;
 	}
 
@@ -617,7 +617,7 @@ public class Bullsquid : BaseMonster
 				}
 				else
 				{
-					Util.AiAlert( "GetPathToEnemy failed!!" );
+					Util.Alert( AlertType.AiConsole, "GetPathToEnemy failed!!" );
 					TaskFail();
 				}
 

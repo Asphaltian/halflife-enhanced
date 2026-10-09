@@ -697,7 +697,7 @@ partial class Player
 
 		if ( sound is null )
 		{
-			Log.Info( "Client lost reserved sound!" );
+			Util.Alert( AlertType.Console, "Client lost reserved sound!" );
 			return;
 		}
 

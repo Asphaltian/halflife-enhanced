@@ -81,7 +81,7 @@ public class BasePlayerItem : BaseAnimating
 				return ItemInfoArray[i].MaxAmmo2;
 		}
 
-		Log.Info( $"MaxAmmoCarry() doesn't recognize '{name}'!" );
+		Util.Alert( AlertType.Console, $"MaxAmmoCarry() doesn't recognize '{name}'!" );
 		return -1;
 	}
 
@@ -109,7 +109,7 @@ public class BasePlayerItem : BaseAnimating
 	{
 		if ( server.CreateNamedEntity( className ) is not BaseEntity entity )
 		{
-			Log.Info( "NULL Ent in UTIL_PrecacheOtherWeapon" );
+			Util.Alert( AlertType.Console, "NULL Ent in UTIL_PrecacheOtherWeapon" );
 			return;
 		}
 
@@ -323,7 +323,7 @@ public class BasePlayerItem : BaseAnimating
 		}
 		else
 		{
-			Log.Info( $"Respawn failed to create {ClassName}!" );
+			Util.Alert( AlertType.Console, $"Respawn failed to create {ClassName}!" );
 		}
 
 		return newWeapon;
@@ -1035,7 +1035,7 @@ public class WeaponBox : BaseEntity
 	{
 		if ( _ammoTypes >= BasePlayerItem.MaxAmmoSlots )
 		{
-			Log.Info( $"WeaponBox too full! only {BasePlayerItem.MaxAmmoSlots} ammotypes allowed" );
+			Util.Alert( AlertType.Console, $"WeaponBox too full! only {BasePlayerItem.MaxAmmoSlots} ammotypes allowed" );
 			return false;
 		}
 
@@ -1140,7 +1140,7 @@ public class WeaponBox : BaseEntity
 	{
 		if ( string.IsNullOrEmpty( name ) )
 		{
-			Log.Info( "NULL String in PackAmmo!" );
+			Util.Alert( AlertType.Console, "NULL String in PackAmmo!" );
 			return false;
 		}
 
@@ -1182,7 +1182,7 @@ public class WeaponBox : BaseEntity
 			return i;
 		}
 
-		Log.Info( "out of named ammo slots" );
+		Util.Alert( AlertType.Console, "out of named ammo slots" );
 		return i;
 	}
 

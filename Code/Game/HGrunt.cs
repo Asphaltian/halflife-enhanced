@@ -994,7 +994,7 @@ public class HGrunt : SquadMonster
 		}
 		else
 		{
-			Log.Info( $"{ClassName} has no sequence for act:{(int)activity}" );
+			Util.Alert( AlertType.Console, $"{ClassName} has no sequence for act:{(int)activity}" );
 			Sequence = 0;
 		}
 	}
@@ -1302,7 +1302,7 @@ public class DeadHGrunt : BaseMonster
 		Sequence = LookupSequence( Poses[_pose] );
 
 		if ( Sequence == -1 )
-			Log.Info( "Dead hgrunt with bad pose" );
+			Util.Alert( AlertType.Console, "Dead hgrunt with bad pose" );
 
 		Health = 8f;
 

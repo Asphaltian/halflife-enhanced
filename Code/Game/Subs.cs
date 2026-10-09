@@ -94,13 +94,13 @@ public class BaseDelay : BaseEntity
 		{
 			Edict found = null;
 
-			Util.AiAlert( $"KillTarget: {KillTarget}" );
+			Util.Alert( AlertType.AiConsole, $"KillTarget: {KillTarget}" );
 
 			while ( (found = Server.FindEntityByString( found, "targetname", KillTarget )) is not null )
 			{
 				(found as BaseEntity)?.Remove();
 
-				Util.AiAlert( $"killing {found.ClassName}" );
+				Util.Alert( AlertType.AiConsole, $"killing {found.ClassName}" );
 			}
 		}
 

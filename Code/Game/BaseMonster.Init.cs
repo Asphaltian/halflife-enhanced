@@ -129,7 +129,7 @@ partial class BaseMonster
 
 			if ( !Server.WalkMove( this, 0f, 0f, WalkMoveMode.Normal ) )
 			{
-				Log.Error( $"Monster {ClassName} stuck in wall--level design error" );
+				Util.Alert( AlertType.Error, $"Monster {ClassName} stuck in wall--level design error" );
 				Effects = Effects.BrightField;
 			}
 		}
@@ -144,7 +144,7 @@ partial class BaseMonster
 
 			if ( GoalEntity is null )
 			{
-				Log.Error( $"ReadyMonster()--{ClassName} couldn't find target {Target}" );
+				Util.Alert( AlertType.Error, $"ReadyMonster()--{ClassName} couldn't find target {Target}" );
 			}
 			else
 			{
@@ -154,7 +154,7 @@ partial class BaseMonster
 				MovementActivity = MoveType == MoveType.Fly ? Activity.Fly : Activity.Walk;
 
 				if ( !RefreshRoute() )
-					Util.AiAlert( "Can't Create Route!" );
+					Util.Alert( AlertType.AiConsole, "Can't Create Route!" );
 
 				SetState( MonsterState.Idle );
 				ChangeSchedule( GetScheduleOfType( ScheduleType.IdleWalk ) );
@@ -282,7 +282,7 @@ partial class BaseMonster
 		ViewOffset = eyePosition;
 
 		if ( MathLib.VectorCompare( ViewOffset, Vector3.Zero ) )
-			Util.AiAlert( $"{ClassName} has no view_ofs!" );
+			Util.Alert( AlertType.AiConsole, $"{ClassName} has no view_ofs!" );
 	}
 
 	public override void HandleAnimEvent( MonsterEvent monsterEvent )
@@ -354,7 +354,7 @@ partial class BaseMonster
 				break;
 
 			default:
-				Util.AiAlert( $"Unhandled animation event {monsterEvent.Event} for {ClassName}" );
+				Util.Alert( AlertType.AiConsole, $"Unhandled animation event {monsterEvent.Event} for {ClassName}" );
 				break;
 		}
 	}
@@ -373,7 +373,7 @@ partial class BaseMonster
 
 		if ( result == 0 )
 		{
-			Util.AiAlert( $"No Path from {sourceNode} to {destinationNode}!" );
+			Util.Alert( AlertType.AiConsole, $"No Path from {sourceNode} to {destinationNode}!" );
 			return false;
 		}
 
@@ -400,7 +400,7 @@ partial class BaseMonster
 
 		if ( !graph.GraphPresent )
 		{
-			Util.AiAlert( "find_hintnode: graph not ready!" );
+			Util.Alert( AlertType.AiConsole, "find_hintnode: graph not ready!" );
 			return Graph.NoNode;
 		}
 
@@ -637,20 +637,20 @@ partial class BaseMonster
 		if ( (SpawnFlags & SpawnFlagPreDisaster) != 0 )
 			report.Append( " Pre-Disaster! " );
 
-		Log.Info( report.ToString() );
+		Util.Alert( AlertType.Console, report.ToString() );
 	}
 
 	public BaseEntity DropItem( string itemName, Vector3 position, Vector3 angles )
 	{
 		if ( itemName is null )
 		{
-			Log.Info( "DropItem() - No item name!" );
+			Util.Alert( AlertType.Console, "DropItem() - No item name!" );
 			return null;
 		}
 
 		if ( Create( itemName, position, angles, this ) is not { } item )
 		{
-			Log.Info( "DropItem() - Didn't create!" );
+			Util.Alert( AlertType.Console, "DropItem() - Didn't create!" );
 			return null;
 		}
 

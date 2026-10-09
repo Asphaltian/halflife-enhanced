@@ -135,18 +135,18 @@ public class World : BaseEntity
 		}
 		else if ( !graph.LoadGraph( Server.Globals.MapName ) )
 		{
-			Log.Info( "*Error opening .NOD file" );
+			Util.Alert( AlertType.Console, "*Error opening .NOD file" );
 			graph.AllocNodes();
 		}
 		else
 		{
-			Log.Info( "\n*Graph Loaded!" );
+			Util.Alert( AlertType.Console, "\n*Graph Loaded!" );
 		}
 
 		Cvar.SetValue( "sv_zmax", Speed > 0f ? Speed : 4096f );
 
 		if ( !string.IsNullOrEmpty( NetName ) )
-			Util.AiAlert( $"Chapter title: {NetName}" );
+			Util.Alert( AlertType.AiConsole, $"Chapter title: {NetName}" );
 
 		if ( !string.IsNullOrEmpty( NetName ) && Create( "env_message", Vector3.Zero, Vector3.Zero, null ) is { } entity )
 		{
@@ -176,7 +176,7 @@ public class InfoDecal : BaseEntity
 		Skin = Server.DecalIndex( value );
 
 		if ( Skin < 0 )
-			Log.Info( $"Can't find decal {value}" );
+			Util.Alert( AlertType.Console, $"Can't find decal {value}" );
 
 		return Skin >= 0;
 	}

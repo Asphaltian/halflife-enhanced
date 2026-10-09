@@ -287,6 +287,10 @@ partial class Client
 					ConsolePrint( message.ReadString() );
 					break;
 
+				case Server.CenterPrintMessage:
+					CenterPrint( message.ReadString() );
+					break;
+
 				case Server.StuffTextMessage:
 					ParseStuffText( message );
 					break;

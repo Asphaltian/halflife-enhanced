@@ -61,14 +61,14 @@ public static class Sentences
 
 			if ( _allNames.Count > MaxSentences )
 			{
-				Log.Error( "Too many sentences in sentences.txt!" );
+				Util.Alert( AlertType.Error, "Too many sentences in sentences.txt!" );
 				break;
 			}
 
 			var name = line[i..j];
 
 			if ( name.Length >= MaxSentenceName )
-				Log.Warning( $"Sentence {name} longer than {MaxSentenceName - 1} letters" );
+				Util.Alert( AlertType.Warning, $"Sentence {name} longer than {MaxSentenceName - 1} letters" );
 
 			_allNames.Add( name );
 
@@ -92,7 +92,7 @@ public static class Sentences
 			{
 				if ( _groups.Count >= MaxGroups )
 				{
-					Log.Error( "Too many sentence groups in sentences.txt!" );
+					Util.Alert( AlertType.Error, "Too many sentence groups in sentences.txt!" );
 					break;
 				}
 
@@ -141,7 +141,7 @@ public static class Sentences
 
 		if ( group < 0 )
 		{
-			Log.Info( $"No such sentence group {groupName}" );
+			Util.Alert( AlertType.Console, $"No such sentence group {groupName}" );
 			return -1;
 		}
 
@@ -289,7 +289,7 @@ public static class Sound
 			if ( Sentences.Lookup( sample, out var name ) >= 0 )
 				entity.Server.EmitSound( entity, channel, name, volume, attenuation, flags, pitch );
 			else
-				Log.Info( $"Unable to find {sample} in sentences.txt" );
+				Util.Alert( AlertType.AiConsole, $"Unable to find {sample} in sentences.txt" );
 
 			return;
 		}
@@ -723,7 +723,7 @@ public class AmbientGeneric : BaseEntity
 
 		if ( string.IsNullOrEmpty( Message ) )
 		{
-			Log.Error( $"EMPTY AMBIENT AT: {Origin.x:F6}, {Origin.y:F6}, {Origin.z:F6}" );
+			Util.Alert( AlertType.Error, $"EMPTY AMBIENT AT: {Origin.x:F6}, {Origin.y:F6}, {Origin.z:F6}" );
 			NextThink = (float)(Server.Globals.Time + 0.1);
 			SetThink( SubRemove );
 			return;
@@ -1303,7 +1303,7 @@ public class Speaker : BaseEntity
 	{
 		if ( Preset == 0 && string.IsNullOrEmpty( Message ) )
 		{
-			Log.Error( $"SPEAKER with no Level/Sentence! at: {Origin.x:F6}, {Origin.y:F6}, {Origin.z:F6}" );
+			Util.Alert( AlertType.Error, $"SPEAKER with no Level/Sentence! at: {Origin.x:F6}, {Origin.y:F6}, {Origin.z:F6}" );
 			NextThink = (float)(Server.Globals.Time + 0.1);
 			SetThink( SubRemove );
 			return;
@@ -1350,7 +1350,7 @@ public class Speaker : BaseEntity
 		else
 		{
 			if ( Sentences.PlayRandom( this, soundFile, volume, attenuation, flags, pitch ) < 0 )
-				Log.Info( $"Level Design Error!\nSPEAKER has bad sentence group name: {soundFile}" );
+				Util.Alert( AlertType.Console, $"Level Design Error!\nSPEAKER has bad sentence group name: {soundFile}" );
 
 			NextThink = (float)(Server.Globals.Time + Server.RandomFloat( AnnounceMinutesMin * 60f, AnnounceMinutesMax * 60f ));
 

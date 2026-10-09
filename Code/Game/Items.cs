@@ -30,7 +30,7 @@ public class WorldItem : BaseEntity
 
 		if ( entity is null )
 		{
-			Log.Info( $"unable to create world_item {_type}" );
+			Util.Alert( AlertType.Console, $"unable to create world_item {_type}" );
 		}
 		else
 		{
@@ -61,7 +61,7 @@ public class Item : BaseEntity
 
 		if ( Server.DropToFloor( this ) == 0 )
 		{
-			Log.Error( $"Item {ClassName} fell out of level at {Origin.x:F6},{Origin.y:F6},{Origin.z:F6}" );
+			Util.Alert( AlertType.Error, $"Item {ClassName} fell out of level at {Origin.x:F6},{Origin.y:F6},{Origin.z:F6}" );
 			Remove();
 		}
 	}

@@ -229,7 +229,7 @@ public class Gauss : BasePlayerWeapon
 				pitch = 250;
 
 			if ( _soundState == 0 )
-				Log.Info( $"sound state {_soundState}" );
+				Util.Alert( AlertType.Console, $"sound state {_soundState}" );
 
 			PlaybackEvent( EventFlags.NotHost, Player, _gaussSpin, 0f, Vector3.Zero, Vector3.Zero, 0f, 0f, pitch, 0, _soundState == SoundChangePitch ? 1 : 0, 0 );
 

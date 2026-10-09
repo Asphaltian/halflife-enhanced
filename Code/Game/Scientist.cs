@@ -730,7 +730,7 @@ public class DeadScientist : BaseMonster
 		Sequence = LookupSequence( Poses[_pose] );
 
 		if ( Sequence == -1 )
-			Log.Info( "Dead scientist with bad pose" );
+			Util.Alert( AlertType.Console, "Dead scientist with bad pose" );
 
 		MonsterInitDead();
 	}

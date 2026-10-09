@@ -79,7 +79,7 @@ public static class Animation
 	{
 		if ( model is null )
 		{
-			Log.Info( "GetEyePosition() Can't get pstudiohdr ptr!" );
+			Util.Alert( AlertType.Console, "GetEyePosition() Can't get pstudiohdr ptr!" );
 			return;
 		}
 
@@ -115,7 +115,7 @@ public static class Animation
 				continue;
 
 			if ( sequenceEvent.Options.Length == 0 )
-				Log.Error( $"Bad sound event {sequenceEvent.Index} in sequence {model.Header.Name} :: {sequenceName} (sound is \"{sequenceEvent.Options}\")" );
+				Util.Alert( AlertType.Error, $"Bad sound event {sequenceEvent.Index} in sequence {model.Header.Name} :: {sequenceName} (sound is \"{sequenceEvent.Options}\")" );
 
 			server.PrecacheSound( Server.AllocString( sequenceEvent.Options ) );
 		}
@@ -311,7 +311,7 @@ public static class Animation
 			}
 		}
 
-		Log.Info( "error in transition graph" );
+		Util.Alert( AlertType.Console, "error in transition graph" );
 		return goalAnim;
 	}
 

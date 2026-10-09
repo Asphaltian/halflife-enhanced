@@ -100,7 +100,7 @@ public class SoundEnt : BaseEntity
 
 		if ( _showReport )
 		{
-			Log.Info( $"Soundlist: {SoundsInList( ListTypeActive )} / {SoundsInList( ListTypeFree )}  ({SoundsInList( ListTypeActive ) - _lastActiveSounds})" );
+			Util.Alert( AlertType.AiConsole, $"Soundlist: {SoundsInList( ListTypeActive )} / {SoundsInList( ListTypeFree )}  ({SoundsInList( ListTypeActive ) - _lastActiveSounds})" );
 			_lastActiveSounds = SoundsInList( ListTypeActive );
 		}
 	}
@@ -123,7 +123,7 @@ public class SoundEnt : BaseEntity
 	{
 		if ( _freeSound == ListEmpty )
 		{
-			Log.Info( "Free Sound List is full!" );
+			Util.Alert( AlertType.Console, "Free Sound List is full!" );
 			return ListEmpty;
 		}
 
@@ -145,7 +145,7 @@ public class SoundEnt : BaseEntity
 
 		if ( sound == ListEmpty )
 		{
-			Log.Info( "Could not AllocSound() for InsertSound() (DLL)" );
+			Util.Alert( AlertType.Console, "Could not AllocSound() for InsertSound() (DLL)" );
 			return;
 		}
 
@@ -175,7 +175,7 @@ public class SoundEnt : BaseEntity
 
 			if ( sound == ListEmpty )
 			{
-				Log.Info( "Could not AllocSound() for Client Reserve! (DLL)" );
+				Util.Alert( AlertType.Console, "Could not AllocSound() for Client Reserve! (DLL)" );
 				return;
 			}
 
@@ -199,7 +199,7 @@ public class SoundEnt : BaseEntity
 		}
 		else
 		{
-			Log.Info( "Unknown Sound List Type!" );
+			Util.Alert( AlertType.Console, "Unknown Sound List Type!" );
 			return 0;
 		}
 
@@ -222,13 +222,13 @@ public class SoundEnt : BaseEntity
 
 		if ( index > MaxWorldSounds - 1 )
 		{
-			Log.Info( "SoundPointerForIndex() - Index too large!" );
+			Util.Alert( AlertType.Console, "SoundPointerForIndex() - Index too large!" );
 			return null;
 		}
 
 		if ( index < 0 )
 		{
-			Log.Info( "SoundPointerForIndex() - Index < 0!" );
+			Util.Alert( AlertType.Console, "SoundPointerForIndex() - Index < 0!" );
 			return null;
 		}
 

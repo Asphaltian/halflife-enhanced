@@ -208,6 +208,9 @@ partial class PlayerMove
 				endLocal = RotateInto( physEnt.Angles, endLocal );
 			}
 
+			if ( i > 0 && physEnt.Model is { } model && hull == model.Hulls[0] && SegmentOutside( startLocal, endLocal, model.Mins, model.Maxs ) )
+				continue;
+
 			var total = new PmTrace { AllSolid = true, Fraction = 1f, EndPos = end };
 
 			if ( numHulls < 1 )
@@ -304,6 +307,13 @@ partial class PlayerMove
 		offset = physEnt.Origin;
 
 		return _boxHull;
+	}
+
+	private static bool SegmentOutside( Vector3 start, Vector3 end, Vector3 mins, Vector3 maxs )
+	{
+		return (start.x < mins.x && end.x < mins.x) || (start.x > maxs.x && end.x > maxs.x)
+			|| (start.y < mins.y && end.y < mins.y) || (start.y > maxs.y && end.y > maxs.y)
+			|| (start.z < mins.z && end.z < mins.z) || (start.z > maxs.z && end.z > maxs.z);
 	}
 
 	private static bool HasAngles( PhysEnt physEnt )

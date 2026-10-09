@@ -406,15 +406,20 @@ public sealed partial class ClientEntity : Component
 			_renderer.Attributes.Set( "TurbMins", angles.x == 0f && angles.y == 0f && angles.z == 0f ? WorldPosition.z + brush.Mins.z : WorldPosition.z - brush.Radius );
 		}
 
+		var drawn = true;
+
 		if ( studio is not null && deadPlayer )
-			StudioDrawDeadPlayer( studio, model == client.GetModelByIndex( ModelIndex ), (SkinnedModelRenderer)_renderer, playerIndex );
+			drawn = StudioDrawDeadPlayer( studio, model == client.GetModelByIndex( ModelIndex ), (SkinnedModelRenderer)_renderer, playerIndex );
 		else if ( studio is not null && player )
-			StudioDrawPlayer( studio, model == client.GetModelByIndex( ModelIndex ), (SkinnedModelRenderer)_renderer, playerIndex, ref client.CurrentFrame.PlayerState[playerIndex], Client.StudioInterpolation, Origin, Angles );
+			drawn = StudioDrawPlayer( studio, model == client.GetModelByIndex( ModelIndex ), (SkinnedModelRenderer)_renderer, playerIndex, ref client.CurrentFrame.PlayerState[playerIndex], Client.StudioInterpolation, Origin, Angles );
 		else if ( studio is not null )
-			StudioDrawModel( studio, (SkinnedModelRenderer)_renderer );
+			drawn = StudioDrawModel( studio, (SkinnedModelRenderer)_renderer );
 
 		if ( _renderer.SceneObject is not { } sceneObject )
 			return;
+
+		if ( studio is not null )
+			sceneObject.RenderingEnabled = drawn;
 
 		var translucent = RenderMode is RenderMode.TransColor or RenderMode.TransTexture or RenderMode.Glow or RenderMode.TransAdd;
 
@@ -423,12 +428,18 @@ public sealed partial class ClientEntity : Component
 		sceneObject.Flags.WantsPrePass = !translucent;
 	}
 
-	private void StudioDrawModel( Studio.File header, SkinnedModelRenderer renderer )
+	private bool StudioDrawModel( Studio.File header, SkinnedModelRenderer renderer )
 	{
 		var client = Client.Current;
 		var time = client.ClientTime;
+		var position = WorldPosition;
 
-		var light = Client.Current.StudioDynamicLight( (Effects)CurState.Effects, RenderFx, CurState.IUser4, CurState.MoveType == (int)MoveType.Step ? Origin : WorldPosition, header.Header.Flags );
+		StudioSetUpTransform( time, position, _renderAngles, Client.StudioInterpolation );
+
+		if ( !client.StudioCheckBBox( header, ref CurState, Origin, WorldTransform ) )
+			return false;
+
+		var light = Client.Current.StudioDynamicLight( (Effects)CurState.Effects, RenderFx, CurState.IUser4, CurState.MoveType == (int)MoveType.Step ? Origin : position, header.Header.Flags );
 
 		if ( light.FloorColor is { } floorColor )
 			FloorColor = floorColor;
@@ -439,9 +450,7 @@ public sealed partial class ClientEntity : Component
 		renderer.Attributes.Set( "LightVector", light.LightVector );
 		renderer.Attributes.Set( "LightColor", light.Color );
 
-		Client.Current.StudioEntityLight( Index, WorldPosition, _attachments, renderer.Attributes );
-
-		StudioSetUpTransform( time, WorldPosition, _renderAngles, Client.StudioInterpolation );
+		Client.Current.StudioEntityLight( Index, position, _attachments, renderer.Attributes );
 
 		var bones = client.BoneSetup;
 
@@ -456,6 +465,8 @@ public sealed partial class ClientEntity : Component
 		Client.Current.StudioClientEvents( header, CurState, _latched, ref effects, _attachments );
 
 		PacketEffects = effects;
+
+		return true;
 	}
 
 	private void StudioSetBody( Studio.File header, SkinnedModelRenderer renderer )

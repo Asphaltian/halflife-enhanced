@@ -435,7 +435,7 @@ public class BigMomma : BaseMonster
 		{
 			Health = damage + 1f;
 			Remember( MemoryAdvanceNode | MemoryCompletedNode );
-			Util.AiAlert( "BM: Finished node health!!!" );
+			Util.Alert( AlertType.AiConsole, "BM: Finished node health!!!" );
 		}
 
 		return base.TakeDamage( inflictor, attacker, damage, damageType );
@@ -551,7 +551,7 @@ public class BigMomma : BaseMonster
 
 		if ( target is null )
 		{
-			Util.AiAlert( "BM: Finished the path!!" );
+			Util.Alert( AlertType.AiConsole, "BM: Finished the path!!" );
 			Remember( MemoryPathFinished );
 			return;
 		}
@@ -633,17 +633,17 @@ public class BigMomma : BaseMonster
 
 				NodeStart( NetName );
 				TaskComplete();
-				Util.AiAlert( $"BM: Found node {NetName}" );
+				Util.Alert( AlertType.AiConsole, $"BM: Found node {NetName}" );
 				break;
 
 			case BigMommaTask.NodeDelay:
 				_nodeTime = Server.Globals.Time + task.Data;
 				TaskComplete();
-				Util.AiAlert( $"BM: FAIL! Delay {task.Data:F2}" );
+				Util.Alert( AlertType.AiConsole, $"BM: FAIL! Delay {task.Data:F2}" );
 				break;
 
 			case BigMommaTask.ProcessNode:
-				Util.AiAlert( $"BM: Reached node {NetName}" );
+				Util.Alert( AlertType.AiConsole, $"BM: Reached node {NetName}" );
 				NodeReach();
 				TaskComplete();
 				break;
@@ -653,7 +653,7 @@ public class BigMomma : BaseMonster
 			{
 				var sequenceName = task.Id == BigMommaTask.PlayNodeSequence ? NodeSequence : NodePresequence;
 
-				Util.AiAlert( $"BM: Playing node sequence {sequenceName}" );
+				Util.Alert( AlertType.AiConsole, $"BM: Playing node sequence {sequenceName}" );
 
 				if ( !string.IsNullOrEmpty( sequenceName ) )
 				{
@@ -664,7 +664,7 @@ public class BigMomma : BaseMonster
 						Sequence = sequence;
 						Frame = 0f;
 						ResetSequenceInfo();
-						Util.AiAlert( $"BM: Sequence {NodeSequence}" );
+						Util.Alert( AlertType.AiConsole, $"BM: Sequence {NodeSequence}" );
 						return;
 					}
 				}
@@ -682,9 +682,9 @@ public class BigMomma : BaseMonster
 				Wait = Server.Globals.Time + NodeDelay;
 
 				if ( (TargetEntity.SpawnFlags & InfoBigMomma.SpawnFlagWait) != 0 )
-					Util.AiAlert( $"BM: Wait at node {NetName} forever" );
+					Util.Alert( AlertType.AiConsole, $"BM: Wait at node {NetName} forever" );
 				else
-					Util.AiAlert( $"BM: Wait at node {NetName} for {NodeDelay:F2}" );
+					Util.Alert( AlertType.AiConsole, $"BM: Wait at node {NetName} for {NodeDelay:F2}" );
 
 				break;
 
@@ -707,7 +707,7 @@ public class BigMomma : BaseMonster
 						TaskFail();
 				}
 
-				Util.AiAlert( $"BM: Moving to node {NetName}" );
+				Util.Alert( AlertType.AiConsole, $"BM: Moving to node {NetName}" );
 				break;
 
 			case TaskId.MeleeAttack1:
@@ -732,7 +732,7 @@ public class BigMomma : BaseMonster
 				}
 				else if ( MathLib.Length2D( MoveGoal - Origin ) < NodeRange || MovementIsComplete )
 				{
-					Util.AiAlert( "BM: Reached node!" );
+					Util.Alert( AlertType.AiConsole, "BM: Reached node!" );
 					TaskComplete();
 					RouteClear();
 				}
@@ -746,7 +746,7 @@ public class BigMomma : BaseMonster
 				if ( Server.Globals.Time > WaitFinished )
 					TaskComplete();
 
-				Util.AiAlert( "BM: The WAIT is over!" );
+				Util.Alert( AlertType.AiConsole, "BM: The WAIT is over!" );
 				break;
 
 			case BigMommaTask.PlayNodePresequence:

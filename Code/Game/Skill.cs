@@ -100,7 +100,7 @@ public sealed class SkillData
 		var value = Cvar.GetFloat( cvar );
 
 		if ( value <= 0f )
-			Log.Info( $"\n\n** GetSkillCVar Got a zero for {cvar} **\n\n" );
+			Util.Alert( AlertType.Console, $"\n\n** GetSkillCVar Got a zero for {cvar} **\n\n" );
 
 		return value;
 	}

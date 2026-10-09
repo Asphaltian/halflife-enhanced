@@ -401,7 +401,7 @@ public sealed partial class HalfLifeDll : GameDll
 				if ( Sandbox.Game.CheatsEnabled && Cmd.Argc > 1 )
 					player.FieldOfViewSetting = Util.Atoi( Cmd.Argv( 1 ) );
 				else
-					Log.Info( $"\"fov\" is \"{player.FieldOfViewSetting}\"" );
+					player.Server.ClientPrintf( player, PrintType.Console, $"\"fov\" is \"{player.FieldOfViewSetting}\"\n" );
 
 				return;
 
@@ -759,7 +759,7 @@ public sealed partial class HalfLifeDll : GameDll
 			if ( edict is BaseEntity entity && (entity.EntityFlags & EntityFlags.Dormant) != EntityFlags.Dormant )
 				entity.Activate();
 			else
-				Log.Info( $"Can't instance {edict.ClassName}" );
+				Util.Alert( AlertType.Console, $"Can't instance {edict.ClassName}" );
 		}
 
 		UserMessages.Link();

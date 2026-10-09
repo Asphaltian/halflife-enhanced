@@ -141,7 +141,7 @@ public class CineMonster : BaseMonster
 					return true;
 				}
 
-				Log.Info( $"Found {Entity}, but can't play!" );
+				Util.Alert( AlertType.Console, $"Found {Entity}, but can't play!" );
 			}
 
 			target = Util.FindEntityByTargetname( target, Entity );
@@ -234,12 +234,12 @@ public class CineMonster : BaseMonster
 		if ( FindEntity() )
 		{
 			PossessEntity();
-			Util.AiAlert( $"script \"{TargetName}\" using monster \"{Entity}\"" );
+			Util.Alert( AlertType.AiConsole, $"script \"{TargetName}\" using monster \"{Entity}\"" );
 		}
 		else
 		{
 			CancelScript();
-			Util.AiAlert( $"script \"{TargetName}\" can't find monster \"{Entity}\"" );
+			Util.Alert( AlertType.AiConsole, $"script \"{TargetName}\" can't find monster \"{Entity}\"" );
 			NextThink = (float)(Server.Globals.Time + 1.0);
 		}
 	}
@@ -250,7 +250,7 @@ public class CineMonster : BaseMonster
 
 		if ( target.Sequence == -1 )
 		{
-			Log.Error( $"{target.TargetName}: unknown {kind} sequence \"{sequence}\"" );
+			Util.Alert( AlertType.Error, $"{target.TargetName}: unknown {kind} sequence \"{sequence}\"" );
 			target.Sequence = 0;
 		}
 
@@ -320,7 +320,7 @@ public class CineMonster : BaseMonster
 
 	public void CancelScript()
 	{
-		Util.AiAlert( $"Cancelling script: {Play}" );
+		Util.Alert( AlertType.AiConsole, $"Cancelling script: {Play}" );
 
 		if ( string.IsNullOrEmpty( TargetName ) )
 		{
@@ -408,7 +408,7 @@ public class CineAi : CineMonster
 
 		if ( !target.CanPlaySequence( CanOverrideState, InterruptAi ) )
 		{
-			Util.AiAlert( $"(AI)Can't possess entity {target.ClassName}" );
+			Util.Alert( AlertType.AiConsole, $"(AI)Can't possess entity {target.ClassName}" );
 			return;
 		}
 
@@ -431,11 +431,11 @@ public class CineAi : CineMonster
 				target.EntityFlags &= ~EntityFlags.OnGround;
 				break;
 			default:
-				Util.AiAlert( "aiscript:  invalid Move To Position value!" );
+				Util.Alert( AlertType.AiConsole, "aiscript:  invalid Move To Position value!" );
 				break;
 		}
 
-		Util.AiAlert( $"\"{target.TargetName}\" found and used" );
+		Util.Alert( AlertType.AiConsole, $"\"{target.TargetName}\" found and used" );
 
 		target.IdealMonsterState = MonsterState.Script;
 
@@ -467,7 +467,7 @@ public class CineAi : CineMonster
 				monster.ChangeSchedule( monster.GetScheduleOfType( ScheduleType.Ambush ) );
 				break;
 			default:
-				Util.AiAlert( "FixScriptMonsterSchedule - no case!" );
+				Util.Alert( AlertType.AiConsole, "FixScriptMonsterSchedule - no case!" );
 				monster.ClearSchedule();
 				break;
 		}
@@ -765,7 +765,7 @@ public class ScriptedSentence : BaseToggle
 
 		target.PlayScriptedSentence( _sentence, _duration, _volume, _attenuation, concurrent, listener );
 
-		Util.AiAlert( $"Playing sentence {_sentence} ({_duration:F1})" );
+		Util.Alert( AlertType.AiConsole, $"Playing sentence {_sentence} ({_duration:F1})" );
 
 		UseTargets( null, UseType.Toggle, 0f );
 	}

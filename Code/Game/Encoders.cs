@@ -47,17 +47,14 @@ public static class Encoders
 				_entityInitialized = true;
 			}
 
-			var f = EntityState.Read( from );
-			var t = EntityState.Read( to );
-
-			if ( t.Number - 1 == Server.Current.CurrentPlayer )
+			if ( StructImage.ReadInt( to, EntityState.NumberOffset ) - 1 == Server.Current.CurrentPlayer )
 			{
 				fields.UnsetFieldByIndex( EntityFields[FieldOrigin0] );
 				fields.UnsetFieldByIndex( EntityFields[FieldOrigin1] );
 				fields.UnsetFieldByIndex( EntityFields[FieldOrigin2] );
 			}
 
-			if ( t.ImpactTime != 0f && t.StartTime != 0f )
+			if ( StructImage.ReadFloat( to, EntityState.ImpactTimeOffset ) != 0f && StructImage.ReadFloat( to, EntityState.StartTimeOffset ) != 0f )
 			{
 				fields.UnsetFieldByIndex( EntityFields[FieldOrigin0] );
 				fields.UnsetFieldByIndex( EntityFields[FieldOrigin1] );
@@ -68,13 +65,15 @@ public static class Encoders
 				fields.UnsetFieldByIndex( EntityFields[FieldAngles2] );
 			}
 
-			if ( t.MoveType == (int)MoveType.Follow && t.AimEnt != 0 )
+			var aimEnt = StructImage.ReadInt( to, EntityState.AimEntOffset );
+
+			if ( StructImage.ReadInt( to, EntityState.MoveTypeOffset ) == (int)MoveType.Follow && aimEnt != 0 )
 			{
 				fields.UnsetFieldByIndex( EntityFields[FieldOrigin0] );
 				fields.UnsetFieldByIndex( EntityFields[FieldOrigin1] );
 				fields.UnsetFieldByIndex( EntityFields[FieldOrigin2] );
 			}
-			else if ( t.AimEnt != f.AimEnt )
+			else if ( aimEnt != StructImage.ReadInt( from, EntityState.AimEntOffset ) )
 			{
 				fields.SetFieldByIndex( EntityFields[FieldOrigin0] );
 				fields.SetFieldByIndex( EntityFields[FieldOrigin1] );
@@ -93,23 +92,22 @@ public static class Encoders
 				_playerInitialized = true;
 			}
 
-			var f = EntityState.Read( from );
-			var t = EntityState.Read( to );
-
-			if ( t.Number - 1 == Server.Current.CurrentPlayer )
+			if ( StructImage.ReadInt( to, EntityState.NumberOffset ) - 1 == Server.Current.CurrentPlayer )
 			{
 				fields.UnsetFieldByIndex( EntityFields[FieldOrigin0] );
 				fields.UnsetFieldByIndex( EntityFields[FieldOrigin1] );
 				fields.UnsetFieldByIndex( EntityFields[FieldOrigin2] );
 			}
 
-			if ( t.MoveType == (int)MoveType.Follow && t.AimEnt != 0 )
+			var aimEnt = StructImage.ReadInt( to, EntityState.AimEntOffset );
+
+			if ( StructImage.ReadInt( to, EntityState.MoveTypeOffset ) == (int)MoveType.Follow && aimEnt != 0 )
 			{
 				fields.UnsetFieldByIndex( EntityFields[FieldOrigin0] );
 				fields.UnsetFieldByIndex( EntityFields[FieldOrigin1] );
 				fields.UnsetFieldByIndex( EntityFields[FieldOrigin2] );
 			}
-			else if ( t.AimEnt != f.AimEnt )
+			else if ( aimEnt != StructImage.ReadInt( from, EntityState.AimEntOffset ) )
 			{
 				fields.SetFieldByIndex( EntityFields[FieldOrigin0] );
 				fields.SetFieldByIndex( EntityFields[FieldOrigin1] );
@@ -128,10 +126,7 @@ public static class Encoders
 				_customInitialized = true;
 			}
 
-			var f = EntityState.Read( from );
-			var t = EntityState.Read( to );
-
-			var beamType = t.RenderMode & 0x0F;
+			var beamType = StructImage.ReadInt( to, EntityState.RenderModeOffset ) & 0x0F;
 
 			if ( beamType != BeamPoints && beamType != BeamEntPoint )
 			{
@@ -153,7 +148,7 @@ public static class Encoders
 				fields.UnsetFieldByIndex( CustomFields[CustomFieldSequence] );
 			}
 
-			if ( (int)f.AnimTime == (int)t.AnimTime )
+			if ( (int)StructImage.ReadFloat( from, EntityState.AnimTimeOffset ) == (int)StructImage.ReadFloat( to, EntityState.AnimTimeOffset ) )
 				fields.UnsetFieldByIndex( CustomFields[CustomFieldAnimTime] );
 		}
 	}

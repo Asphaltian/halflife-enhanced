@@ -364,7 +364,7 @@ partial class ClientEntity
 			playerInfo.GaitFrame += sequence.NumFrames;
 	}
 
-	private void StudioDrawDeadPlayer( Studio.File header, bool entityModel, SkinnedModelRenderer renderer, int playerIndex )
+	private bool StudioDrawDeadPlayer( Studio.File header, bool entityModel, SkinnedModelRenderer renderer, int playerIndex )
 	{
 		var deadPlayer = Client.Current.CurrentFrame.PlayerState[playerIndex];
 
@@ -375,10 +375,10 @@ partial class ClientEntity
 		deadPlayer.Angles = CurState.Angles;
 		deadPlayer.Origin = CurState.Origin;
 
-		StudioDrawPlayer( header, entityModel, renderer, playerIndex, ref deadPlayer, false, WorldPosition, _renderAngles );
+		return StudioDrawPlayer( header, entityModel, renderer, playerIndex, ref deadPlayer, false, WorldPosition, _renderAngles );
 	}
 
-	private void StudioDrawPlayer( Studio.File header, bool entityModel, SkinnedModelRenderer renderer, int playerIndex, ref EntityState playerState, bool doInterp, Vector3 basePosition, Vector3 baseAngles )
+	private bool StudioDrawPlayer( Studio.File header, bool entityModel, SkinnedModelRenderer renderer, int playerIndex, ref EntityState playerState, bool doInterp, Vector3 basePosition, Vector3 baseAngles )
 	{
 		var client = Client.Current;
 		var time = client.ClientTime;
@@ -413,6 +413,14 @@ partial class ClientEntity
 		if ( doInterp )
 			_renderAngles = Angles;
 
+		if ( !client.StudioCheckBBox( header, ref CurState, Origin, WorldTransform ) )
+		{
+			if ( _weaponRenderer is not null )
+				_weaponRenderer.Enabled = false;
+
+			return false;
+		}
+
 		var bones = client.BoneSetup;
 
 		bones.SetupBones( header, ref CurState, ref _latched, time, doInterp, MouthOpen, playerInfo );
@@ -445,6 +453,8 @@ partial class ClientEntity
 		StudioSetupLighting( client, renderer, light );
 
 		StudioDrawWeapon( client, client.GetModelByIndex( playerState.WeaponModel ) as StudioModel, light, time );
+
+		return true;
 	}
 
 	private void StudioSetupLighting( Client client, SkinnedModelRenderer renderer, in StudioLight light )

@@ -503,7 +503,7 @@ public class Nihilanth : BaseMonster
 			else
 			{
 				_recharger = null;
-				Util.AiAlert( $"nihilanth can't find {name}" );
+				Util.Alert( AlertType.AiConsole, $"nihilanth can't find {name}" );
 				_level++;
 
 				if ( _level > 9 )
@@ -524,7 +524,7 @@ public class Nihilanth : BaseMonster
 
 					FireTargets( text, this, this, UseType.On, 1f );
 
-					Log.Info( $"fireing {text}" );
+					Util.Alert( AlertType.Console, $"fireing {text}" );
 				}
 
 				Sequence = LookupSequence( "recharge" );
@@ -790,7 +790,7 @@ public class Nihilanth : BaseMonster
 
 					Sound.Emit( this, SoundChannel.Weapon, RandomSound( BallSounds ), 1f, 0.2f );
 
-					Util.AiAlert( $"nihilanth can't target {triggerName}" );
+					Util.Alert( AlertType.AiConsole, $"nihilanth can't target {triggerName}" );
 
 					HandLights();
 

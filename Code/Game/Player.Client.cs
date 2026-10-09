@@ -370,7 +370,7 @@ partial class Player
 				if ( !HalfLifeDll.PrecacheGrunt )
 				{
 					HalfLifeDll.PrecacheGrunt = true;
-					Log.Info( "You must now restart to use Grunt-o-matic." );
+					Util.Alert( AlertType.Console, "You must now restart to use Grunt-o-matic." );
 				}
 				else
 				{
@@ -426,12 +426,12 @@ partial class Player
 			case 105:
 				if ( _noPlayerSound )
 				{
-					Log.Info( "Player is audible" );
+					Util.Alert( AlertType.Console, "Player is audible" );
 					_noPlayerSound = false;
 				}
 				else
 				{
-					Log.Info( "Player is silent" );
+					Util.Alert( AlertType.Console, "Player is silent" );
 					_noPlayerSound = true;
 				}
 
@@ -442,11 +442,11 @@ partial class Player
 
 				if ( entity is not null )
 				{
-					Log.Info( $"Classname: {entity.ClassName}" + (string.IsNullOrEmpty( entity.TargetName ) ? " - TargetName: No Targetname" : $" - Targetname: {entity.TargetName}") );
-					Log.Info( $"Model: {entity.ModelName}" );
+					Util.Alert( AlertType.Console, $"Classname: {entity.ClassName}" + (string.IsNullOrEmpty( entity.TargetName ) ? " - TargetName: No Targetname" : $" - Targetname: {entity.TargetName}") );
+					Util.Alert( AlertType.Console, $"Model: {entity.ModelName}" );
 
 					if ( !string.IsNullOrEmpty( entity.GlobalName ) )
-						Log.Info( $"Globalname: {entity.GlobalName}" );
+						Util.Alert( AlertType.Console, $"Globalname: {entity.GlobalName}" );
 				}
 
 				break;
@@ -457,7 +457,7 @@ partial class Player
 				var textureTrace = Util.TraceLine( start, end, IgnoreMonsters, this );
 
 				if ( Server.TraceTexture( textureTrace.Ent ?? Server.GetEdict( 0 ), start, end ) is { } textureName )
-					Log.Info( $"Texture: {textureName}" );
+					Util.Alert( AlertType.Console, $"Texture: {textureName}" );
 
 				break;
 
@@ -474,7 +474,7 @@ partial class Player
 				break;
 
 			case 199:
-				Log.Info( $"{HalfLifeDll.WorldGraph.FindNearestNode( Origin, GraphNode.GroupRealm )}" );
+				Util.Alert( AlertType.Console, $"{HalfLifeDll.WorldGraph.FindNearestNode( Origin, GraphNode.GroupRealm )}" );
 				HalfLifeDll.WorldGraph.ShowNodeConnections( HalfLifeDll.WorldGraph.FindNearestNode( Origin, GraphNode.GroupRealm ) );
 				break;
 
@@ -895,7 +895,7 @@ public class DeadHev : BaseMonster
 
 		if ( Sequence == -1 )
 		{
-			Log.Info( "Dead hevsuit with bad pose" );
+			Util.Alert( AlertType.Console, "Dead hevsuit with bad pose" );
 			Sequence = 0;
 			Effects = Effects.BrightField;
 		}

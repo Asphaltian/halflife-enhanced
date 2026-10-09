@@ -2,11 +2,85 @@ using System;
 
 namespace GoldSrc;
 
+public enum AlertType
+{
+	Notice,
+	Console,
+	AiConsole,
+	Warning,
+	Error,
+	Logged
+}
+
+public enum PrintType
+{
+	Console,
+	Center,
+	Chat
+}
+
 partial class Server
 {
 	public const int SetViewMessage = 5;
 	public const int ParticleMessage = 18;
 	public const int CrosshairAngleMessage = 47;
+
+	public void AlertMessage( AlertType type, string message )
+	{
+		if ( type == AlertType.Logged && MaxClients > 1 )
+		{
+			LogPrintf( message );
+			return;
+		}
+
+		if ( Host.Developer == 0f )
+			return;
+
+		if ( type == AlertType.AiConsole && Host.Developer < 2f )
+			return;
+
+		Log.Info( type switch
+		{
+			AlertType.Notice => $"NOTE:  {message}",
+			AlertType.Warning => $"WARNING:  {message}",
+			AlertType.Error => $"ERROR:  {message}",
+			_ => message
+		} );
+	}
+
+	public void ClientPrintf( Edict edict, PrintType type, string message )
+	{
+		var index = edict.Index;
+
+		if ( index < 1 || index > MaxClients )
+		{
+			Log.Info( "tried to sprint to a non-client\n" );
+			return;
+		}
+
+		var client = _clients[index - 1];
+
+		if ( client.FakeClient )
+			return;
+
+		switch ( type )
+		{
+			case PrintType.Console:
+			case PrintType.Chat:
+				client.Message.WriteByte( PrintMessage );
+				client.Message.WriteString( message );
+				break;
+
+			case PrintType.Center:
+				client.Message.WriteByte( CenterPrintMessage );
+				client.Message.WriteString( message );
+				break;
+
+			default:
+				Log.Info( $"invalid PRINT_TYPE {(int)type}\n" );
+				break;
+		}
+	}
 
 	public int DropToFloor( Edict edict )
 	{

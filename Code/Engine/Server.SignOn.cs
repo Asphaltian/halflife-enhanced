@@ -9,6 +9,7 @@ partial class Server
 	public const int ServerInfoMessage = 11;
 	public const int LightStyleMessage = 12;
 	public const int SignOnNumMessage = 25;
+	public const int CenterPrintMessage = 26;
 	public const int RestoreMessage = 33;
 	public const int NewUserMsgMessage = 39;
 	public const int VoiceInitMessage = 52;

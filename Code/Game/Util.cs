@@ -207,7 +207,7 @@ public static class Util
 
 	public static bool IsNullEnt( Edict edict ) => edict is null || edict.Index == 0;
 
-	public static void AiAlert( string message ) => Log.Trace( message );
+	public static void Alert( AlertType type, string message ) => Server.AlertMessage( type, message );
 
 	public static int SharedRandomLong( uint seed, int low, int high )
 	{
@@ -486,7 +486,7 @@ public static class Util
 	{
 		if ( Server.CreateNamedEntity( className ) is not BaseEntity entity )
 		{
-			Log.Info( "NULL Ent in UTIL_PrecacheOther" );
+			Util.Alert( AlertType.Console, "NULL Ent in UTIL_PrecacheOther" );
 			return;
 		}
 

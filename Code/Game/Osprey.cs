@@ -145,7 +145,7 @@ public class Osprey : BaseMonster
 
 		if ( _units == 0 )
 		{
-			Log.Info( "osprey error: no grunts to resupply" );
+			Util.Alert( AlertType.Console, "osprey error: no grunts to resupply" );
 			Remove();
 			return;
 		}
@@ -254,7 +254,7 @@ public class Osprey : BaseMonster
 	{
 		if ( _goal is null )
 		{
-			Log.Info( "osprey missing target" );
+			Util.Alert( AlertType.Console, "osprey missing target" );
 			return;
 		}
 

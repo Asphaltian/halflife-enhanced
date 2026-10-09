@@ -308,7 +308,7 @@ public partial class BaseEntity : Edict
 	{
 		if ( Server.CreateNamedEntity( className ) is not BaseEntity entity )
 		{
-			Log.Info( "NULL Ent in Create!" );
+			Util.Alert( AlertType.Console, "NULL Ent in Create!" );
 			return null;
 		}
 
@@ -335,7 +335,7 @@ public partial class BaseEntity : Edict
 		if ( Health > 0f )
 		{
 			Health = 0f;
-			Util.AiAlert( "SUB_Remove called on entity with health > 0" );
+			Util.Alert( AlertType.AiConsole, "SUB_Remove called on entity with health > 0" );
 		}
 
 		Server.FreeEdict( this );
@@ -360,7 +360,7 @@ public partial class BaseEntity : Edict
 		if ( targetName is null )
 			return;
 
-		Util.AiAlert( $"Firing: ({targetName})" );
+		Util.Alert( AlertType.AiConsole, $"Firing: ({targetName})" );
 
 		Edict found = null;
 
@@ -368,7 +368,7 @@ public partial class BaseEntity : Edict
 		{
 			if ( found is BaseEntity target && (target.EntityFlags & EntityFlags.KillMe) != EntityFlags.KillMe )
 			{
-				Util.AiAlert( $"Found: {target.ClassName}, firing ({targetName})" );
+				Util.Alert( AlertType.AiConsole, $"Found: {target.ClassName}, firing ({targetName})" );
 				target.Use( activator, caller, useType, value );
 			}
 		}
@@ -382,7 +382,7 @@ public partial class BaseEntity : Edict
 		if ( Server.FindEntityByString( null, "targetname", master ) is BaseEntity entity && (entity.ObjectCaps & ObjectCaps.Master) == ObjectCaps.Master )
 			return entity.IsTriggered( activator );
 
-		Log.Info( "Master was null or not a master!" );
+		Util.Alert( AlertType.Console, "Master was null or not a master!" );
 		return true;
 	}
 
@@ -439,7 +439,7 @@ public partial class BaseEntity : Edict
 		var table = saveData.Current;
 
 		if ( table.Edict != this )
-			Log.Error( "ENTITY TABLE OR INDEX IS WRONG!!!!" );
+			Util.Alert( AlertType.Error, "ENTITY TABLE OR INDEX IS WRONG!!!!" );
 
 		if ( (ObjectCaps & ObjectCaps.DontSave) == ObjectCaps.DontSave )
 			return;
@@ -511,7 +511,7 @@ public partial class BaseEntity : Edict
 		{
 			if ( !globalState.Contains( entity.GlobalName ) )
 			{
-				Log.Error( $"Global Entity {entity.GlobalName} ({entity.ClassName}) not in table!!!" );
+				Util.Alert( AlertType.Error, $"Global Entity {entity.GlobalName} ({entity.ClassName}) not in table!!!" );
 				globalState.EntityAdd( entity.GlobalName, Server.Globals.MapName, GlobalEntityState.On );
 			}
 			else if ( globalState.EntityGetState( entity.GlobalName ) == GlobalEntityState.Dead )
@@ -534,7 +534,7 @@ public partial class BaseEntity : Edict
 
 		if ( entity.ClassName != className )
 		{
-			Log.Info( $"Global entity found {globalName}, wrong class {entity.ClassName}" );
+			Util.Alert( AlertType.Console, $"Global entity found {globalName}, wrong class {entity.ClassName}" );
 			return null;
 		}
 
@@ -544,7 +544,7 @@ public partial class BaseEntity : Edict
 	public sealed override void DispatchThink()
 	{
 		if ( (EntityFlags & EntityFlags.Dormant) == EntityFlags.Dormant )
-			Log.Error( $"Dormant entity {ClassName} is thinking!!" );
+			Util.Alert( AlertType.Error, $"Dormant entity {ClassName} is thinking!!" );
 
 		Think();
 	}

@@ -45,7 +45,7 @@ public class NodeEnt : BaseEntity
 
 		if ( graph.NodeCount >= Graph.MaxNodes )
 		{
-			Util.AiAlert( "cNodes > MAX_NODES" );
+			Util.Alert( AlertType.AiConsole, "cNodes > MAX_NODES" );
 			return;
 		}
 
@@ -240,7 +240,7 @@ public class TestHull : BaseMonster
 			SetOrigin( source.Origin );
 
 			if ( (EntityFlags & EntityFlags.OnGround) != EntityFlags.OnGround )
-				Util.AiAlert( "OFFGROUND!" );
+				Util.Alert( AlertType.AiConsole, "OFFGROUND!" );
 
 			if ( hull == Graph.NodeFlyHull )
 			{
@@ -309,7 +309,7 @@ public class TestHull : BaseMonster
 
 		if ( poolLinks == 0 )
 		{
-			Util.AiAlert( "**ConnectVisibleNodes FAILED!" );
+			Util.Alert( AlertType.AiConsole, "**ConnectVisibleNodes FAILED!" );
 
 			SetThink( ShowBadNode );
 			Origin = graph.Nodes[badNode].Origin;
@@ -399,7 +399,7 @@ public class TestHull : BaseMonster
 		report.Append( $"Connection Pool: {Graph.LinkSize * poolLinks} bytes\n" );
 		report.Append( ReportRule ).Append( '\n' );
 
-		Util.AiAlert( $"{graph.NodeCount} Nodes, {poolLinks} Connections" );
+		Util.Alert( AlertType.AiConsole, $"{graph.NodeCount} Nodes, {poolLinks} Connections" );
 
 		graph.BuildRegionTables();
 
@@ -416,7 +416,7 @@ public class TestHull : BaseMonster
 		graph.ComputeStaticRoutingTables();
 		graph.SaveGraph( Server.Globals.MapName );
 
-		Log.Info( "Done." );
+		Util.Alert( AlertType.Console, "Done." );
 	}
 }
 
@@ -443,7 +443,7 @@ public class NodeViewer : BaseEntity
 
 		if ( !graph.GraphPresent || !graph.GraphPointersSet )
 		{
-			Log.Info( "Graph not ready!" );
+			Util.Alert( AlertType.Console, "Graph not ready!" );
 			Remove();
 			return;
 		}
@@ -471,13 +471,13 @@ public class NodeViewer : BaseEntity
 
 		if ( _baseNode < 0 )
 		{
-			Log.Info( "No nearby node" );
+			Util.Alert( AlertType.Console, "No nearby node" );
 			return;
 		}
 
 		_visited = 0;
 
-		Util.AiAlert( $"basenode {_baseNode}" );
+		Util.Alert( AlertType.AiConsole, $"basenode {_baseNode}" );
 
 		if ( graph.NodeCount < MaxVisited )
 		{
@@ -502,7 +502,7 @@ public class NodeViewer : BaseEntity
 			while ( end != _visited );
 		}
 
-		Util.AiAlert( $"{_visited} nodes" );
+		Util.Alert( AlertType.AiConsole, $"{_visited} nodes" );
 
 		_draw = 0;
 

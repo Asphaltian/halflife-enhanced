@@ -183,7 +183,7 @@ public sealed class Save( SaveRestoreData data, List<SaveBlock> header = null ) 
 			}
 		}
 
-		Log.Error( "Invalid function pointer in entity!" );
+		Util.Alert( AlertType.Error, "Invalid function pointer in entity!" );
 		return null;
 	}
 

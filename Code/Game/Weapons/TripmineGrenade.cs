@@ -121,7 +121,7 @@ public class TripmineGrenade : Grenade
 				SetThink( SubRemove );
 				NextThink = (float)(Server.Globals.Time + 0.1);
 
-				Log.Info( $"WARNING:Tripmine at {Origin.x:0}, {Origin.y:0}, {Origin.z:0} removed" );
+				Util.Alert( AlertType.Console, $"WARNING:Tripmine at {Origin.x:0}, {Origin.y:0}, {Origin.z:0} removed" );
 
 				KillBeam();
 				return;

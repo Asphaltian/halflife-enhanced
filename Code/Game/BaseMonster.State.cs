@@ -9,7 +9,7 @@ partial class BaseMonster
 		if ( state == MonsterState.Idle && EnemyEntity is not null )
 		{
 			EnemyEntity = null;
-			Util.AiAlert( "Stripped" );
+			Util.Alert( AlertType.AiConsole, "Stripped" );
 		}
 
 		MonsterState = state;
@@ -100,7 +100,7 @@ partial class BaseMonster
 				if ( EnemyEntity is null )
 				{
 					IdealMonsterState = MonsterState.Alert;
-					Util.AiAlert( "***Combat state with no enemy!" );
+					Util.Alert( AlertType.AiConsole, "***Combat state with no enemy!" );
 				}
 
 				break;

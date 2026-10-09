@@ -575,6 +575,9 @@ public sealed partial class Client : GameObjectSystem<Client>
 
 		if ( _nextViewWorld )
 		{
+			SetFrustum( _nextViewFrustum, refParams.ViewOrigin, forward, right, up, FieldOfView, Math.Max( refParams.ViewportWidth, 1 ), Math.Max( refParams.ViewportHeight, 1 ) );
+			MarkViewLeaves( refParams.ViewOrigin );
+
 			_drawView = 1;
 
 			DrawParticles( refParams.ViewOrigin, forward, right, up, tanHalfX, tanHalfY );

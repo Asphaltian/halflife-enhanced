@@ -170,7 +170,7 @@ public sealed partial class Graph
 
 		if ( !IsDoor( linkEntity ) )
 		{
-			Util.AiAlert( $"Unsupported PathEnt:\n'{linkEntity.ClassName}'" );
+			Util.Alert( AlertType.AiConsole, $"Unsupported PathEnt:\n'{linkEntity.ClassName}'" );
 			return null;
 		}
 
@@ -203,13 +203,13 @@ public sealed partial class Graph
 	{
 		if ( !GraphPresent || !GraphPointersSet )
 		{
-			Util.AiAlert( "Graph not ready!" );
+			Util.Alert( AlertType.AiConsole, "Graph not ready!" );
 			return false;
 		}
 
 		if ( Util.IsNullEnt( linkEntity ) )
 		{
-			Util.AiAlert( "dead path ent!" );
+			Util.Alert( AlertType.AiConsole, "dead path ent!" );
 			return true;
 		}
 
@@ -230,7 +230,7 @@ public sealed partial class Graph
 		if ( linkEntity.ClassName == "func_breakable" && queryType == QueryType.Static )
 			return true;
 
-		Util.AiAlert( $"Unhandled Ent in Path {linkEntity.ClassName}" );
+		Util.Alert( AlertType.AiConsole, $"Unhandled Ent in Path {linkEntity.ClassName}" );
 
 		return false;
 	}
@@ -268,7 +268,7 @@ public sealed partial class Graph
 		{
 			if ( maxLoop-- <= 0 )
 			{
-				Log.Info( "Route Failure" );
+				Util.Alert( AlertType.Console, "Route Failure" );
 				return 0f;
 			}
 
@@ -281,7 +281,7 @@ public sealed partial class Graph
 
 			if ( link < 0 )
 			{
-				Log.Info( $"HashLinks is broken from {current} to {destination}." );
+				Util.Alert( AlertType.Console, $"HashLinks is broken from {current} to {destination}." );
 				return 0f;
 			}
 
@@ -354,13 +354,13 @@ public sealed partial class Graph
 	{
 		if ( !GraphPresent || !GraphPointersSet )
 		{
-			Util.AiAlert( "Graph not ready!" );
+			Util.Alert( AlertType.AiConsole, "Graph not ready!" );
 			return 0;
 		}
 
 		if ( start < 0 || start > NodeCount )
 		{
-			Util.AiAlert( $"Can't build a path, iStart is {start}!" );
+			Util.Alert( AlertType.AiConsole, $"Can't build a path, iStart is {start}!" );
 			return 0;
 		}
 
@@ -557,7 +557,7 @@ public sealed partial class Graph
 	{
 		if ( !GraphPresent || !GraphPointersSet )
 		{
-			Util.AiAlert( "Graph not ready!" );
+			Util.Alert( AlertType.AiConsole, "Graph not ready!" );
 			return -1;
 		}
 
@@ -619,13 +619,13 @@ public sealed partial class Graph
 	{
 		if ( !GraphPresent || !GraphPointersSet )
 		{
-			Util.AiAlert( "Graph not ready!" );
+			Util.Alert( AlertType.AiConsole, "Graph not ready!" );
 			return;
 		}
 
 		if ( node < 0 )
 		{
-			Util.AiAlert( $"Can't show connections for node {node}" );
+			Util.Alert( AlertType.AiConsole, $"Can't show connections for node {node}" );
 			return;
 		}
 
@@ -635,7 +635,7 @@ public sealed partial class Graph
 		Util.ParticleEffect( source.Origin, Vector3.Zero, 255, 20 );
 
 		if ( source.NumLinks <= 0 )
-			Util.AiAlert( "**No Connections!" );
+			Util.Alert( AlertType.AiConsole, "**No Connections!" );
 
 		for ( var i = 0; i < source.NumLinks; i++ )
 		{

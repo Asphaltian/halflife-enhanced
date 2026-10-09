@@ -37,7 +37,7 @@ public sealed class VoiceGameMgr
 		if ( VoiceServerDebugCvar == 0f )
 			return;
 
-		Log.Info( message );
+		Util.Alert( AlertType.Console, message );
 	}
 
 	public bool Init( Server server, IVoiceGameMgrHelper helper, int maxClients )

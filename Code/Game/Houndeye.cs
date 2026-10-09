@@ -172,7 +172,7 @@ public class Houndeye : SquadMonster
 				return true;
 		}
 
-		Util.AiAlert( "Couldn't validate hint type" );
+		Util.Alert( AlertType.AiConsole, "Couldn't validate hint type" );
 		return false;
 	}
 
@@ -369,7 +369,7 @@ public class Houndeye : SquadMonster
 					(red, green, blue) = (62, 33, 211);
 					break;
 				default:
-					Util.AiAlert( "Unsupported Houndeye SquadSize!" );
+					Util.Alert( AlertType.AiConsole, "Unsupported Houndeye SquadSize!" );
 					break;
 			}
 		}

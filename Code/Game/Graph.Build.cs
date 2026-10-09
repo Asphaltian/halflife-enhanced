@@ -31,7 +31,7 @@ partial class Graph
 
 		if ( NodeCount <= 0 )
 		{
-			Util.AiAlert( "No Nodes!" );
+			Util.Alert( AlertType.AiConsole, "No Nodes!" );
 			return 0;
 		}
 
@@ -100,7 +100,7 @@ partial class Graph
 
 				if ( linksThisNode == MaxNodeInitialLinks )
 				{
-					Util.AiAlert( $"**LinkVisibleNodes:\nNode {i} has NodeLinks > MAX_NODE_INITIAL_LINKS" );
+					Util.Alert( AlertType.AiConsole, $"**LinkVisibleNodes:\nNode {i} has NodeLinks > MAX_NODE_INITIAL_LINKS" );
 					report.Append( $"** NODE {i} HAS NodeLinks > MAX_NODE_INITIAL_LINKS **\n" );
 					badNode = i;
 					return 0;
@@ -108,7 +108,7 @@ partial class Graph
 
 				if ( totalLinks > MaxNodeInitialLinks * NodeCount )
 				{
-					Util.AiAlert( "**LinkVisibleNodes:\nTotalLinks > MAX_NODE_INITIAL_LINKS * NUMNODES" );
+					Util.Alert( AlertType.AiConsole, "**LinkVisibleNodes:\nTotalLinks > MAX_NODE_INITIAL_LINKS * NUMNODES" );
 					badNode = i;
 					return 0;
 				}

@@ -254,7 +254,7 @@ partial class Graph
 
 		if ( version != Version )
 		{
-			Util.AiAlert( $"**ERROR** Graph version is {version}, expected {Version}" );
+			Util.Alert( AlertType.AiConsole, $"**ERROR** Graph version is {version}, expected {Version}" );
 			return false;
 		}
 
@@ -326,7 +326,7 @@ partial class Graph
 		GraphPointersSet = false;
 
 		if ( length != 0 )
-			Util.AiAlert( $"***WARNING***:Node graph was longer than expected by {length} bytes.!" );
+			Util.Alert( AlertType.AiConsole, $"***WARNING***:Node graph was longer than expected by {length} bytes.!" );
 
 		return true;
 	}
@@ -335,7 +335,7 @@ partial class Graph
 	{
 		if ( !GraphPresent || !GraphPointersSet )
 		{
-			Util.AiAlert( "Graph not ready!" );
+			Util.Alert( AlertType.AiConsole, "Graph not ready!" );
 			return false;
 		}
 
@@ -379,7 +379,7 @@ partial class Graph
 		FileSystem.Data.CreateDirectory( GraphDirectory );
 		FileSystem.Data.WriteAllBytes( fileName, stream.ToArray() );
 
-		Util.AiAlert( $"Created: {fileName}" );
+		Util.Alert( AlertType.AiConsole, $"Created: {fileName}" );
 
 		return true;
 	}
@@ -396,7 +396,7 @@ partial class Graph
 
 			if ( Util.IsNullEnt( linkEntity ) )
 			{
-				Util.AiAlert( $"**Could not find model {name}" );
+				Util.Alert( AlertType.AiConsole, $"**Could not find model {name}" );
 				LinkPool[i].LinkEntity = null;
 				continue;
 			}

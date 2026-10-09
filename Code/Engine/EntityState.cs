@@ -57,6 +57,14 @@ public struct EntityState
 	public const int EntityNormal = 1 << 0;
 	public const int EntityBeam = 1 << 1;
 
+	public const int NumberOffset = 4;
+	public const int RenderModeOffset = 72;
+	public const int MoveTypeOffset = 88;
+	public const int AnimTimeOffset = 92;
+	public const int AimEntOffset = 148;
+	public const int ImpactTimeOffset = 252;
+	public const int StartTimeOffset = 256;
+
 	public const int EFlagSlerp = 1;
 	public const int EFlagFleshSound = 2;
 
@@ -163,7 +171,7 @@ public struct EntityState
 		Array.Clear( image, 0, Size );
 
 		StructImage.Write( image, 0, EntityType );
-		StructImage.Write( image, 4, Number );
+		StructImage.Write( image, NumberOffset, Number );
 		StructImage.Write( image, 8, MsgTime );
 		StructImage.Write( image, 12, MessageNum );
 		StructImage.Write( image, 16, Origin );
@@ -177,14 +185,14 @@ public struct EntityState
 		StructImage.Write( image, 60, Effects );
 		StructImage.Write( image, 64, Scale );
 		image[68] = EFlags;
-		StructImage.Write( image, 72, RenderMode );
+		StructImage.Write( image, RenderModeOffset, RenderMode );
 		StructImage.Write( image, 76, RenderAmt );
 		image[80] = RenderColorR;
 		image[81] = RenderColorG;
 		image[82] = RenderColorB;
 		StructImage.Write( image, 84, RenderFx );
-		StructImage.Write( image, 88, MoveType );
-		StructImage.Write( image, 92, AnimTime );
+		StructImage.Write( image, MoveTypeOffset, MoveType );
+		StructImage.Write( image, AnimTimeOffset, AnimTime );
 		StructImage.Write( image, 96, FrameRate );
 		StructImage.Write( image, 100, Body );
 		image[104] = Controller0;
@@ -198,7 +206,7 @@ public struct EntityState
 		StructImage.Write( image, 112, Velocity );
 		StructImage.Write( image, 124, Mins );
 		StructImage.Write( image, 136, Maxs );
-		StructImage.Write( image, 148, AimEnt );
+		StructImage.Write( image, AimEntOffset, AimEnt );
 		StructImage.Write( image, 152, Owner );
 		StructImage.Write( image, 156, Friction );
 		StructImage.Write( image, 160, Gravity );
@@ -218,8 +226,8 @@ public struct EntityState
 		StructImage.Write( image, 224, WeaponAnim );
 		StructImage.Write( image, 228, StartPos );
 		StructImage.Write( image, 240, EndPos );
-		StructImage.Write( image, 252, ImpactTime );
-		StructImage.Write( image, 256, StartTime );
+		StructImage.Write( image, ImpactTimeOffset, ImpactTime );
+		StructImage.Write( image, StartTimeOffset, StartTime );
 		StructImage.Write( image, 260, IUser1 );
 		StructImage.Write( image, 264, IUser2 );
 		StructImage.Write( image, 268, IUser3 );
@@ -239,7 +247,7 @@ public struct EntityState
 		return new EntityState
 		{
 			EntityType = StructImage.ReadInt( image, 0 ),
-			Number = StructImage.ReadInt( image, 4 ),
+			Number = StructImage.ReadInt( image, NumberOffset ),
 			MsgTime = StructImage.ReadFloat( image, 8 ),
 			MessageNum = StructImage.ReadInt( image, 12 ),
 			Origin = StructImage.ReadVector( image, 16 ),
@@ -253,14 +261,14 @@ public struct EntityState
 			Effects = StructImage.ReadInt( image, 60 ),
 			Scale = StructImage.ReadFloat( image, 64 ),
 			EFlags = image[68],
-			RenderMode = StructImage.ReadInt( image, 72 ),
+			RenderMode = StructImage.ReadInt( image, RenderModeOffset ),
 			RenderAmt = StructImage.ReadInt( image, 76 ),
 			RenderColorR = image[80],
 			RenderColorG = image[81],
 			RenderColorB = image[82],
 			RenderFx = StructImage.ReadInt( image, 84 ),
-			MoveType = StructImage.ReadInt( image, 88 ),
-			AnimTime = StructImage.ReadFloat( image, 92 ),
+			MoveType = StructImage.ReadInt( image, MoveTypeOffset ),
+			AnimTime = StructImage.ReadFloat( image, AnimTimeOffset ),
 			FrameRate = StructImage.ReadFloat( image, 96 ),
 			Body = StructImage.ReadInt( image, 100 ),
 			Controller0 = image[104],
@@ -274,7 +282,7 @@ public struct EntityState
 			Velocity = StructImage.ReadVector( image, 112 ),
 			Mins = StructImage.ReadVector( image, 124 ),
 			Maxs = StructImage.ReadVector( image, 136 ),
-			AimEnt = StructImage.ReadInt( image, 148 ),
+			AimEnt = StructImage.ReadInt( image, AimEntOffset ),
 			Owner = StructImage.ReadInt( image, 152 ),
 			Friction = StructImage.ReadFloat( image, 156 ),
 			Gravity = StructImage.ReadFloat( image, 160 ),
@@ -294,8 +302,8 @@ public struct EntityState
 			WeaponAnim = StructImage.ReadInt( image, 224 ),
 			StartPos = StructImage.ReadVector( image, 228 ),
 			EndPos = StructImage.ReadVector( image, 240 ),
-			ImpactTime = StructImage.ReadFloat( image, 252 ),
-			StartTime = StructImage.ReadFloat( image, 256 ),
+			ImpactTime = StructImage.ReadFloat( image, ImpactTimeOffset ),
+			StartTime = StructImage.ReadFloat( image, StartTimeOffset ),
 			IUser1 = StructImage.ReadInt( image, 260 ),
 			IUser2 = StructImage.ReadInt( image, 264 ),
 			IUser3 = StructImage.ReadInt( image, 268 ),

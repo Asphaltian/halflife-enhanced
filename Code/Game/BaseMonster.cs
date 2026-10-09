@@ -372,7 +372,7 @@ public partial class BaseMonster : BaseToggle, IHotloadManaged
 		if ( !fireTarget )
 			return false;
 
-		Util.AiAlert( "AI Trigger Fire Target" );
+		Util.Alert( AlertType.AiConsole, "AI Trigger Fire Target" );
 
 		FireTargets( TriggerTarget, this, this, UseType.Toggle, 0f );
 		TriggerCondition = AiTrigger.None;

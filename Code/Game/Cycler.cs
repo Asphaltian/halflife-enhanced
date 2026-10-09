@@ -17,7 +17,7 @@ public class Cycler : BaseMonster
 	{
 		if ( string.IsNullOrEmpty( model ) )
 		{
-			Log.Error( $"cycler at {Origin.x:0} {Origin.y:0} {Origin.z:0} missing modelname" );
+			Util.Alert( AlertType.Error, $"cycler at {Origin.x:0} {Origin.y:0} {Origin.z:0} missing modelname" );
 			Server.FreeEdict( this );
 			return;
 		}
@@ -112,7 +112,7 @@ public class Cycler : BaseMonster
 			FrameRate = 1f;
 			StudioFrameAdvance( 0.1f );
 			FrameRate = 0f;
-			Log.Info( $"sequence: {Sequence}, frame {Frame:0}" );
+			Util.Alert( AlertType.Console, $"sequence: {Sequence}, frame {Frame:0}" );
 		}
 
 		return false;
@@ -179,7 +179,7 @@ public class CyclerSprite : BaseEntity
 	public override void Use( BaseEntity activator, BaseEntity caller, UseType useType, float value )
 	{
 		_animate = _animate == 0 ? 1 : 0;
-		Log.Info( $"Sprite: {ModelName}" );
+		Util.Alert( AlertType.Console, $"Sprite: {ModelName}" );
 	}
 
 	public override bool TakeDamage( BaseEntity inflictor, BaseEntity attacker, float damage, int damageType )

@@ -77,7 +77,7 @@ public abstract class GameRules
 
 		HalfLifeDll.SkillData.SkillLevel = skill;
 
-		Log.Info( $"\nGAME SKILL LEVEL:{skill}\n" );
+		Util.Alert( AlertType.Console, $"\nGAME SKILL LEVEL:{skill}\n" );
 
 		HalfLifeDll.SkillData.Refresh();
 	}

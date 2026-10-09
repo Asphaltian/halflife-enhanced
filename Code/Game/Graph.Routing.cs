@@ -98,7 +98,7 @@ partial class Graph
 		else if ( c is >= -128 and <= 127 )
 			route[length++] = (sbyte)c;
 		else
-			Util.AiAlert( $"Nodes need sorting ({lastNode},{from})!" );
+			Util.Alert( AlertType.AiConsole, $"Nodes need sorting ({lastNode},{from})!" );
 	}
 
 	private int CompressRoute( ushort[] bestNextNodes, sbyte[] route, int from, out int compressedSize )
@@ -265,7 +265,7 @@ partial class Graph
 			}
 		}
 
-		Util.AiAlert( $"Size of Routes = {totalCompressedSize}" );
+		Util.Alert( AlertType.AiConsole, $"Size of Routes = {totalCompressedSize}" );
 
 		RoutingComplete = true;
 	}

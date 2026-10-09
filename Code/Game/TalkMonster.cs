@@ -999,7 +999,7 @@ public abstract class TalkMonster : BaseMonster
 
 			if ( HasMemory( MemoryProvoked ) )
 			{
-				Log.Info( "I'm not following you, you evil person!" );
+				Util.Alert( AlertType.Console, "I'm not following you, you evil person!" );
 			}
 			else
 			{

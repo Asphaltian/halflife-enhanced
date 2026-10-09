@@ -64,6 +64,7 @@ public sealed class ClientModelRenderer : Component
 		_renderer.Attributes.SetCombo( "D_RENDER_MODE", (int)temp.RenderMode );
 
 		var translucent = temp.RenderMode is RenderMode.TransColor or RenderMode.TransTexture or RenderMode.Glow or RenderMode.TransAdd;
+		var drawn = true;
 
 		if ( model is SpriteModel sprite )
 		{
@@ -86,18 +87,21 @@ public sealed class ClientModelRenderer : Component
 		}
 		else if ( model is StudioModel studio )
 		{
-			DrawStudio( client, studio.File, temp, blend );
+			drawn = DrawStudio( client, studio.File, temp, blend );
 		}
 
 		if ( _renderer.SceneObject is not { } sceneObject )
 			return;
+
+		if ( model is StudioModel )
+			sceneObject.RenderingEnabled = drawn;
 
 		sceneObject.Flags.IsTranslucent = translucent;
 		sceneObject.Flags.IsOpaque = !translucent;
 		sceneObject.Flags.WantsPrePass = !translucent;
 	}
 
-	private void DrawStudio( Client client, File header, TempEnt temp, int blend )
+	private bool DrawStudio( Client client, File header, TempEnt temp, int blend )
 	{
 		var renderer = (SkinnedModelRenderer)_renderer;
 		var angles = temp.Angles;
@@ -112,6 +116,12 @@ public sealed class ClientModelRenderer : Component
 		_latched.PrevOrigin = temp.Origin;
 		_latched.PrevAngles = angles;
 
+		WorldPosition = temp.Origin;
+		WorldRotation = Edict.ToRotation( new Vector3( -angles.x, angles.y, angles.z ) );
+
+		if ( !client.StudioCheckBBox( header, ref _state, temp.Origin, WorldTransform ) )
+			return false;
+
 		var light = Client.Current.StudioDynamicLight( (Effects)temp.Effects, temp.RenderFx, 0, temp.Origin, header.Header.Flags );
 
 		renderer.Attributes.Set( "AmbientLight", (float)light.AmbientLight );
@@ -123,11 +133,6 @@ public sealed class ClientModelRenderer : Component
 		Client.Current.StudioEntityLight( 0, temp.Origin, _attachments, renderer.Attributes );
 		renderer.Attributes.Set( "Blend", blend / 255f );
 		renderer.Attributes.Set( "RenderColor", new Vector3( (byte)(int)temp.RenderColor.x, (byte)(int)temp.RenderColor.y, (byte)(int)temp.RenderColor.z ) );
-
-		angles.x = -angles.x;
-
-		WorldPosition = temp.Origin;
-		WorldRotation = Edict.ToRotation( angles );
 
 		client.BoneSetup.SetupBones( header, ref _state, ref _latched, client.ClientTime, Client.StudioInterpolation );
 
@@ -144,5 +149,7 @@ public sealed class ClientModelRenderer : Component
 		renderer.UseAnimGraph = false;
 
 		_boneOutput.Apply( client, header, renderer, WorldTransform, _attachments );
+
+		return true;
 	}
 }

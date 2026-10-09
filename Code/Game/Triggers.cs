@@ -452,7 +452,7 @@ public class BaseTrigger : BaseToggle
 		{
 			if ( tellActivator )
 			{
-				Log.Info( TriggersLeft switch
+				Util.Alert( AlertType.Console, TriggersLeft switch
 				{
 					1 => "Only 1 more to go...",
 					2 => "Only 2 more to go...",
@@ -465,7 +465,7 @@ public class BaseTrigger : BaseToggle
 		}
 
 		if ( tellActivator )
-			Log.Info( "Sequence completed!" );
+			Util.Alert( AlertType.Console, "Sequence completed!" );
 
 		ActivateMultiTrigger( Activator );
 	}
@@ -774,13 +774,13 @@ public class ChangeLevel : BaseTrigger
 		{
 			case "map":
 				if ( value.Length >= MapNameMost )
-					Log.Error( $"Map name '{value}' too long (32 chars)" );
+					Util.Alert( AlertType.Error, $"Map name '{value}' too long (32 chars)" );
 
 				MapName = value;
 				return true;
 			case "landmark":
 				if ( value.Length >= MapNameMost )
-					Log.Error( $"Landmark name '{value}' too long (32 chars)" );
+					Util.Alert( AlertType.Error, $"Landmark name '{value}' too long (32 chars)" );
 
 				LandmarkName = value;
 				return true;
@@ -798,10 +798,10 @@ public class ChangeLevel : BaseTrigger
 	public override void Spawn()
 	{
 		if ( MapName.Length == 0 )
-			Log.Info( "a trigger_changelevel doesn't have a map" );
+			Util.Alert( AlertType.Console, "a trigger_changelevel doesn't have a map" );
 
 		if ( LandmarkName.Length == 0 )
-			Log.Info( $"trigger_changelevel to {MapName} doesn't have a landmark" );
+			Util.Alert( AlertType.Console, $"trigger_changelevel to {MapName} doesn't have a landmark" );
 
 		if ( !string.IsNullOrEmpty( TargetName ) )
 			SetUse( UseChangeLevel );
@@ -822,7 +822,7 @@ public class ChangeLevel : BaseTrigger
 				return landmark;
 		}
 
-		Log.Error( $"Can't find landmark {landmarkName}" );
+		Util.Alert( AlertType.Error, $"Can't find landmark {landmarkName}" );
 		return null;
 	}
 
@@ -853,7 +853,7 @@ public class ChangeLevel : BaseTrigger
 
 		if ( !InTransitionVolume( Server, player, LandmarkName ) )
 		{
-			Util.AiAlert( $"Player isn't in the transition volume {LandmarkName}, aborting" );
+			Util.Alert( AlertType.AiConsole, $"Player isn't in the transition volume {LandmarkName}, aborting" );
 			return;
 		}
 
@@ -878,7 +878,7 @@ public class ChangeLevel : BaseTrigger
 			Server.Globals.LandmarkOffset = landmark.Origin;
 		}
 
-		Log.Info( $"CHANGE LEVEL: {MapName} {nextSpot}" );
+		Util.Alert( AlertType.Console, $"CHANGE LEVEL: {MapName} {nextSpot}" );
 		Server.ChangeLevel( MapName, nextSpot );
 	}
 
@@ -941,7 +941,7 @@ public class ChangeLevel : BaseTrigger
 				entities.Add( (entity, flags) );
 
 				if ( entities.Count > MaxEntity )
-					Log.Error( "Too many entities across a transition!" );
+					Util.Alert( AlertType.Error, "Too many entities across a transition!" );
 			}
 
 			foreach ( var (entity, flags) in entities )
@@ -1232,7 +1232,7 @@ public static class Triggers
 
 		if ( track is < -1 or > 30 )
 		{
-			Log.Info( "TriggerCDAudio - Track %d out of range" );
+			Util.Alert( AlertType.Console, "TriggerCDAudio - Track %d out of range" );
 			return;
 		}
 

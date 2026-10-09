@@ -31,10 +31,10 @@ public sealed class GlobalState
 
 	public void DumpGlobals()
 	{
-		Log.Info( "-- Globals --" );
+		Util.Alert( AlertType.Console, "-- Globals --" );
 
 		foreach ( var entity in _entities )
-			Log.Info( $"{entity.Name}: {entity.LevelName} ({entity.State})" );
+			Util.Alert( AlertType.Console, $"{entity.Name}: {entity.LevelName} ({entity.State})" );
 	}
 
 	public void EntityAdd( string name, string mapName, GlobalEntityState state )
@@ -237,7 +237,7 @@ public class MultiSource : PointEntity
 
 		if ( i > _total )
 		{
-			Log.Info( $"MultiSrc:Used by non member {caller.ClassName}." );
+			Util.Alert( AlertType.Console, $"MultiSrc:Used by non member {caller.ClassName}." );
 			return;
 		}
 
@@ -246,7 +246,7 @@ public class MultiSource : PointEntity
 
 		if ( IsTriggered( activator ) )
 		{
-			Util.AiAlert( $"Multisource {TargetName} enabled ({_total} inputs)" );
+			Util.Alert( AlertType.AiConsole, $"Multisource {TargetName} enabled ({_total} inputs)" );
 			UseTargets( null, GlobalStateName is not null ? UseType.On : UseType.Toggle, 0f );
 		}
 	}

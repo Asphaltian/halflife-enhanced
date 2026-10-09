@@ -145,7 +145,7 @@ public sealed partial class Hull
 		}
 
 		var node = ClipNodes[num];
-		var plane = Planes[node.PlaneNum];
+		ref readonly var plane = ref Planes[node.PlaneNum];
 
 		var t1 = Distance( plane, p1 );
 		var t2 = Distance( plane, p2 );
@@ -251,7 +251,7 @@ public sealed partial class Hull
 			throw new InvalidOperationException( "SV_RecursiveHullCheck: bad node number" );
 
 		var node = ClipNodes[num];
-		var plane = Planes[node.PlaneNum];
+		ref readonly var plane = ref Planes[node.PlaneNum];
 
 		var t1 = Distance( plane, p1 );
 		var t2 = Distance( plane, p2 );
@@ -315,8 +315,15 @@ public sealed partial class Hull
 
 	private static float Distance( in Plane plane, Vector3 point )
 	{
-		if ( plane.Type < PlaneType.AnyX )
-			return point[(int)plane.Type] - plane.Dist;
+		switch ( plane.Type )
+		{
+			case PlaneType.X:
+				return point.x - plane.Dist;
+			case PlaneType.Y:
+				return point.y - plane.Dist;
+			case PlaneType.Z:
+				return point.z - plane.Dist;
+		}
 
 		return (plane.Normal.y * point.y) + (plane.Normal.x * point.x) + (plane.Normal.z * point.z) - plane.Dist;
 	}

@@ -8,7 +8,7 @@ partial class Client
 {
 	private const float TransAlphaDistance = 1e9f;
 
-	private readonly Plane[] _frustum = new Plane[4];
+	private readonly Frustum _frustum = new();
 	private readonly List<(ClientEntity Entity, float Distance)> _transBrushes = [];
 
 	private (byte R, byte G, byte B, byte Density)[] _waterPalettes;
@@ -85,7 +85,7 @@ partial class Client
 	public void EmitWater( Vector3 viewOrigin, Vector3 forward, Vector3 right, Vector3 up, float fieldOfView, float width, float height )
 	{
 		MarkViewLeaves( viewOrigin );
-		SetFrustum( viewOrigin, forward, right, up, fieldOfView, width, height );
+		SetFrustum( _frustum, viewOrigin, forward, right, up, fieldOfView, width, height );
 
 		_surfaceFrameCount++;
 		_waterChain = -1;
@@ -120,8 +120,11 @@ partial class Client
 			_waterFog = _waterPalettes[mipTex];
 	}
 
-	private void SetFrustum( Vector3 origin, Vector3 forward, Vector3 right, Vector3 up, float fieldOfView, float width, float height )
+	private static void SetFrustum( Frustum frustum, Vector3 origin, Vector3 forward, Vector3 right, Vector3 up, float fieldOfView, float width, float height )
 	{
+		frustum.Origin = origin;
+		frustum.Forward = forward;
+
 		var aspect = width / height;
 
 		if ( Client.WidescreenYFov != 0f && aspect > 1.5f )
@@ -138,20 +141,22 @@ partial class Client
 		var angleX = (90f - (fieldOfView * 0.5f)) * (MathF.PI / 180f);
 		var angleY = (90f - (fovY * 0.5f)) * (MathF.PI / 180f);
 
-		SetFrustumPlane( 0, origin, (forward * MathF.Cos( angleX )) + (right * MathF.Sin( angleX )) );
-		SetFrustumPlane( 1, origin, (forward * MathF.Cos( angleX )) - (right * MathF.Sin( angleX )) );
-		SetFrustumPlane( 2, origin, (forward * MathF.Cos( angleY )) + (up * MathF.Sin( angleY )) );
-		SetFrustumPlane( 3, origin, (forward * MathF.Cos( angleY )) - (up * MathF.Sin( angleY )) );
+		SetFrustumPlane( frustum, 0, (forward * MathF.Cos( angleX )) + (right * MathF.Sin( angleX )) );
+		SetFrustumPlane( frustum, 1, (forward * MathF.Cos( angleX )) - (right * MathF.Sin( angleX )) );
+		SetFrustumPlane( frustum, 2, (forward * MathF.Cos( angleY )) + (up * MathF.Sin( angleY )) );
+		SetFrustumPlane( frustum, 3, (forward * MathF.Cos( angleY )) - (up * MathF.Sin( angleY )) );
 	}
 
-	private void SetFrustumPlane( int index, Vector3 origin, Vector3 normal )
+	private static void SetFrustumPlane( Frustum frustum, int index, Vector3 normal )
 	{
-		_frustum[index] = new Plane( normal, Vector3.Dot( origin, normal ), PlaneType.AnyZ );
+		frustum.Planes[index] = new Plane( normal, Vector3.Dot( frustum.Origin, normal ), PlaneType.AnyZ );
 	}
 
-	private bool CullBox( Vector3 mins, Vector3 maxs )
+	private bool CullBox( Vector3 mins, Vector3 maxs ) => CullBox( _drawView == 0 ? _frustum : _nextViewFrustum, mins, maxs );
+
+	private static bool CullBox( Frustum frustum, Vector3 mins, Vector3 maxs )
 	{
-		foreach ( var plane in _frustum )
+		foreach ( var plane in frustum.Planes )
 		{
 			if ( Bsp.File.BoxOnPlaneSide( mins, maxs, plane ) == 2 )
 				return true;

@@ -42,9 +42,9 @@ partial class BaseMonster
 		FailSchedule = ScheduleType.None;
 
 		if ( (schedule.InterruptMask & ConditionHearSound) != 0 && schedule.SoundMask == 0 )
-			Util.AiAlert( "COND_HEAR_SOUND with no sound mask!" );
+			Util.Alert( AlertType.AiConsole, "COND_HEAR_SOUND with no sound mask!" );
 		else if ( schedule.SoundMask != 0 && (schedule.InterruptMask & ConditionHearSound) == 0 )
-			Util.AiAlert( "Sound mask without COND_HEAR_SOUND!" );
+			Util.Alert( AlertType.AiConsole, "Sound mask without COND_HEAR_SOUND!" );
 	}
 
 	public void NextScheduledTask()
@@ -111,7 +111,7 @@ partial class BaseMonster
 				{
 					var schedule = GetScheduleOfType( FailSchedule != ScheduleType.None ? FailSchedule : ScheduleType.Fail );
 
-					Util.AiAlert( $"Schedule Failed at {ScheduleIndex}!" );
+					Util.Alert( AlertType.AiConsole, $"Schedule Failed at {ScheduleIndex}!" );
 					ChangeSchedule( schedule );
 				}
 				else
@@ -364,7 +364,7 @@ partial class BaseMonster
 			return;
 		}
 
-		Util.AiAlert( failure );
+		Util.Alert( AlertType.AiConsole, failure );
 		TaskFail();
 	}
 
@@ -546,7 +546,7 @@ partial class BaseMonster
 			case TaskId.FaceRoute:
 				if ( RouteIsClear() )
 				{
-					Util.AiAlert( "No route to face!" );
+					Util.Alert( AlertType.AiConsole, "No route to face!" );
 					TaskFail();
 				}
 				else
@@ -602,7 +602,7 @@ partial class BaseMonster
 					else if ( TargetEntity is null || !MoveToTarget( activity, 2f ) )
 					{
 						TaskFail();
-						Util.AiAlert( $"{ClassName} Failed to reach target!!!" );
+						Util.Alert( AlertType.AiConsole, $"{ClassName} Failed to reach target!!!" );
 						RouteClear();
 					}
 				}
@@ -768,7 +768,7 @@ partial class BaseMonster
 				break;
 
 			case TaskId.SoundAngry:
-				Util.AiAlert( "SOUND" );
+				Util.Alert( AlertType.AiConsole, "SOUND" );
 				TaskComplete();
 				break;
 
@@ -830,7 +830,7 @@ partial class BaseMonster
 				break;
 
 			default:
-				Util.AiAlert( $"No StartTask entry for {task.Id}" );
+				Util.Alert( AlertType.AiConsole, $"No StartTask entry for {task.Id}" );
 				break;
 		}
 	}
@@ -843,7 +843,7 @@ partial class BaseMonster
 				return GetScheduleOfType( ScheduleType.BarnacleVictimGrab );
 
 			case MonsterState.None:
-				Util.AiAlert( "MONSTERSTATE IS NONE!" );
+				Util.Alert( AlertType.AiConsole, "MONSTERSTATE IS NONE!" );
 				break;
 
 			case MonsterState.Idle:
@@ -905,7 +905,7 @@ partial class BaseMonster
 				if ( !FacingIdeal() )
 					return GetScheduleOfType( ScheduleType.CombatFace );
 
-				Util.AiAlert( "No suitable combat schedule!" );
+				Util.Alert( AlertType.AiConsole, "No suitable combat schedule!" );
 				break;
 
 			case MonsterState.Dead:
@@ -914,7 +914,7 @@ partial class BaseMonster
 			case MonsterState.Script:
 				if ( Cine is null )
 				{
-					Util.AiAlert( $"Script failed for {ClassName}" );
+					Util.Alert( AlertType.AiConsole, $"Script failed for {ClassName}" );
 					CineCleanup();
 					return GetScheduleOfType( ScheduleType.IdleStand );
 				}
@@ -922,7 +922,7 @@ partial class BaseMonster
 				return GetScheduleOfType( ScheduleType.AiScript );
 
 			default:
-				Util.AiAlert( "Invalid State for GetSchedule!" );
+				Util.Alert( AlertType.AiConsole, "Invalid State for GetSchedule!" );
 				break;
 		}
 

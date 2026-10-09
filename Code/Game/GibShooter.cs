@@ -83,7 +83,7 @@ public class GibShooter : BaseDelay
 		gib.GibBloodColor = BloodColorRed;
 
 		if ( Body <= 1 )
-			Util.AiAlert( "GibShooter Body is <= 1!" );
+			Util.Alert( AlertType.AiConsole, "GibShooter Body is <= 1!" );
 
 		gib.Body = Server.RandomLong( 1, Body - 1 );
 
