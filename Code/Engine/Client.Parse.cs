@@ -25,6 +25,7 @@ public sealed class PlayerInfo
 	public float GaitFrame;
 	public float GaitYaw;
 	public Vector3 PrevGaitOrigin;
+	public List<Customization> Customizations = [];
 }
 
 public sealed class HudPlayerInfo
@@ -327,6 +328,10 @@ partial class Client
 					SendResourceListBlock( message );
 					break;
 
+				case Server.CustomizationMessage:
+					ParseCustomization( message );
+					break;
+
 				case Server.FileTransferFailedMessage:
 					ParseFileTransferFailed( message );
 					break;
@@ -619,5 +624,8 @@ partial class Client
 		player.BottomColor = Common.Atoi( Info.ValueForKey( player.UserInfo, "bottomcolor" ) );
 		player.Spectator = Common.Atoi( Info.ValueForKey( player.UserInfo, "*hltv" ) );
 		player.SteamId = long.TryParse( Info.ValueForKey( player.UserInfo, "*sid" ), out var steamId ) ? steamId : 0;
+
+		if ( player.UserInfo.Length == 0 || player.Name.Length == 0 )
+			ClearCustomizationList( player.Customizations, true );
 	}
 }

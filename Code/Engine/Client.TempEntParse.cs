@@ -365,13 +365,34 @@ partial class Client
 
 			case TempEntity.PlayerDecal:
 			{
-				message.ReadByte();
-
+				var player = message.ReadByte() - 1;
+				var customization = PlayerCustomization( player );
 				var position = message.ReadPosition();
 				var entity = message.ReadShort();
 				var decal = message.ReadByte();
 
-				ShootDecal( decal, entity, 0, position, DecalFlags.Custom );
+				if ( entity >= _maxEdicts )
+					throw new InvalidOperationException( $"Decal: entity = {entity}" );
+
+				CustomDecalImage image = null;
+
+				if ( customization is { Buffer: { } buffer, Info: { } wad, IsDecal: true, Translated: true } )
+				{
+					decal = Math.Min( decal, wad.LumpCount - 1 );
+
+					customization.UserData1 = decal;
+
+					image = wad.CacheGet( buffer, decal );
+				}
+
+				if ( DecalLimit == 0f )
+					break;
+
+				if ( customization is null )
+					DecalShoot( decal, entity, 0, position, DecalFlags.Custom );
+				else if ( image is not null )
+					DecalShoot( ~player, entity, 0, position, DecalFlags.Custom );
+
 				break;
 			}
 

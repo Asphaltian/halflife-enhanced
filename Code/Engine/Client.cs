@@ -677,11 +677,17 @@ public sealed partial class Client : GameObjectSystem<Client>
 				ParseServerMessage( _netMessage );
 		}
 
-		if ( _state is not ClientState.Dedicated and not ClientState.Disconnected && _netchan.IncomingReady && _netchan.CopyNormalFragments() is { } fragments )
+		if ( _state is not ClientState.Dedicated and not ClientState.Disconnected && _netchan.IncomingReady )
 		{
-			_netMessage.BeginReading( fragments, fragments.Length );
+			if ( _netchan.CopyNormalFragments() is { } fragments )
+			{
+				_netMessage.BeginReading( fragments, fragments.Length );
 
-			ParseServerMessage( _netMessage );
+				ParseServerMessage( _netMessage );
+			}
+
+			if ( _netchan.CopyFileFragments() )
+				ProcessFile( true, _netchan.IncomingFileName );
 		}
 
 		SetSolidEntities();

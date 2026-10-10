@@ -16,6 +16,8 @@ public abstract class GameDll
 
 	public abstract void ClientPutInServer( Edict client );
 
+	public abstract void PlayerCustomization( Edict entity, Customization customization );
+
 	public abstract void ClientCommand( Edict client );
 
 	public abstract void ClientUserInfoChanged( Edict client, ref string info );

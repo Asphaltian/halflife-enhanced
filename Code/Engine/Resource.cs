@@ -30,5 +30,21 @@ public sealed class Resource
 	public int DownloadSize;
 	public int Flags;
 	public byte[] Md5 = new byte[Md5Size];
+	public int PlayerNum;
 	public byte[] Reserved = new byte[ReservedSize];
+
+	public Resource Clone()
+	{
+		return new Resource
+		{
+			Name = Name,
+			Type = Type,
+			Index = Index,
+			DownloadSize = DownloadSize,
+			Flags = Flags,
+			Md5 = [.. Md5],
+			PlayerNum = PlayerNum,
+			Reserved = [.. Reserved]
+		};
+	}
 }

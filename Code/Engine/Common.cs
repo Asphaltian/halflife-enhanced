@@ -367,4 +367,15 @@ public static class Common
 
 		return BitConverter.ToInt32( data );
 	}
+
+	public static string DefaultExtension( string name, string extension )
+	{
+		for ( var i = name.Length - 1; i > 0 && name[i] != '/'; i-- )
+		{
+			if ( name[i] == '.' )
+				return name;
+		}
+
+		return name + extension;
+	}
 }

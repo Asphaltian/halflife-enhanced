@@ -189,9 +189,12 @@ public sealed partial class Server : GameObjectSystem<Server>, IHotloadManaged
 
 		ClearEdicts();
 		ClearSounds();
+		ClearClientStates();
 
 		if ( _shadow.IsValid() )
 			_shadow.GameObject.Destroy();
+
+		Hpak.FlushHostQueue();
 	}
 
 	public void LoadEntities()
@@ -267,6 +270,8 @@ public sealed partial class Server : GameObjectSystem<Server>, IHotloadManaged
 		CreateBaseline();
 		CreateResourceList();
 		SendServerInfoToClients();
+
+		Hpak.FlushHostQueue();
 
 		Log.Trace( MaxClients < 2 ? "Game started\n" : $"{MaxClients} player server started\n" );
 

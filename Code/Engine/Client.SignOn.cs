@@ -321,6 +321,8 @@ partial class Client
 		_signon = 0;
 
 		ClearClientState();
+
+		Server.Get( Scene )?.ClearClientStates();
 	}
 
 	private void ClearState()
@@ -374,6 +376,8 @@ partial class Client
 
 	private void ParseServerInfo( MessageReader message )
 	{
+		Hpak.CheckSize( "custom" );
+
 		Log.Trace( "Serverinfo packet received.\n" );
 
 		ClearState();
@@ -417,6 +421,8 @@ partial class Client
 		_maxEdicts = Server.DefaultMaxEdicts + ((_maxClients - 1) * 15);
 		_playerNum = message.ReadByte();
 		_serverCrc = Common.UnMunge3( _serverCrc, (-1 - _playerNum) & 0xFF );
+
+		CreateLocalCustomizations();
 
 		message.ReadByte();
 

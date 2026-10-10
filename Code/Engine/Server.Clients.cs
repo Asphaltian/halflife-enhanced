@@ -272,7 +272,10 @@ partial class Server
 		client.Spawned = false;
 		client.Connected = true;
 		client.Uploading = false;
+		client.UploadDoneRegistering = false;
 		client.FullyConnected = false;
+
+		ClearResourceLists( client );
 
 		LogPrintf( $"\"{name}<{client.UserId}><{GetIdString( client.SteamId )}><>\" connected, address \"{address}\"\n" );
 
@@ -322,6 +325,7 @@ partial class Server
 
 			client.Message.Clear();
 			client.Datagram.Clear();
+			client.Customizations.Clear();
 
 			client.PhysInfo = "";
 		}
@@ -356,6 +360,7 @@ partial class Server
 		client.Name = "";
 		client.ConnectionStarted = Host.RealTime;
 		client.Proxy = false;
+		client.Customizations.Clear();
 		client.Loopback = false;
 		client.UserInfo = "";
 		client.PhysInfo = "";

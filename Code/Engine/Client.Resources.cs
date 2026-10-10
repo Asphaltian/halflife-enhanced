@@ -11,7 +11,7 @@ partial class Client
 	private const int MaxDecalNames = 512;
 
 	[ConVar( "cl_allowdownload", ConVarFlags.Saved )]
-	private static float AllowDownload { get; set; } = 1f;
+	public static float AllowDownload { get; set; } = 1f;
 
 	[ConVar( "cl_download_ingame", ConVarFlags.Saved )]
 	private static float DownloadInGame { get; set; } = 1f;
@@ -264,7 +264,19 @@ partial class Client
 					break;
 
 				case ResourceKind.Decal:
-					throw new NotSupportedException( "customization download is not ported" );
+					if ( Hpak.GetDataPointer( Hpak.Custom, resource ) )
+					{
+						MoveToOnHandList( resource );
+					}
+					else if ( (resource.Flags & Resource.Requested) == 0 )
+					{
+						buffer.WriteByte( Server.StringCommand );
+						buffer.WriteString( $"dlfile {CustomizationPrefix}{Hpak.Md5Print( resource.Md5 )}" );
+
+						resource.Flags |= Resource.Requested;
+					}
+
+					break;
 
 				case ResourceKind.Generic:
 				case ResourceKind.EventScript:
@@ -298,40 +310,61 @@ partial class Client
 
 	private void ProcessFile( bool successfully, string name )
 	{
-		if ( name[0] == '!' )
-			throw new NotSupportedException( "customization download is not ported" );
-
-		Log.Info( successfully ? $"Processing {name}\n" : $"Error: server failed to transmit file '{name}'\n" );
+		if ( !successfully )
+			Log.Info( $"Error: server failed to transmit file '{(name[0] == '!' ? "customization" : name)}'\n" );
+		else if ( name[0] != '!' )
+			Log.Info( $"Processing {name}\n" );
 
 		var soundName = name.StartsWith( "sound/", StringComparison.OrdinalIgnoreCase ) ? name["sound/".Length..] : name;
+		var hash = name.StartsWith( CustomizationPrefix, StringComparison.OrdinalIgnoreCase ) ? Hpak.HexConvert( soundName[CustomizationPrefix.Length..], Resource.Md5Size * 2 ) : null;
 
 		foreach ( var resource in _resourcesNeeded )
 		{
-			if ( !resource.Name.Equals( resource.Type == ResourceKind.Generic ? name : soundName, StringComparison.OrdinalIgnoreCase ) )
+			if ( hash is not null )
+			{
+				if ( !resource.Md5.AsSpan().SequenceEqual( hash ) )
+					continue;
+			}
+			else if ( !resource.Name.Equals( resource.Type == ResourceKind.Generic ? name : soundName, StringComparison.OrdinalIgnoreCase ) )
+			{
 				continue;
+			}
 
 			if ( successfully )
 				resource.Flags &= ~Resource.WasMissing;
+
+			if ( name[0] == '!' )
+				ProcessCustomizationFile( resource );
+
+			_netchan.TempBuffer = null;
 
 			MoveToOnHandList( resource );
 			break;
 		}
 
-		if ( _state == ClientState.Disconnected || _resourcesNeeded.Count != 0 )
+		if ( _state == ClientState.Disconnected )
 			return;
 
-		var buffer = _resourceRegistration;
-
-		buffer.Clear();
-
-		if ( PrecacheResources() )
-			RegisterResources( buffer );
-
-		if ( buffer.CurSize > 0 )
+		if ( _resourcesNeeded.Count == 0 )
 		{
-			_netchan.CreateFragments( buffer );
-			_netchan.FragSend();
+			var buffer = _resourceRegistration;
+
+			buffer.Clear();
+
+			if ( PrecacheResources() )
+				RegisterResources( buffer );
+
+			if ( buffer.CurSize > 0 )
+			{
+				_netchan.CreateFragments( buffer );
+				_netchan.FragSend();
+			}
 		}
+
+		if ( _netchan.TempBuffer is not null )
+			Log.Info( $"CL_ProcessFile: Received a decal {soundName}, but didn't find it in resources needed list!\n" );
+
+		_netchan.TempBuffer = null;
 	}
 
 	private bool PrecacheResources()

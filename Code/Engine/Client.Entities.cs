@@ -151,6 +151,9 @@ partial class Client
 		Array.Clear( _modelPrecache );
 		Array.Clear( _soundPrecache );
 		Array.Clear( _eventPrecache );
+
+		ClearCustomizationLists( false );
+
 		Array.Clear( _players );
 
 		_modelPrecacheCount = 0;
@@ -179,6 +182,7 @@ partial class Client
 
 		_viewModel?.ClearState();
 
+		RegisterLogo();
 		CreateEntity( 0 );
 	}
 

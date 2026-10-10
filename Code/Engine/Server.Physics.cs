@@ -32,6 +32,7 @@ partial class Server
 		}
 
 		CheckMoveVars();
+		RegisterUploads();
 		CheckTimeouts();
 		SendClientMessages();
 		PublishPlayerData();

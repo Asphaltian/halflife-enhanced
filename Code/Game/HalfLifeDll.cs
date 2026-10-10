@@ -520,6 +520,37 @@ public sealed partial class HalfLifeDll : GameDll
 		player.IUser2 = 0;
 	}
 
+	public override void PlayerCustomization( Edict entity, Customization customization )
+	{
+		if ( entity is not Player player )
+		{
+			Util.Alert( AlertType.Console, "PlayerCustomization:  Couldn't get player!\n" );
+			return;
+		}
+
+		if ( customization is null )
+		{
+			Util.Alert( AlertType.Console, "PlayerCustomization:  NULL customization!\n" );
+			return;
+		}
+
+		switch ( customization.Resource.Type )
+		{
+			case ResourceKind.Decal:
+				player.SetCustomDecalFrames( customization.UserData2 );
+				break;
+
+			case ResourceKind.Sound:
+			case ResourceKind.Skin:
+			case ResourceKind.Model:
+				break;
+
+			default:
+				Util.Alert( AlertType.Console, "PlayerCustomization:  Unknown customization type!\n" );
+				break;
+		}
+	}
+
 	public override void ClientUserInfoChanged( Edict client, ref string info )
 	{
 		if ( client is not Player player )

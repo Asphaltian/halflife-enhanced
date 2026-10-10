@@ -32,6 +32,7 @@ public sealed class ServerClient( int slot )
 	public bool FullyConnected;
 	public bool Connected;
 	public bool Uploading;
+	public bool UploadDoneRegistering;
 	public bool HasUserMessages;
 	public bool SentNewResponse;
 	public int SendResourceCount;
@@ -88,6 +89,9 @@ public sealed class ServerClient( int slot )
 	public const int MaxBlockSize = 1024;
 
 	public readonly EventInfo[] Events = new EventInfo[MaxEventQueue];
+	public readonly List<Resource> ResourcesNeeded = [];
+	public readonly List<Resource> ResourcesOnHand = [];
+	public readonly List<Customization> Customizations = [];
 
 	public ServerFrame[] Frames = [];
 

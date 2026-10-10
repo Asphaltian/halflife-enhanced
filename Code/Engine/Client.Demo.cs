@@ -313,17 +313,6 @@ partial class Client
 		return HasExtension( name, extension ) ? name : $"{name}.{extension.TrimStart( '.' )}";
 	}
 
-	private static string DefaultExtension( string name, string extension )
-	{
-		for ( var i = name.Length - 1; i > 0 && name[i] != '/'; i-- )
-		{
-			if ( name[i] == '.' )
-				return name;
-		}
-
-		return name + extension;
-	}
-
 	private static string StripExtension( string name )
 	{
 		for ( var i = name.Length - 1; i >= 0 && name[i] is not ('/' or '\\'); i-- )
@@ -1420,7 +1409,7 @@ partial class Client
 
 		Disconnect();
 
-		var name = DefaultExtension( arguments[0].Length > 0xfb ? arguments[0][..0xfb] : arguments[0], ".dem" );
+		var name = Common.DefaultExtension( arguments[0].Length > 0xfb ? arguments[0][..0xfb] : arguments[0], ".dem" );
 
 		Log.Info( $"Playing demo from {name}.\n" );
 
@@ -1539,7 +1528,7 @@ partial class Client
 			return;
 		}
 
-		var name = DefaultExtension( arguments.Length > 0 ? arguments[0] : "", ".dem" );
+		var name = Common.DefaultExtension( arguments.Length > 0 ? arguments[0] : "", ".dem" );
 
 		Log.Info( $"Demo contents for {name}.\n" );
 
@@ -1680,7 +1669,7 @@ partial class Client
 			Log.Info( $"Forcing CD track to {track}\n" );
 		}
 
-		var name = DefaultExtension( arguments[0], ".dem" );
+		var name = Common.DefaultExtension( arguments[0], ".dem" );
 
 		if ( !HasExtension( name, "dem" ) )
 		{
@@ -1801,7 +1790,7 @@ partial class Client
 			return;
 		}
 
-		var name = DefaultExtension( arguments[0], ".dem" );
+		var name = Common.DefaultExtension( arguments[0], ".dem" );
 
 		if ( !HasExtension( name, "dem" ) )
 		{
@@ -1921,7 +1910,7 @@ partial class Client
 		}
 
 		var second = Common.Atoi( arguments[2] );
-		var name = DefaultExtension( arguments[0], ".dem" );
+		var name = Common.DefaultExtension( arguments[0], ".dem" );
 
 		if ( !HasExtension( name, "dem" ) )
 		{
@@ -2012,7 +2001,7 @@ partial class Client
 			return;
 		}
 
-		var name = DefaultExtension( arguments[0], ".dem" );
+		var name = Common.DefaultExtension( arguments[0], ".dem" );
 
 		if ( !HasExtension( name, "dem" ) )
 		{

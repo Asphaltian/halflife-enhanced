@@ -195,19 +195,6 @@ partial class Server
 		client.Netchan.FragSend();
 	}
 
-	private void ParseResourceList( ServerClient client )
-	{
-		var total = _netMessage.ReadShort();
-
-		if ( total > 0 )
-			throw new NotSupportedException( "clc_resourcelist with custom resources is not ported" );
-
-		if ( SvAllowUpload != 0f )
-			Log.Trace( "Verifying and uploading resources...\n" );
-
-		client.Uploading = true;
-	}
-
 	[ConCmd( "dlfile" )]
 	private static void BeginFileDownloadCommand( params string[] arguments )
 	{
@@ -227,12 +214,17 @@ partial class Server
 		if ( IsSafeFileToDownload( name ) && SvAllowDownload != 0f )
 		{
 			if ( name[0] == '!' )
-				throw new NotSupportedException( "customization download is not ported" );
+			{
+				if ( BeginCustomizationDownload( client, name ) )
+					return;
+			}
+			else if ( !client.FullyConnected )
+			{
+				var redirected = SvDownloadUrl.Length != 0 && SvDownloadUrl.Length < MaxDownloadUrlLength && SvAllowDlFile == 0f;
 
-			var redirected = SvDownloadUrl.Length != 0 && SvDownloadUrl.Length < MaxDownloadUrlLength && SvAllowDlFile == 0f;
-
-			if ( !client.FullyConnected && SvSendResources != 0f && !redirected && FileExists( name ) )
-				throw new NotSupportedException( "file transfer is not ported" );
+				if ( SvSendResources != 0f && !redirected && FileExists( name ) )
+					throw new NotSupportedException( "file transfer is not ported" );
+			}
 		}
 
 		client.Message.WriteByte( FileTransferFailedMessage );

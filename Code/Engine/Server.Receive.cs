@@ -109,11 +109,21 @@ partial class Server
 					Globals.FrameTime = (float)Host.FrameTime;
 				}
 
-				if ( client.Netchan.IncomingReady && client.Netchan.CopyNormalFragments() is { } fragments )
+				if ( !client.Netchan.IncomingReady )
+					continue;
+
+				if ( client.Netchan.CopyNormalFragments() is { } fragments )
 				{
 					_netMessage.BeginReading( fragments, fragments.Length );
 
 					ExecuteClientMessage( client );
+				}
+
+				if ( client.Netchan.CopyFileFragments() )
+				{
+					_hostClient = client;
+
+					ProcessFile( client, client.Netchan.IncomingFileName );
 				}
 			}
 		}

@@ -120,7 +120,7 @@ partial class Client
 		if ( model is null && Server.Get( Scene ) is { Active: true } server )
 			model = server.GetModel( server.GetEdict( entityIndex )?.ModelIndex ?? 0 );
 
-		if ( model is not BrushModel brush || textureIndex < 0 || textureIndex >= DecalWad.Textures.Length )
+		if ( model is not BrushModel brush || textureIndex >= DecalWad.Textures.Length )
 		{
 			Log.Info( "Decals must hit mod_brush!\n" );
 			return;
@@ -153,7 +153,10 @@ partial class Client
 		_decalTexture = textureIndex;
 		_decalFlags = (flags & DecalFlags.Custom) == DecalFlags.Custom ? flags : flags | DecalFlags.ClipTest;
 		_decalEntity = entityIndex;
-		_decalSize = Math.Max( DecalWad.Textures[textureIndex].Width >> 1, DecalWad.Textures[textureIndex].Height >> 1 );
+
+		var (_, width, height) = DecalTexture( textureIndex );
+
+		_decalSize = Math.Max( width >> 1, height >> 1 );
 
 		DecalNode( node );
 	}
@@ -187,7 +190,7 @@ partial class Client
 
 	private void DecalNodeSurfaces( in Node node )
 	{
-		var (_, decalWidth, decalHeight) = DecalWad.Textures[_decalTexture];
+		var (_, decalWidth, decalHeight) = DecalTexture( _decalTexture );
 
 		for ( var i = 0; i < node.NumFaces; i++ )
 		{
@@ -223,7 +226,7 @@ partial class Client
 	{
 		var face = WorldFile.Faces[surface];
 		var (textureWidth, textureHeight) = WorldFile.GetTextureSize( face );
-		var (_, width, height) = DecalWad.Textures[_decalTexture];
+		var (_, width, height) = DecalTexture( _decalTexture );
 
 		var count = 0;
 		var lastDistance = 0xffff;
@@ -233,7 +236,7 @@ partial class Client
 
 		foreach ( var existing in decals ?? [] )
 		{
-			var (_, existingWidth, existingHeight) = DecalWad.Textures[existing.Texture];
+			var (_, existingWidth, existingHeight) = DecalTexture( existing.Texture );
 
 			if ( (existing.Flags & (DecalFlags.Permanent | DecalFlags.UseAxis)) != 0 || existingWidth > (float)(width * 1.5) )
 				continue;
@@ -313,6 +316,35 @@ partial class Client
 		decal.Surface = -1;
 	}
 
+	private void DecalRemoveAll( int texture )
+	{
+		foreach ( var decal in _decalPool )
+		{
+			if ( decal is null || decal.Texture != texture )
+				continue;
+
+			DecalUnlink( decal );
+
+			decal.Dx = 0f;
+			decal.Dy = 0f;
+			decal.Scale = 0f;
+			decal.Texture = 0;
+			decal.Flags = default;
+			decal.EntityIndex = 0;
+		}
+
+		_decalMaterials.Remove( texture );
+
+		foreach ( var decalObject in _decalObjects.Values )
+		{
+			foreach ( var key in decalObject.Batches.Keys )
+			{
+				if ( key.Texture == texture )
+					decalObject.Batches.Remove( key );
+			}
+		}
+	}
+
 	private int DecalGetOrigin( Decal decal, out Vector3 position )
 	{
 		var face = WorldFile.Faces[decal.Surface];
@@ -321,7 +353,7 @@ partial class Client
 		var extents = WorldFile.SurfaceExtents[decal.Surface];
 
 		var (textureWidth, textureHeight) = WorldFile.GetTextureSize( face );
-		var (_, decalWidth, decalHeight) = DecalWad.Textures[decal.Texture];
+		var (_, decalWidth, decalHeight) = DecalTexture( decal.Texture );
 
 		var length = MathLib.Length( texInfo.S );
 		var half = (float)(length * 0.5);
@@ -366,7 +398,7 @@ partial class Client
 
 			var depth = (byte)_surfaceDecals[decal.Surface].IndexOf( decal );
 			var entityIndex = (short)DecalGetOrigin( decal, out var position );
-			var name = DecalWad.Textures[decal.Texture].Name;
+			var name = DecalTexture( decal.Texture ).Name;
 
 			if ( !list.Exists( x => x.Name == name && x.EntityIndex == entityIndex && MathLib.Length( position - x.Position ) < 2f ) )
 				list.Add( new DecalEntry( name, entityIndex, depth, (byte)decal.Flags, position ) );
@@ -620,7 +652,7 @@ partial class Client
 
 		material = Material.Create( $"decal_{texture}", "goldsrc_lightmapped" );
 		material.SetFeature( "F_DECAL", 1 );
-		material.Set( "Color0", Texture.Load( Server.GetMountPath( $"decals/{texture}.vtex" ) ) );
+		material.Set( "Color0", texture < 0 ? CustomDecalTexture( ~texture ) : Texture.Load( Server.GetMountPath( $"decals/{texture}.vtex" ) ) );
 
 		for ( var i = 0; i < Face.MaxLightmaps; i++ )
 			material.Set( $"Lightmap{i}", _lightmaps[i] );
@@ -671,7 +703,7 @@ partial class Client
 		var normal = face.Side != 0 ? -plane.Normal : plane.Normal;
 
 		var (textureWidth, textureHeight) = WorldFile.GetTextureSize( face );
-		var (_, decalWidth, decalHeight) = DecalWad.Textures[decal.Texture];
+		var (_, decalWidth, decalHeight) = DecalTexture( decal.Texture );
 
 		var scaleS = textureWidth * decal.Scale / decalWidth;
 		var scaleT = textureHeight * decal.Scale / decalHeight;

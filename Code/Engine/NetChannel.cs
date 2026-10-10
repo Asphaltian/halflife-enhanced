@@ -15,6 +15,11 @@ public sealed class NetChannel
 	private const int UdpHeaderSize = 28;
 	private const int MaxStreams = 2;
 	private const int NormalStream = 0;
+	private const int FileStream = 1;
+	private const int MaxFileNameLength = 259;
+	private const int MaxCompressionNameLength = 31;
+	private const string Uncompressed = "uncompressed";
+	private const string Compressed = "bz2";
 	private const int MaxFragmentId = 25000;
 	private const int MaxFragmentLength = 0x800;
 	private const int MaxFragmentOffset = 0x4000;
@@ -88,6 +93,9 @@ public sealed class NetChannel
 	public Action<byte[]> Send;
 	public Func<int> BlockSize;
 
+	public string IncomingFileName = "";
+	public byte[] TempBuffer;
+
 	private readonly SizeBuf _send = new( "Netchan_Transmit", MaxPacketSize, false );
 	private readonly byte[] _reliableBuffer = new byte[MessageSize];
 	private readonly Queue<Queue<FragBuf>>[] _waitList = [[], []];
@@ -99,6 +107,8 @@ public sealed class NetChannel
 	private readonly int[] _fragLength = new int[MaxStreams];
 	private readonly List<FragBuf>[] _incomingBufs = [[], []];
 	private readonly bool[] _incomingReady = new bool[MaxStreams];
+	private readonly SizeBuf _fileHeader = new( "Frag Buffer Alloc'd", FragmentBufferSize, true );
+	private readonly MessageReader _fileMessage = new();
 
 	private bool _client;
 	private int _reliableLength;
@@ -202,6 +212,8 @@ public sealed class NetChannel
 			_fragStartPos[i] = 0;
 			_fragLength[i] = 0;
 		}
+
+		TempBuffer = null;
 	}
 
 	public bool CanPacket()
@@ -250,6 +262,45 @@ public sealed class NetChannel
 		}
 
 		CreateFragmentBuffers( message );
+	}
+
+	public void CreateFileFragmentsFromBuffer( string fileName, byte[] data )
+	{
+		if ( data.Length == 0 )
+			return;
+
+		var header = _fileHeader;
+
+		header.Clear();
+		header.WriteString( fileName );
+		header.WriteString( Uncompressed );
+		header.WriteLong( data.Length );
+
+		var chunkSize = BlockSize();
+		var wait = new Queue<FragBuf>();
+		var remaining = data.Length;
+		var position = 0;
+		var bufferId = 1;
+
+		while ( remaining > 0 )
+		{
+			var bytes = Math.Min( remaining, chunkSize );
+			var prefix = bufferId == 1 ? header.CurSize : 0;
+
+			bytes -= prefix;
+
+			var buffer = new byte[prefix + bytes];
+
+			Array.Copy( header.Data, buffer, prefix );
+			Array.Copy( data, position, buffer, prefix, bytes );
+
+			wait.Enqueue( new FragBuf { BufferId = bufferId++, Data = buffer } );
+
+			position += bytes;
+			remaining -= bytes;
+		}
+
+		_waitList[FileStream].Enqueue( wait );
 	}
 
 	public void FragSend()
@@ -573,6 +624,136 @@ public sealed class NetChannel
 	}
 
 	public bool IncomingReady => _incomingReady[0] || _incomingReady[1];
+
+	private void FlushIncoming( int stream )
+	{
+		_incomingBufs[stream].Clear();
+		_incomingReady[stream] = false;
+	}
+
+	public bool CopyFileFragments()
+	{
+		if ( !_incomingReady[FileStream] )
+			return false;
+
+		var list = _incomingBufs[FileStream];
+
+		if ( list.Count == 0 )
+		{
+			Log.Info( "Netchan_CopyFileFragments:  Called with no fragments readied\n" );
+
+			_incomingReady[FileStream] = false;
+
+			return false;
+		}
+
+		var message = _fileMessage;
+
+		message.BeginReading( list[0].Data, list[0].Data.Length );
+
+		var fileName = message.ReadString();
+
+		if ( fileName.Length > MaxFileNameLength )
+			fileName = fileName[..MaxFileNameLength];
+
+		var compression = message.ReadString();
+
+		if ( compression.Length > MaxCompressionNameLength )
+			compression = compression[..MaxCompressionNameLength];
+
+		message.ReadLong();
+
+		var serverActive = Server.Current is { Active: true };
+
+		if ( !Application.IsDedicatedServer && !serverActive && Client.AllowDownload == 0f )
+		{
+			Log.Info( "File fragment received but cl_allow_download set to 0, ignoring\n" );
+			FlushIncoming( FileStream );
+
+			return false;
+		}
+
+		if ( fileName.Length < 1 )
+		{
+			Log.Info( "File fragment received with no filename\nFlushing input queue\n" );
+			FlushIncoming( FileStream );
+
+			return false;
+		}
+
+		if ( fileName.Contains( ".." ) )
+		{
+			Log.Info( "File fragment received with relative path, ignoring\n" );
+			FlushIncoming( FileStream );
+
+			return false;
+		}
+
+		if ( fileName[0] != '!' && !Server.IsSafeFileToDownload( fileName ) )
+		{
+			Log.Info( "File fragment received with bad path, ignoring\n" );
+			FlushIncoming( FileStream );
+
+			return false;
+		}
+
+		if ( serverActive && fileName[0] != '!' )
+		{
+			Log.Info( "File fragment received with bad path, ignoring (2)\n" );
+			FlushIncoming( FileStream );
+
+			return false;
+		}
+
+		IncomingFileName = fileName;
+
+		if ( fileName[0] != '!' && Server.FileExists( fileName ) )
+		{
+			Log.Info( $"Can't download {fileName}, already exists\n" );
+			FlushIncoming( FileStream );
+
+			return true;
+		}
+
+		if ( compression.Equals( Compressed, StringComparison.OrdinalIgnoreCase ) )
+			throw new NotSupportedException( "bz2 file fragments are not ported" );
+
+		var total = -message.ReadCount;
+
+		foreach ( var buffer in list )
+			total += buffer.Data.Length;
+
+		var data = new byte[total];
+		var position = 0;
+
+		for ( var i = 0; i < list.Count; i++ )
+		{
+			var skip = i == 0 ? message.ReadCount : 0;
+			var length = list[i].Data.Length - skip;
+
+			Array.Copy( list[i].Data, skip, data, position, length );
+
+			position += length;
+		}
+
+		if ( fileName[0] == '!' )
+		{
+			if ( TempBuffer is not null )
+				Log.Trace( "Netchan_CopyFragments:  Freeing holdover tempbuffer\n" );
+
+			TempBuffer = data;
+		}
+		else
+		{
+			Log.Trace( $"COM_WriteFile: {fileName}\n" );
+
+			Server.WriteFile( fileName, data );
+		}
+
+		FlushIncoming( FileStream );
+
+		return true;
+	}
 
 	public byte[] CopyNormalFragments()
 	{
