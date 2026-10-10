@@ -109,6 +109,7 @@ public sealed partial class Client : GameObjectSystem<Client>
 			_decalCamera.RemoveCommandList( _decalCommands );
 
 		ClearLightVolume();
+		ClearSky();
 
 		_dynamicLightTexture?.Dispose();
 		_dynamicLightTexture = null;

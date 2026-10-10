@@ -514,6 +514,7 @@ partial class Client
 		ClearParticles();
 		ClearBeams();
 		ClearDecals();
+		LoadSky();
 		InitLevel();
 		LoadWaterPalettes();
 		CreateLightVolume( world.Name );

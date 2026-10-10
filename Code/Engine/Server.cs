@@ -146,6 +146,21 @@ public sealed partial class Server : GameObjectSystem<Server>, IHotloadManaged
 		Array.Clear( LightStyles );
 		LoadVisibility();
 
+		if ( DeathmatchCvar != 0f )
+		{
+			Cvar.Set( "sv_skyname", "desert" );
+			Cvar.Set( "sv_skycolor_r", "0" );
+			Cvar.Set( "sv_skycolor_g", "0" );
+			Cvar.Set( "sv_skycolor_b", "0" );
+			Cvar.Set( "sv_skyvec_x", "0" );
+			Cvar.Set( "sv_skyvec_y", "0" );
+			Cvar.Set( "sv_skyvec_z", "0" );
+			Cvar.Set( "room_type", "0" );
+		}
+
+		Cvar.Set( "sv_allow_shaders", DeathmatchCvar == 0f ? "1" : "0" );
+		Cvar.Set( "sv_allow_autoaim", DeathmatchCvar == 0f ? "1" : "0" );
+
 		SetMoveVars();
 
 		Listen();

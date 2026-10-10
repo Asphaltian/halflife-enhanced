@@ -111,6 +111,8 @@ partial class Client
 
 		_entities.Clear();
 		_visibleEntities.Clear();
+
+		ClearSky();
 		_beamEntities.Clear();
 
 		Array.Clear( _frames );
