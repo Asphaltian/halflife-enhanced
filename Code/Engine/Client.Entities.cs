@@ -292,7 +292,7 @@ partial class Client
 			if ( _visibleEntities.Count == MaxVisibleEntities )
 				break;
 
-			var direct = !_netchan.Loopback || (interpolated && _maxClients > 1);
+			var direct = (!_netchan.Loopback && !_demoPlayback) || (interpolated && _maxClients > 1);
 
 			if ( direct )
 				entity.SetRenderTransform();

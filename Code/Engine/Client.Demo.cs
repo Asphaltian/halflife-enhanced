@@ -248,6 +248,7 @@ partial class Client
 	private static float GameGauge { get; set; }
 
 	private readonly byte[] _demoInfo = new byte[DemoInfoSize];
+	private readonly byte[] _demoTickInfo = new byte[DemoInfoSize];
 	private readonly byte[][] _demoFrames = new byte[DemoFrameHistory][];
 	private readonly byte[] _demoPacket = new byte[MaxDemoMessage];
 	private readonly string[] _demos = new string[MaxDemos];
@@ -510,7 +511,7 @@ partial class Client
 			return;
 		}
 
-		var time = (float)((double)((float)(_demoTimeScale * Host.RealTime) - _demoStartTime) - DemoInterpolationDelay);
+		var time = (float)((double)((float)(_demoTimeScale * (Host.RealTime - CommandTime + _accumulator)) - _demoStartTime) - DemoInterpolationDelay);
 		var to = latest;
 		byte[] from = null;
 
@@ -582,9 +583,27 @@ partial class Client
 		Log.Trace( "Spooling demo header.\n" );
 	}
 
+	private void WriteDemoInfo( DemoFile file )
+	{
+		var info = _demoTickInfo;
+
+		_demoInfo.CopyTo( info, 0 );
+
+		var simOrigin = StructImage.ReadVector( info, DemoRefParamsOffset + 0x64 );
+		var viewHeight = StructImage.ReadVector( info, DemoRefParamsOffset + 0x70 );
+		var offset = _simOrg - simOrigin + _viewHeight - viewHeight;
+
+		StructImage.Write( info, DemoRefParamsOffset, StructImage.ReadVector( info, DemoRefParamsOffset ) + offset );
+		StructImage.Write( info, DemoRefParamsOffset + 0x64, _simOrg );
+		StructImage.Write( info, DemoRefParamsOffset + 0x70, _viewHeight );
+		StructImage.Write( info, DemoViewOffset, StructImage.ReadVector( info, DemoViewOffset ) + offset );
+
+		file.Write( info );
+	}
+
 	private void WriteDemoNetchan( DemoFile file, int length )
 	{
-		file.Write( _demoInfo );
+		WriteDemoInfo( file );
 		file.WriteInt( _netchan.IncomingSequence );
 		file.WriteInt( _netchan.IncomingAcknowledged );
 		file.WriteInt( _netchan.IncomingReliableAcknowledged );
@@ -847,7 +866,7 @@ partial class Client
 
 			elapsed = (float)(_demoTimeScale * Host.RealTime) - _demoStartTime;
 
-			if ( command != DemoNetworkStartup && command != DemoNextSection && !_timeDemo && elapsed <= frameTime )
+			if ( command != DemoNetworkStartup && command != DemoNextSection && !_timeDemo && elapsed + (CommandTime * 0.5) <= frameTime )
 			{
 				_demoFile.Position = position;
 
