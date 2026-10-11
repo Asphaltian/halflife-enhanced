@@ -10,6 +10,21 @@ public sealed class BoneOutput
 	private Sandbox.Texture _fxTexture;
 	private BBox _bounds;
 
+	public static void SetBody( File header, SkinnedModelRenderer renderer, int body, int skin )
+	{
+		for ( var i = 0; i < header.BodyParts.Length; i++ )
+		{
+			ref readonly var bodyPart = ref header.BodyParts[i];
+
+			renderer.SetBodyGroup( i, body / bodyPart.Base % bodyPart.NumModels );
+		}
+
+		if ( renderer.HasMaterialGroups )
+			renderer.MaterialGroup = $"Skin {skin}";
+
+		renderer.UseAnimGraph = false;
+	}
+
 	public void UpdateBounds( SkinnedModelRenderer renderer )
 	{
 		if ( renderer is { Enabled: true, SceneModel: { } sceneModel } )

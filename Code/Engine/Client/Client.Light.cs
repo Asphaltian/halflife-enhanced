@@ -10,6 +10,14 @@ public struct StudioLight
 	public Vector3 Color;
 	public Vector3 LightVector;
 	public Vector3Int? FloorColor;
+
+	public readonly void Apply( RenderAttributes attributes )
+	{
+		attributes.Set( "AmbientLight", (float)AmbientLight );
+		attributes.Set( "ShadeLight", (float)ShadeLight );
+		attributes.Set( "LightVector", LightVector );
+		attributes.Set( "LightColor", Color );
+	}
 }
 
 partial class Client
@@ -232,7 +240,7 @@ partial class Client
 		var green = 0;
 		var blue = 0;
 
-		for ( var map = 0; map < Face.MaxLightmaps && face.Styles[map] != 255; map++ )
+		for ( var map = 0; map < Face.MaxLightmaps && face.Styles[map] != NoStyle; map++ )
 		{
 			var scale = _lightStyleValues[face.Styles[map]];
 

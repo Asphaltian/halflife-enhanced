@@ -84,6 +84,8 @@ public class Barney : TalkMonster
 
 	public override int Classify() => ClassPlayerAlly;
 
+	public override bool CanBecomeRagdoll() => Cvar.GetFloat( "violence_hgibs" ) != 0f;
+
 	public override void AlertSound()
 	{
 		if ( EnemyEntity is not null && OkToSpeak() )

@@ -1,4 +1,5 @@
 using System;
+
 namespace GoldSrc;
 
 partial class Client
@@ -20,6 +21,20 @@ partial class Client
 
 	[ConVar( "chase_right" )]
 	private static float ChaseRight { get; set; }
+
+	private sealed class PlayerModelState
+	{
+		public string Name = "";
+		public Model Model;
+	}
+
+	private readonly PlayerModelState[] _playerModels = new PlayerModelState[Server.MaxClientsLimit];
+
+	public int FrameCount => _frameCount;
+
+	private bool IsSinglePlayerGame => (Server.Get( Scene ) is { Active: true } server ? server.MaxClients : _maxClients) == 1;
+
+	public double OldClientTime => _oldTime;
 
 	private void ChaseUpdate( ref RefParams refParams )
 	{
@@ -44,20 +59,6 @@ partial class Client
 		refParams.ViewAngles.x = (float)(-Math.Atan( (stop.z - origin.z) / distance ) / Math.PI * 180.0);
 		refParams.ViewOrigin = destination;
 	}
-
-	private sealed class PlayerModelState
-	{
-		public string Name = "";
-		public Model Model;
-	}
-
-	private readonly PlayerModelState[] _playerModels = new PlayerModelState[Server.MaxClientsLimit];
-
-	public int FrameCount => _frameCount;
-
-	private bool IsSinglePlayerGame => (Server.Get( Scene ) is { Active: true } server ? server.MaxClients : _maxClients) == 1;
-
-	public double OldClientTime => _oldTime;
 
 	private void LinkPlayers()
 	{
@@ -157,5 +158,66 @@ partial class Client
 		state.Model = ModelCache.ForName( $"models/player/{model}/{model}.mdl" ) ?? entityModel;
 
 		return state.Model;
+	}
+
+	private void LinkPlayerLight( ClientEntity player )
+	{
+		var effects = player?.PacketEffects ?? default;
+
+		var newFlashlight = NewFlashlight != 0f && (effects & Effects.BrightLight) == 0 && (effects & Effects.DimLight) == Effects.DimLight;
+
+		if ( !newFlashlight )
+			FlashlightOff();
+
+		if ( newFlashlight || (effects & (Effects.BrightLight | Effects.DimLight)) == 0 )
+		{
+			if ( _playerLight is { Key: 1 } )
+				_playerLight.Die = (float)ClientTime;
+
+			_playerLight = null;
+
+			if ( newFlashlight )
+				UpdateFlashlight( player.Origin + _viewHeight );
+
+			return;
+		}
+
+		var light = _playerLight is { Key: 1 } ? _playerLight : AllocDlight( 1 );
+
+		if ( (effects & Effects.BrightLight) == Effects.BrightLight )
+		{
+			light.R = 250;
+			light.G = 250;
+			light.B = 250;
+			light.Radius = 400f;
+			light.Origin = player.Origin + new Vector3( 0f, 0f, 16f );
+		}
+		else
+		{
+			MathLib.AngleVectors( _viewAngles, out var forward, out _, out _ );
+
+			var start = player.Origin + _viewHeight;
+			var end = start + (forward * 2000f);
+
+			_pmove.UseHull = 2;
+
+			var trace = _pmove.PlayerTrace( start, end, TraceFlags.StudioBox, -1 );
+
+			light.Origin = trace.Ent > 0 && _pmove.PhysEnts[trace.Ent].StudioModel is not null ? _pmove.PhysEnts[trace.Ent].Origin : trace.EndPos;
+
+			var falloff = trace.Fraction * 2000f;
+
+			falloff = falloff >= 500f ? 500f / falloff : 1f;
+
+			var brightness = (byte)(int)(falloff * falloff * 255f);
+
+			light.Radius = 80f;
+			light.R = brightness;
+			light.G = brightness;
+			light.B = brightness;
+		}
+
+		_playerLight = light;
+		light.Die = (float)(ClientTime + 0.2);
 	}
 }

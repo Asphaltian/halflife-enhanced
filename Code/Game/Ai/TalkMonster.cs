@@ -474,7 +474,10 @@ public abstract class TalkMonster : BaseMonster
 		}
 
 		TargetEntity = null;
-		StopTalking();
+
+		if ( !ShouldBecomeRagdoll( gib ) )
+			StopTalking();
+
 		SetUse( null );
 
 		base.Killed( attacker, gib );

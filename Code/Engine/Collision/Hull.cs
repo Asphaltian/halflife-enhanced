@@ -31,6 +31,7 @@ public struct Trace
 	public float PlaneDist;
 	public Edict Ent;
 	public int HitGroup;
+	public int HitBone;
 	public Rigidbody Body;
 }
 

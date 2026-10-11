@@ -12,10 +12,13 @@ public sealed class StudioHulls
 	private readonly Studio.BoneSetup _boneSetup = new();
 	private readonly Hull[] _hulls = CreateHulls();
 	private readonly int[] _hitGroups = new int[MaxHulls];
+	private readonly int[] _bones = new int[MaxHulls];
 
 	public Hull this[int index] => _hulls[index];
 
 	public int HitGroup( int index ) => _hitGroups[index];
+
+	public int Bone( int index ) => _bones[index];
 
 	private static Hull[] CreateHulls()
 	{
@@ -41,6 +44,7 @@ public sealed class StudioHulls
 			var planes = _hulls[i].Planes;
 
 			_hitGroups[i] = box.Group;
+			_bones[i] = box.Bone;
 
 			for ( var axis = 0; axis < 3; axis++ )
 			{

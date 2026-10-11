@@ -116,7 +116,13 @@ public static class Sentences
 		if ( !_initialized || groupName is null )
 			return -1;
 
-		return _groups.FindIndex( x => x.Name == groupName );
+		for ( var i = 0; i < _groups.Count; i++ )
+		{
+			if ( _groups[i].Name == groupName )
+				return i;
+		}
+
+		return -1;
 	}
 
 	public static int PlayRandom( Edict entity, int group, float volume, float attenuation, int flags, int pitch )
@@ -186,7 +192,7 @@ public static class Sentences
 
 	public static int Lookup( string sample, out string sentence )
 	{
-		var index = _allNames.FindIndex( x => x.Equals( sample[1..], StringComparison.OrdinalIgnoreCase ) );
+		var index = Common.IndexOfName( _allNames, sample[1..] );
 
 		sentence = index >= 0 ? $"!{index}" : null;
 

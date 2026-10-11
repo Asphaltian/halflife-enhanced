@@ -1,4 +1,5 @@
 using System;
+
 namespace GoldSrc;
 
 partial class Server

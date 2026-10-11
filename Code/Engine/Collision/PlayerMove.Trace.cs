@@ -282,7 +282,7 @@ partial class PlayerMove
 				trace.AllSolid = start == end;
 			}
 
-			SceneContact?.Invoke( hit, Velocity + BaseVelocity );
+			SceneContact?.Invoke( hit );
 		}
 
 		return trace;

@@ -335,12 +335,11 @@ public class Gauss : BasePlayerWeapon
 				firstBeam = false;
 			}
 
+			Combat.ClearMultiDamage();
 			ScenePhysicsDamage.MeleeImpact( trace, damage, direction );
 
 			if ( entity.DamageMode != DamageNo )
 			{
-				Combat.ClearMultiDamage();
-
 				if ( entity == Player )
 					trace.HitGroup = 0;
 
@@ -374,6 +373,8 @@ public class Gauss : BasePlayerWeapon
 				continue;
 			}
 
+			Combat.RagdollImpact( source, trace.EndPos );
+
 			if ( hasPunched )
 				break;
 
@@ -393,7 +394,9 @@ public class Gauss : BasePlayerWeapon
 				continue;
 			}
 
-			beamTrace = TraceLine( beamTrace.EndPos, trace.EndPos, DontIgnoreMonsters, ignore );
+			var exitStart = beamTrace.EndPos;
+
+			beamTrace = TraceLine( exitStart, trace.EndPos, DontIgnoreMonsters, ignore );
 
 			var thickness = MathLib.Length( beamTrace.EndPos - trace.EndPos );
 
@@ -404,6 +407,8 @@ public class Gauss : BasePlayerWeapon
 				thickness = 1f;
 
 			damage -= thickness;
+
+			Combat.RagdollImpact( exitStart, beamTrace.EndPos );
 
 			var radius = HalfLifeDll.GameRules.IsMultiplayer() ? damage * 1.75f : damage * 2.5f;
 

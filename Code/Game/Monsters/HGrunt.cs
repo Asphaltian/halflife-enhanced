@@ -610,6 +610,28 @@ public class HGrunt : SquadMonster
 
 	public override int Classify() => ClassHumanMilitary;
 
+	public override bool CanBecomeRagdoll() => true;
+
+	public override void Killed( BaseEntity attacker, int gib )
+	{
+		if ( ShouldBecomeRagdoll( gib ) && GetBodygroup( GunGroup ) != GunNone )
+			DropGun();
+
+		base.Killed( attacker, gib );
+	}
+
+	private void DropGun()
+	{
+		var gunPosition = Server.GetAttachment( this, 0 );
+
+		SetBodygroup( GunGroup, GunNone );
+
+		DropItem( (Weapons & WeaponShotgun) != 0 ? "weapon_shotgun" : "weapon_9mmAR", gunPosition, Vector3.Zero );
+
+		if ( (Weapons & WeaponGrenadeLauncher) != 0 )
+			DropItem( "ammo_ARgrenades", BodyTarget( Origin ), Vector3.Zero );
+	}
+
 	public BaseEntity Kick()
 	{
 		Server.Globals.MakeVectors( Angles );
@@ -662,18 +684,8 @@ public class HGrunt : SquadMonster
 		switch ( monsterEvent.Event )
 		{
 			case AnimEventDropGun:
-				{
-					var gunPosition = Server.GetAttachment( this, 0 );
-
-					SetBodygroup( GunGroup, GunNone );
-
-					DropItem( (Weapons & WeaponShotgun) != 0 ? "weapon_shotgun" : "weapon_9mmAR", gunPosition, Vector3.Zero );
-
-					if ( (Weapons & WeaponGrenadeLauncher) != 0 )
-						DropItem( "ammo_ARgrenades", BodyTarget( Origin ), Vector3.Zero );
-
-					break;
-				}
+				DropGun();
+				break;
 
 			case AnimEventReload:
 				Sound.Emit( this, SoundChannel.Weapon, "hgrunt/gr_reload1.wav", 1f, Server.AttenuationNormal );

@@ -9,8 +9,6 @@ partial class Server
 
 	public Studio.BoneSetup BoneSetup { get; } = new();
 
-	private const int IgnoreGlass = 0x100;
-
 	private readonly List<Model> _models = [];
 	private readonly List<string> _modelNames = [];
 	private readonly List<int> _modelFlags = [];
@@ -50,7 +48,7 @@ partial class Server
 
 	public int FindModel( string name )
 	{
-		return _modelNames.FindIndex( x => x is not null && x.Equals( name, StringComparison.OrdinalIgnoreCase ) );
+		return Common.IndexOfName( _modelNames, name );
 	}
 
 	public int ModelIndex( string name )

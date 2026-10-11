@@ -115,12 +115,6 @@ partial class Server
 
 		_pmove.FrameTime = frameTime;
 		_pmove.RunFuncs = true;
-		_pmove.PlaySound = PlayerMovePlaySound;
-		_pmove.TraceTexture = PlayerMoveTraceTexture;
-		_pmove.LoadFile = LoadMountText;
-
-		_pmove.Scene = Scene;
-		_pmove.SceneContact = PlayerSceneContact;
 
 		GameDll.Move( _pmove, true );
 
@@ -218,18 +212,9 @@ partial class Server
 		return IsInUse( player );
 	}
 
-	public int PlayerMovePointContents( Vector3 point ) => _pmove.PointContents( point );
-
 	private void PlayerMovePlaySound( SoundChannel channel, string sample, float volume, float attenuation, int flags, int pitch )
 	{
 		StartSound( true, GetEdict( _hostClient.EdictIndex ), (int)channel, sample, (int)(volume * 255f), attenuation, flags, pitch );
-	}
-
-	public float? PlayerMoveWaterEntityScale( Vector3 point )
-	{
-		_pmove.WaterEntity( point, out var info );
-
-		return info >= 0 && GetEdict( info ) is { } water && GetModel( water.ModelIndex ) is not null ? water.Scale : null;
 	}
 
 	private string PlayerMoveTraceTexture( int ground, Vector3 start, Vector3 end )

@@ -111,6 +111,9 @@ partial class Client
 
 	private void NetCheckTimeouts()
 	{
+		if ( _netRequests.Count == 0 )
+			return;
+
 		var requests = _netRequests;
 		var kept = new List<NetRequest>( requests.Count );
 

@@ -22,6 +22,13 @@ public enum TriPrimitive
 
 partial class Client
 {
+	private const int TriInitialVertices = 4096;
+	private const float TriColorScale = 255.9f;
+	private const float TriAlphaScale = 255f;
+
+	[ConVar( "gl_cull" )]
+	private static float GlCull { get; set; } = 1f;
+
 	private enum TriBlend
 	{
 		None,
@@ -55,20 +62,13 @@ partial class Client
 		public GpuBuffer<Vertex> Buffer;
 	}
 
-	[ConVar( "gl_cull" )]
-	private static float GlCull { get; set; } = 1f;
-
-	private const int TriInitialVertices = 4096;
-	private const float TriColorScale = 255.9f;
-	private const float TriAlphaScale = 255f;
-
 	private readonly TriView[] _triViews = [new( 0 ), new( 1 )];
 	private readonly Dictionary<Texture, Material> _triMaterials = [];
 	private readonly List<Vertex> _triPrimitive = [];
+
 	private Vertex[] _triVertices = new Vertex[TriInitialVertices];
 	private int _triVertexCount;
 	private TriPass _triPass;
-
 	private RenderMode _triRenderMode;
 	private float _triRed;
 	private float _triGreen;

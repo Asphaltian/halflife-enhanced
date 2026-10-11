@@ -93,13 +93,13 @@ partial class Client
 		[255, 120, 70]
 	];
 
+	private readonly DynamicMesh[] _particleMeshes = new DynamicMesh[ViewCount];
+	private readonly DynamicMesh[] _tracerMeshes = new DynamicMesh[ViewCount];
+
 	private Particle _freeParticles;
 	private Particle _activeParticles;
 	private Particle _activeTracers;
-
 	private byte[] _palette;
-	private readonly DynamicMesh[] _particleMeshes = new DynamicMesh[ViewCount];
-	private readonly DynamicMesh[] _tracerMeshes = new DynamicMesh[ViewCount];
 	private Vector3 _viewOrigin;
 	private Texture _particleTexture;
 

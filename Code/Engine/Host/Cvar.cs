@@ -5,12 +5,12 @@ namespace GoldSrc;
 
 public static class Cvar
 {
-	public static float GetFloat( string name ) => Common.Atof( GetString( name ) );
-
 	private const string VolumeName = "volume";
 	private const string SensitivityName = "sensitivity";
 	private const string HostNameName = "hostname";
 	private const string VoiceLoopbackName = "voice_loopback";
+
+	public static float GetFloat( string name ) => Common.Atof( GetString( name ) );
 
 	public static void ReadArchive()
 	{

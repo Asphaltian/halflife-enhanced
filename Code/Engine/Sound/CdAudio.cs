@@ -85,7 +85,6 @@ public static class CdAudio
 
 		_initialized = true;
 		_enabled = true;
-
 	}
 
 	public static void Shutdown()

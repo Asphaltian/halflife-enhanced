@@ -45,6 +45,10 @@ public static class UserMessages
 	public static int TeamNames { get; private set; }
 	public static int StatusText { get; private set; }
 	public static int StatusValue { get; private set; }
+	public static int Ragdoll { get; private set; }
+	public static int RagdollImpact { get; private set; }
+	public static int BoltImpact { get; private set; }
+	public static int RagdollExplosion { get; private set; }
 
 	public static void Link()
 	{
@@ -86,5 +90,9 @@ public static class UserMessages
 		TeamNames = Server.RegUserMsg( "TeamNames", -1 );
 		StatusText = Server.RegUserMsg( "StatusText", -1 );
 		StatusValue = Server.RegUserMsg( "StatusValue", 3 );
+		Ragdoll = Server.RegUserMsg( "Ragdoll", 15 );
+		RagdollImpact = Server.RegUserMsg( "RagImpact", 12 );
+		BoltImpact = Server.RegUserMsg( "BoltImpact", 18 );
+		RagdollExplosion = Server.RegUserMsg( "RagExplode", 10 );
 	}
 }

@@ -42,9 +42,25 @@ partial class Client
 	[ConVar( "mp_decals", ConVarFlags.Saved )]
 	public static float MultiplayerDecalLimit { get; set; } = 300f;
 
-	private readonly Decal[] _decalPool = new Decal[MaxDecals];
-	private readonly Dictionary<int, List<Decal>> _surfaceDecals = [];
-	private readonly HashSet<int> _dirtyDecalEntities = [];
+	[StructLayout( LayoutKind.Sequential )]
+	private struct DecalVertex
+	{
+		[VertexLayout.Position]
+		public Vector3 Position;
+
+		[VertexLayout.Normal]
+		public Vector3 Normal;
+
+		[VertexLayout.TexCoord( 0 )]
+		public Vector2 TexCoord;
+
+		[VertexLayout.TexCoord( 1 )]
+		public Vector2 LightmapCoord;
+
+		[VertexLayout.Color]
+		public Color32 LightmapBlock;
+	}
+
 	private sealed class DecalBatch
 	{
 		public Mesh Mesh;
@@ -73,40 +89,23 @@ partial class Client
 		}
 	}
 
+	private readonly Decal[] _decalPool = new Decal[MaxDecals];
+	private readonly Dictionary<int, List<Decal>> _surfaceDecals = [];
+	private readonly HashSet<int> _dirtyDecalEntities = [];
 	private readonly Dictionary<int, DecalSceneObject> _decalObjects = [];
 	private readonly Sandbox.Rendering.CommandList _decalCommands = new( "Decals" );
-	private CameraComponent _decalCamera;
-	private CameraComponent _decalNextCamera;
 	private readonly Dictionary<int, (bool Visible, RenderMode RenderMode, float Blend, Transform Transform)> _decalStates = [];
 	private readonly Dictionary<int, Material> _decalMaterials = [];
 	private readonly Dictionary<Decal, DecalVertex[]> _decalVertices = [];
 
+	private CameraComponent _decalCamera;
+	private CameraComponent _decalNextCamera;
 	private int _decalAllocIndex;
-
 	private Vector3 _decalPosition;
 	private int _decalTexture;
 	private int _decalSize;
 	private DecalFlags _decalFlags;
 	private int _decalEntity;
-
-	[StructLayout( LayoutKind.Sequential )]
-	private struct DecalVertex
-	{
-		[VertexLayout.Position]
-		public Vector3 Position;
-
-		[VertexLayout.Normal]
-		public Vector3 Normal;
-
-		[VertexLayout.TexCoord( 0 )]
-		public Vector2 TexCoord;
-
-		[VertexLayout.TexCoord( 1 )]
-		public Vector2 LightmapCoord;
-
-		[VertexLayout.Color]
-		public Color32 LightmapBlock;
-	}
 
 	public void DecalShoot( int textureIndex, int entityIndex, int modelIndex, Vector3 position, DecalFlags flags )
 	{

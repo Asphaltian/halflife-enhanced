@@ -108,6 +108,9 @@ public class EnvExplosion : BaseMonster
 		var spot = Origin + new Vector3( 0f, 0f, 8f );
 		var trace = Util.TraceLine( spot, spot + new Vector3( 0f, 0f, -40f ), IgnoreMonsters, this );
 
+		var damageOrigin = Origin;
+		var blastOrigin = trace.Fraction != 1f ? trace.EndPos + (trace.PlaneNormal * 24f) : Origin;
+
 		if ( trace.Fraction != 1f )
 			Origin = trace.EndPos + (trace.PlaneNormal * (float)((_magnitude - 24) * 0.6));
 
@@ -125,8 +128,10 @@ public class EnvExplosion : BaseMonster
 		Server.WriteByte( TempEntity.ExplosionNone );
 		Server.MessageEnd();
 
+		Combat.RagdollExplosion( blastOrigin, (int)(_magnitude * 2.5f), _magnitude );
+
 		if ( (SpawnFlags & SpawnFlagNoDamage) == 0 )
-			RadiusDamage( this, this, _magnitude, ClassNone, DamageBlast );
+			Combat.RadiusDamage( Origin, this, this, _magnitude, (float)(_magnitude * 2.5), ClassNone, DamageBlast, damageOrigin );
 
 		SetThink( Smoke );
 		NextThink = (float)(Server.Globals.Time + 0.3);

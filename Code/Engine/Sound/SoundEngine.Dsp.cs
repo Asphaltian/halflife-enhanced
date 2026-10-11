@@ -117,8 +117,9 @@ partial class SoundEngine
 		if ( RoomOff == 0f )
 		{
 			var roomType = Cvar.GetFloat( "room_type" );
+			var underwater = Client.Current is { WaterLevel: > 2 };
 
-			if ( Client.Current is { WaterLevel: > 2 } )
+			if ( underwater )
 				roomType = WaterRoomType;
 
 			var preset = (uint)roomType;
@@ -134,7 +135,7 @@ partial class SoundEngine
 				}
 			}
 
-			if ( preset < RoomEffectNames.Length )
+			if ( preset < RoomEffectNames.Length && (Acoustics == 0f || underwater) )
 				effect = RoomEffectNames[preset];
 		}
 

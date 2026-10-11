@@ -10,6 +10,7 @@ partial class Client
 
 	private string _chatBuffer = "";
 	private string _messageType = DefaultMessageType;
+	private bool _messagePrivileged = true;
 
 	public bool MessageMode { get; private set; }
 
@@ -20,6 +21,7 @@ partial class Client
 			return;
 
 		client.MessageMode = true;
+		client._messagePrivileged = Cmd.Privileged;
 
 		if ( type is null )
 			client._messageType = DefaultMessageType;
@@ -34,6 +36,7 @@ partial class Client
 			return;
 
 		client.MessageMode = true;
+		client._messagePrivileged = Cmd.Privileged;
 		client._messageType = "say_team";
 	}
 
@@ -43,7 +46,13 @@ partial class Client
 		{
 			case "enter":
 			case "pad_enter":
-				Cmd.AddText( $"{_messageType} \"{_chatBuffer.Replace( ';', ',' )}\"\n" );
+				var line = $"{_messageType} \"{_chatBuffer.Replace( ';', ',' )}\"\n";
+
+				if ( _messagePrivileged )
+					Cmd.AddText( line );
+				else
+					Cmd.AddFilteredText( line );
+
 				break;
 
 			case "escape":
@@ -66,6 +75,7 @@ partial class Client
 		MessageMode = false;
 		_chatBuffer = "";
 		_messageType = DefaultMessageType;
+		_messagePrivileged = true;
 	}
 
 	public void KeyMessageText( string text )

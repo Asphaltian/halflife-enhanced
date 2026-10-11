@@ -83,6 +83,8 @@ public class Controller : SquadMonster
 
 	public override int Classify() => ClassAlienMilitary;
 
+	public override bool CanBecomeRagdoll() => true;
+
 	public override void SetYawSpeed() => YawSpeed = 120f;
 
 	public override bool TakeDamage( BaseEntity inflictor, BaseEntity attacker, float damage, int damageType )

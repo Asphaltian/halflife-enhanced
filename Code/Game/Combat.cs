@@ -278,12 +278,14 @@ public class Gib : BaseEntity
 
 public static partial class Combat
 {
-	public static void RadiusDamage( Vector3 source, BaseEntity inflictor, BaseEntity attacker, float damage, float radius, int classIgnore, int damageType )
+	public static void RadiusDamage( Vector3 source, BaseEntity inflictor, BaseEntity attacker, float damage, float radius, int classIgnore, int damageType, Vector3? forceSource = null )
 	{
 		var falloff = radius != 0f ? damage / radius : 1f;
 		var inWater = Util.PointContents( source ) == (int)Contents.Water;
 
 		source.z += 1f;
+
+		var forceOrigin = forceSource is { } origin ? origin + new Vector3( 0f, 0f, 1f ) : source;
 
 		attacker ??= inflictor;
 
@@ -320,15 +322,20 @@ public static partial class Combat
 			if ( adjustedDamage < 0f )
 				adjustedDamage = 0f;
 
+			var force = ScenePhysicsDamage.ExplosiveForce( damage, spot - forceOrigin );
+
 			if ( trace.Fraction != 1f )
 			{
 				Combat.ClearMultiDamage();
+				Combat.DamageForce = force;
 				entity.TraceAttack( inflictor, adjustedDamage, Util.Normalize( trace.EndPos - source ), trace, damageType );
 				Combat.ApplyMultiDamage( inflictor, attacker );
 			}
 			else
 			{
+				Combat.DamageForce = force;
 				entity.TakeDamage( inflictor, attacker, adjustedDamage, damageType );
+				Combat.DamageForce = Vector3.Zero;
 			}
 		}
 
@@ -338,6 +345,12 @@ public static partial class Combat
 
 partial class BaseMonster
 {
+	private const float RagdollRemoveDelay = 2f;
+
+	private Vector3 _damageForce;
+
+	protected int ForceBone { get; set; }
+
 	public virtual bool HasHumanGibs()
 	{
 		return Classify() is ClassHumanMilitary or ClassPlayerAlly or ClassHumanPassive or ClassPlayer;
@@ -562,6 +575,12 @@ partial class BaseMonster
 			return;
 		}
 
+		if ( ShouldBecomeRagdoll( gib ) )
+		{
+			BecomeRagdoll();
+			return;
+		}
+
 		if ( (EntityFlags & EntityFlags.Monster) == EntityFlags.Monster )
 		{
 			SetTouch( null );
@@ -572,6 +591,74 @@ partial class BaseMonster
 			Health = 0f;
 
 		IdealMonsterState = MonsterState.Dead;
+	}
+
+	public virtual bool CanBecomeRagdoll() => false;
+
+	private bool RagdollAllowed() => GameCvars.Ragdolls != 0f && CanBecomeRagdoll() && ClientRagdoll.Supports( Server.GetRenderModel( ModelIndex ) );
+
+	protected bool ShouldBecomeRagdoll( int gib ) => RagdollAllowed() && !ShouldGibMonster( gib );
+
+	private void BecomeRagdoll()
+	{
+		Server.MessageBegin( MessageDest.All, UserMessages.Ragdoll );
+		Server.WriteShort( Index );
+		Server.WriteLong( BitConverter.SingleToInt32Bits( _damageForce.x ) );
+		Server.WriteLong( BitConverter.SingleToInt32Bits( _damageForce.y ) );
+		Server.WriteLong( BitConverter.SingleToInt32Bits( _damageForce.z ) );
+		Server.WriteByte( ForceBone );
+		Server.MessageEnd();
+
+		DeathSound();
+
+		Solid = Solid.Not;
+		MoveType = MoveType.None;
+		DamageMode = DamageNo;
+		Effects |= Effects.NoDraw;
+		DeadFlag = DeadDead;
+
+		SetTouch( null );
+		CheckAiTrigger();
+
+		SetThink( SubRemove );
+		NextThink = Server.Globals.Time + RagdollRemoveDelay;
+	}
+
+	private Vector3 CalcDamageForceVector( BaseEntity inflictor, BaseEntity attacker, float damage, int damageType, Vector3 damageForce )
+	{
+		if ( damageForce != Vector3.Zero || (damageType & DamageNoPhysicsForce) != 0 )
+		{
+			if ( (damageType & DamageBlast) == 0 )
+				return damageForce;
+
+			var scale = Server.RandomFloat( 0.85f, 1.15f );
+
+			return new Vector3( damageForce.x * scale, damageForce.y * scale, damageForce.z * (damageForce.z > 0f ? 1.15f : scale) );
+		}
+
+		var source = inflictor ?? attacker;
+
+		if ( source is null )
+			return Vector3.Zero;
+
+		var forceScale = damage * 75f * 4f;
+		Vector3 force;
+
+		if ( (damageType & DamageBlast) != 0 )
+		{
+			force = Util.Normalize( Origin + new Vector3( 0f, 0f, Size.z ) - source.Origin ) * 1.375f;
+		}
+		else if ( source == this )
+		{
+			force = new Vector3( Server.RandomFloat( -1f, 1f ), Server.RandomFloat( -1f, 1f ), 0f );
+			forceScale = Server.RandomFloat( 1000f, 2000f );
+		}
+		else
+		{
+			force = Util.Normalize( Origin - source.Origin );
+		}
+
+		return force * forceScale;
 	}
 
 	public override bool TakeHealth( float health, int damageType )
@@ -625,13 +712,20 @@ partial class BaseMonster
 
 		if ( MonsterState == MonsterState.Script )
 		{
-			SetConditions( ConditionLightDamage );
-			return false;
+			if ( Health > 0f || !RagdollAllowed() )
+			{
+				SetConditions( ConditionLightDamage );
+				return false;
+			}
+
+			Cine?.CancelScript();
 		}
 
 		if ( Health <= 0f )
 		{
 			HalfLifeDll.LastInflictor = inflictor;
+
+			_damageForce = CalcDamageForceVector( inflictor, attacker, damage, damageType, Combat.DamageForce );
 
 			if ( (damageType & DamageAlwaysGib) != 0 )
 				Killed( attacker, GibAlways );
@@ -727,7 +821,13 @@ partial class BaseMonster
 			return null;
 
 		if ( damage > 0 )
+		{
+			Combat.DamageForce = ScenePhysicsDamage.MeleeForce( damage, entity.Center - Center );
+
 			entity.TakeDamage( this, this, damage, damageType );
+
+			Combat.DamageForce = Vector3.Zero;
+		}
 
 		return entity;
 	}
@@ -750,6 +850,7 @@ partial class BaseMonster
 			return;
 
 		LastHitGroup = trace.HitGroup;
+		ForceBone = trace.HitBone;
 
 		switch ( trace.HitGroup )
 		{

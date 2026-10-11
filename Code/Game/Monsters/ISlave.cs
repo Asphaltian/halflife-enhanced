@@ -48,6 +48,8 @@ public class ISlave : SquadMonster
 
 	public override int Classify() => ClassAlienMilitary;
 
+	public override bool CanBecomeRagdoll() => true;
+
 	public override int Relationship( BaseEntity target )
 	{
 		if ( target.IsPlayer && (SpawnFlags & SpawnFlagWaitUntilProvoked) != 0 && !HasMemory( MemoryProvoked ) )

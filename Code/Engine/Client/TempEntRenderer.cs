@@ -2,13 +2,13 @@ using GoldSrc.Studio;
 
 namespace GoldSrc;
 
-public sealed class ClientModelRenderer : Component
+public sealed class TempEntRenderer : Component
 {
 	private readonly BoneOutput _boneOutput = new();
 	private readonly Vector3[] _attachments = new Vector3[4];
+	private readonly SpriteNextView _spriteNextView = new();
 
 	private ModelRenderer _renderer;
-	private readonly SpriteNextView _spriteNextView = new();
 	private Model _model;
 	private EntityState _state;
 	private LatchedVars _latched = new() { PrevController = new byte[4] };
@@ -122,30 +122,18 @@ public sealed class ClientModelRenderer : Component
 		if ( !client.StudioCheckBBox( header, ref _state, temp.Origin, WorldTransform ) )
 			return false;
 
-		var light = Client.Current.StudioDynamicLight( (Effects)temp.Effects, temp.RenderFx, 0, temp.Origin, header.Header.Flags );
+		var light = client.StudioDynamicLight( (Effects)temp.Effects, temp.RenderFx, 0, temp.Origin, header.Header.Flags );
 
-		renderer.Attributes.Set( "AmbientLight", (float)light.AmbientLight );
-		renderer.Attributes.Set( "ShadeLight", (float)light.ShadeLight );
-		renderer.Attributes.Set( "LightVector", light.LightVector );
-		renderer.Attributes.Set( "LightColor", light.Color );
+		light.Apply( renderer.Attributes );
 
-		Client.Current.StudioEntityLight( 0, temp.Origin, _attachments, renderer.Attributes );
+		client.StudioEntityLight( 0, temp.Origin, _attachments, renderer.Attributes );
+
 		renderer.Attributes.Set( "Blend", blend / 255f );
 		renderer.Attributes.Set( "RenderColor", new Vector3( (byte)(int)temp.RenderColor.x, (byte)(int)temp.RenderColor.y, (byte)(int)temp.RenderColor.z ) );
 
 		client.BoneSetup.SetupBones( header, ref _state, ref _latched, client.ClientTime, Client.StudioInterpolation );
 
-		for ( var i = 0; i < header.BodyParts.Length; i++ )
-		{
-			ref readonly var bodyPart = ref header.BodyParts[i];
-
-			renderer.SetBodyGroup( i, temp.Body / bodyPart.Base % bodyPart.NumModels );
-		}
-
-		if ( renderer.HasMaterialGroups )
-			renderer.MaterialGroup = $"Skin {temp.Skin}";
-
-		renderer.UseAnimGraph = false;
+		BoneOutput.SetBody( header, renderer, temp.Body, temp.Skin );
 
 		_boneOutput.Apply( client, header, renderer, WorldTransform, _attachments );
 

@@ -69,7 +69,7 @@ public static partial class Host
 			return;
 		}
 
-		var count = System.Math.Max( Common.Atoi( arguments[0] ), 1 );
+		var count = Math.Max( Common.Atoi( arguments[0] ), 1 );
 
 		if ( count > Server.MaxClientsLimit )
 		{
@@ -234,6 +234,8 @@ public static partial class Host
 		if ( SaveFileBase( saveName ) is not { } fileBase || server.LoadGame( fileBase ) is not { } header )
 			return false;
 
+		server.InactivateClients();
+
 		Client.Current?.BeginLoadingPlaque();
 
 		Cvar.SetValue( "deathmatch", 0f );
@@ -242,8 +244,6 @@ public static partial class Host
 		server.MaxClients = 1;
 
 		Cvar.SetValue( "maxplayers", 1f );
-
-		Client.Current?.BeginLoadingPlaque();
 
 		_ = Map( server, header.MapName, true, shutdown: true );
 

@@ -17,6 +17,8 @@ public sealed class Sfx
 
 internal sealed class SfxChannel
 {
+	public readonly int Index;
+
 	public Sfx Sfx;
 	public SoundHandle Handle;
 	public int LeftVol;
@@ -32,6 +34,11 @@ internal sealed class SfxChannel
 	public int Pitch;
 	public bool PitchShift;
 	public bool Loop;
+
+	public SfxChannel( int index )
+	{
+		Index = index;
+	}
 
 	public void Clear()
 	{
@@ -86,11 +93,10 @@ public sealed partial class SoundEngine
 	[ConVar( "snd_show" )]
 	public static float ShowCvar { get; set; } = 0f;
 
+	[ConVar( "snd_acoustics", ConVarFlags.Saved )]
+	public static float Acoustics { get; set; }
+
 	public static float Volume { get; set; } = 0.7f;
-	private static float NoSound => NoSoundCvar;
-	private static float HiSound => HiSoundCvar;
-	private static float LoadAs8Bit => LoadAs8BitCvar;
-	private static float Show => ShowCvar;
 
 	private readonly SfxChannel[] _channels = new SfxChannel[MaxChannels];
 	private readonly List<Sfx> _knownSfx = [];
@@ -112,7 +118,7 @@ public sealed partial class SoundEngine
 		_current = this;
 
 		for ( var i = 0; i < MaxChannels; i++ )
-			_channels[i] = new SfxChannel();
+			_channels[i] = new SfxChannel( i );
 
 		ReadSentenceFile();
 		StopAllSounds();
@@ -127,7 +133,7 @@ public sealed partial class SoundEngine
 
 	public Sfx PrecacheSound( string name )
 	{
-		if ( NoSound != 0f || name.Length >= 64 )
+		if ( NoSoundCvar != 0f || name.Length >= 64 )
 			return null;
 
 		var sfx = FindName( name );
@@ -248,7 +254,7 @@ public sealed partial class SoundEngine
 
 	public void StartDynamicSound( int entNum, int entChannel, Sfx sfx, Vector3 origin, float volume, float attenuation, int flags, int pitch )
 	{
-		if ( sfx is null || NoSound != 0f )
+		if ( sfx is null || NoSoundCvar != 0f )
 			return;
 
 		if ( !PrepareStart( DynamicCaller, sfx, entNum, ref entChannel, volume, ref pitch, flags, out var vol ) )
@@ -428,8 +434,6 @@ public sealed partial class SoundEngine
 		}
 
 		handle.TargetMixer = _mixer;
-		handle.OcclusionEnabled = false;
-		handle.AirAbsorption = false;
 		handle.Falloff = LinearFalloff;
 
 		channel.Handle = handle;
@@ -446,18 +450,22 @@ public sealed partial class SoundEngine
 
 	private static Mixer FindMixer()
 	{
-		if ( Mixer.FindMixerByName( MixerName ) is { } existing )
-			return existing;
-
-		var mixer = Mixer.Master.AddChild();
+		var mixer = Mixer.FindMixerByName( MixerName ) ?? Mixer.Master.AddChild();
 
 		mixer.Name = MixerName;
 		mixer.MaxVoices = MaxChannels;
-		mixer.Occlusion = 0f;
-		mixer.AirAbsorption = 0f;
-		mixer.Reverb = 0f;
+		mixer.BlockingTags.Add( ScenePhysics.WorldTag );
 
 		return mixer;
+	}
+
+	public void StopSound( int entNum, int entChannel )
+	{
+		for ( var i = NumAmbients; i < _totalChannels; i++ )
+		{
+			if ( _channels[i].EntNum == entNum && _channels[i].EntChannel == entChannel )
+				FreeChannel( _channels[i] );
+		}
 	}
 
 	private bool AlterChannel( int entNum, int entChannel, Sfx sfx, int volume, int pitch, int flags )
@@ -561,6 +569,8 @@ public sealed partial class SoundEngine
 		handle.Pitch = PitchScale( channel );
 		handle.SpacialBlend = local ? 0f : 1f;
 		handle.DistanceAttenuation = !local && channel.DistMult > 0f;
+		handle.OcclusionEnabled = Acoustics != 0f && handle.DistanceAttenuation && channel.Index < NumAmbients + MaxDynamicChannels;
+		handle.AirAbsorption = handle.OcclusionEnabled;
 		handle.Position = local ? _listenerOrigin : channel.Origin;
 
 		if ( channel.DistMult > 0f )
@@ -577,8 +587,13 @@ public sealed partial class SoundEngine
 		if ( !Paused )
 			_time += RealTime.Delta;
 
+		var simulation = Acoustics != 0f ? 1f : 0f;
+
 		_mixer ??= FindMixer();
 		_mixer.Volume = Math.Clamp( Volume, 0f, 1f );
+		_mixer.Occlusion = simulation;
+		_mixer.AirAbsorption = simulation;
+		_mixer.Reverb = simulation;
 
 		UpdateRoom();
 
@@ -615,7 +630,7 @@ public sealed partial class SoundEngine
 			}
 		}
 
-		if ( Show == 0f )
+		if ( ShowCvar == 0f )
 			return;
 
 		var total = 0;

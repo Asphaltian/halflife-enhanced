@@ -433,7 +433,7 @@ partial class ClientEntity
 		if ( !(Host.Developer == 0f && client.MaxClients == 1) && entityModel )
 			CurState.Body = 1;
 
-		StudioSetBody( header, renderer );
+		BoneOutput.SetBody( header, renderer, CurState.Body, CurState.Skin );
 
 		_boneOutput.Apply( client, header, renderer, WorldTransform, _attachments, RenderFx, CurState.AnimTime );
 
@@ -459,10 +459,7 @@ partial class ClientEntity
 
 	private void StudioSetupLighting( Client client, SkinnedModelRenderer renderer, in StudioLight light )
 	{
-		renderer.Attributes.Set( "AmbientLight", (float)light.AmbientLight );
-		renderer.Attributes.Set( "ShadeLight", (float)light.ShadeLight );
-		renderer.Attributes.Set( "LightVector", light.LightVector );
-		renderer.Attributes.Set( "LightColor", light.Color );
+		light.Apply( renderer.Attributes );
 
 		client.StudioEntityLight( Index, WorldPosition, _attachments, renderer.Attributes );
 	}

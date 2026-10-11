@@ -39,6 +39,7 @@ partial class Server
 		gameObject.NetworkMode = NetworkMode.Never;
 		gameObject.Tags.Add( ScenePhysics.Tag );
 		gameObject.Tags.Add( ScenePhysics.ShadowTag );
+		gameObject.Tags.Add( ScenePhysics.BoxTag );
 		gameObject.WorldPosition = player.Origin;
 
 		_shadow = gameObject.AddComponent<PlayerShadow>();

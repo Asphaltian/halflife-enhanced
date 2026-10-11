@@ -1,3 +1,4 @@
+using System;
 using GoldSrc;
 using GoldSrc.Bsp;
 
@@ -51,24 +52,36 @@ public class CrossbowBolt : BaseEntity
 
 	public override int Classify() => ClassNone;
 
+	private void BoltImpact( Vector3 origin, Vector3 direction )
+	{
+		Server.MessageBegin( MessageDest.Pvs, UserMessages.BoltImpact, origin );
+		Server.WriteCoord( origin.x );
+		Server.WriteCoord( origin.y );
+		Server.WriteCoord( origin.z );
+		Server.WriteLong( BitConverter.SingleToInt32Bits( direction.x ) );
+		Server.WriteLong( BitConverter.SingleToInt32Bits( direction.y ) );
+		Server.WriteLong( BitConverter.SingleToInt32Bits( direction.z ) );
+		Server.MessageEnd();
+	}
+
 	public void BoltTouch( BaseEntity other )
 	{
 		SetTouch( null );
 		SetThink( null );
 
+		Combat.ClearMultiDamage();
 		ScenePhysicsDamage.MeleeImpact( Globals.Trace, HalfLifeDll.SkillData.PlrDmgCrossbowMonster, Velocity );
 
 		if ( other.DamageMode != DamageNo )
 		{
 			var trace = Globals.Trace;
 			var owner = Owner as BaseEntity;
-
-			Combat.ClearMultiDamage();
+			var direction = Util.Normalize( Velocity );
 
 			if ( other.IsPlayer )
-				other.TraceAttack( owner, HalfLifeDll.SkillData.PlrDmgCrossbowClient, Util.Normalize( Velocity ), trace, DamageNeverGib );
+				other.TraceAttack( owner, HalfLifeDll.SkillData.PlrDmgCrossbowClient, direction, trace, DamageNeverGib );
 			else
-				other.TraceAttack( owner, HalfLifeDll.SkillData.PlrDmgCrossbowMonster, Util.Normalize( Velocity ), trace, DamageBullet | DamageNeverGib );
+				other.TraceAttack( owner, HalfLifeDll.SkillData.PlrDmgCrossbowMonster, direction, trace, DamageBullet | DamageNeverGib );
 
 			Combat.ApplyMultiDamage( this, owner );
 
@@ -77,6 +90,14 @@ public class CrossbowBolt : BaseEntity
 			var sample = Server.RandomLong( 0, 1 ) == 0 ? "weapons/xbow_hitbod1.wav" : "weapons/xbow_hitbod2.wav";
 
 			Sound.Emit( this, SoundChannel.Body, sample, 1f, Server.AttenuationNormal );
+
+			if ( GameCvars.Ragdolls != 0f )
+			{
+				var wall = Util.TraceLine( Origin, Origin + (direction * 128f), IgnoreMonsters, other );
+
+				if ( wall.Fraction != 1f )
+					BoltImpact( wall.EndPos, direction );
+			}
 
 			if ( !HalfLifeDll.GameRules.IsMultiplayer() )
 				Killed( this, GibNever );
@@ -88,7 +109,12 @@ public class CrossbowBolt : BaseEntity
 			SetThink( SubRemove );
 			NextThink = Globals.Time;
 
-			if ( other.ClassName == "worldspawn" )
+			var sticky = GameCvars.Ragdolls != 0f && !HalfLifeDll.GameRules.IsMultiplayer();
+
+			if ( sticky )
+				BoltImpact( Origin, Util.Normalize( Velocity ) );
+
+			if ( !sticky && other.ClassName == "worldspawn" )
 			{
 				var direction = Util.Normalize( Velocity );
 
@@ -289,11 +315,11 @@ public class Crossbow : BasePlayerWeapon
 
 		if ( !ClientSide )
 		{
+			Combat.ClearMultiDamage();
 			ScenePhysicsDamage.MeleeImpact( trace, 120f, direction );
 
 			if ( trace.Ent is BaseEntity hit && hit.DamageMode != DamageNo )
 			{
-				Combat.ClearMultiDamage();
 				hit.TraceAttack( Player, 120f, direction, trace, DamageBullet | DamageNeverGib );
 				Combat.ApplyMultiDamage( this, Player );
 			}

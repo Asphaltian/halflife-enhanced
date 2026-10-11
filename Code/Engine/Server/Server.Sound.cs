@@ -44,8 +44,6 @@ partial class Server
 
 	private readonly List<string> _soundPrecache = [];
 
-	public IReadOnlyList<string> SoundPrecache => _soundPrecache;
-
 	public int PrecacheSound( string name )
 	{
 		if ( name is null )
@@ -57,7 +55,7 @@ partial class Server
 		if ( name[0] == '!' )
 			throw HostError( $"PF_precache_sound_I: '{name}' do not precache sentence names!" );
 
-		var index = _soundPrecache.FindIndex( x => x.Equals( name, StringComparison.OrdinalIgnoreCase ) );
+		var index = Common.IndexOfName( _soundPrecache, name );
 
 		if ( index >= 0 )
 			return index;
@@ -239,7 +237,7 @@ partial class Server
 		}
 		else
 		{
-			index = _soundPrecache.FindIndex( x => x.Equals( sample, StringComparison.OrdinalIgnoreCase ) );
+			index = Common.IndexOfName( _soundPrecache, sample );
 
 			if ( index < 0 )
 			{

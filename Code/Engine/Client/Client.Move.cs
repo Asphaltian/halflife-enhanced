@@ -2,14 +2,35 @@ namespace GoldSrc;
 
 partial class Client
 {
-
 	[ConVar( "cl_solid_players" )]
 	public static float SolidPlayers { get; set; } = 1f;
 
+	private static readonly string[] PlayerPhysEntNames = CreatePlayerPhysEntNames();
+
 	private readonly PlayerMove _pmove = new();
+	private readonly PhysEntPool _physEntPool = new();
+
 	private bool _pushed;
 	private int _pushedPhysEnts;
 	private int _pushedVisEnts;
+
+	public Vector3 LocalPlayerViewHeight => _viewHeight;
+
+	public bool IsThirdPerson => _clientDll.IsThirdPerson();
+
+	public int WindowCenterX => (int)Screen.Width / 2;
+
+	public int WindowCenterY => (int)Screen.Height / 2;
+
+	private static string[] CreatePlayerPhysEntNames()
+	{
+		var names = new string[Server.MaxClientsLimit];
+
+		for ( var i = 0; i < names.Length; i++ )
+			names[i] = $"player {i}";
+
+		return names;
+	}
 
 	public PmTrace TraceGlow( Vector3 start, Vector3 end )
 	{
@@ -18,15 +39,7 @@ partial class Client
 		return _pmove.PlayerTrace( start, end, TraceFlags.StudioIgnore | TraceFlags.GlassIgnore, -1 );
 	}
 
-	public Vector3 LocalPlayerViewHeight => _viewHeight;
-
 	public ClientEntity GetLocalPlayer() => GetEntity( _playerNum + 1 );
-
-	public bool IsThirdPerson => _clientDll.IsThirdPerson();
-
-	public int WindowCenterX => (int)Screen.Width / 2;
-
-	public int WindowCenterY => (int)Screen.Height / 2;
 
 	public void GetMousePosition( out int x, out int y )
 	{
@@ -97,7 +110,7 @@ partial class Client
 
 			var physEnt = _physEntPool.Alloc();
 
-			physEnt.Name = $"player {i}";
+			physEnt.Name = PlayerPhysEntNames[i];
 			physEnt.Player = 1;
 			physEnt.Origin = player.Origin;
 			physEnt.Mins = PlayerMove.PlayerMins[player.UseHull];
@@ -180,8 +193,6 @@ partial class Client
 
 		return face < 0 ? null : file.GetTextureName( file.Faces[face] );
 	}
-
-	private readonly PhysEntPool _physEntPool = new();
 
 	private void SetSolidEntities()
 	{

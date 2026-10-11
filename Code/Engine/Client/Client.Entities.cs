@@ -113,6 +113,7 @@ partial class Client
 		_visibleEntities.Clear();
 
 		ClearSky();
+		ClearRagdolls();
 		_beamEntities.Clear();
 
 		Array.Clear( _frames );
@@ -386,36 +387,19 @@ partial class Client
 
 	private int ParseDeltaHeader( MessageReader message, out bool remove, out bool custom, ref int numBase, out bool instanced, out int instancedIndex, bool full, out int offset )
 	{
-		int number;
-
 		custom = false;
 		instanced = false;
 		instancedIndex = 0;
 		offset = 0;
+		remove = !full && message.ReadBits( 1 ) != 0;
 
-		bool absolute;
+		int number;
 
-		if ( !full )
-		{
-			remove = message.ReadBits( 1 ) != 0;
-			absolute = message.ReadBits( 1 ) != 0;
-		}
+		if ( full && message.ReadBits( 1 ) != 0 )
+			number = numBase + 1;
 		else
-		{
-			remove = false;
+			number = message.ReadBits( 1 ) != 0 ? (int)message.ReadBits( 11 ) : numBase + (int)message.ReadBits( 6 );
 
-			if ( message.ReadBits( 1 ) != 0 )
-			{
-				number = numBase + 1;
-				goto SetBase;
-			}
-
-			absolute = message.ReadBits( 1 ) != 0;
-		}
-
-		number = absolute ? (int)message.ReadBits( 11 ) : numBase + (int)message.ReadBits( 6 );
-
-		SetBase:
 		numBase = number;
 
 		if ( remove )

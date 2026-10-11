@@ -1,6 +1,6 @@
 using System;
 
-namespace GoldSrc.GameUI;
+namespace GoldSrc;
 
 public sealed class KeyValues( string name )
 {

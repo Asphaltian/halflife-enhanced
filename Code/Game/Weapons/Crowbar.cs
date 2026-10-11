@@ -200,19 +200,20 @@ public class Crowbar : BasePlayerWeapon
 		{
 			var entity = (trace.Ent ?? World) as BaseEntity;
 
+			Combat.RagdollImpact( source, trace.EndPos );
 			Combat.ClearMultiDamage();
 
 			if ( NextPrimaryAttack + 1f <= WeaponTimeBase || HalfLifeDll.GameRules.IsMultiplayer() )
 			{
-				entity.TraceAttack( Player, HalfLifeDll.SkillData.PlrDmgCrowbar, Globals.Forward, trace, DamageClub );
-
 				ScenePhysicsDamage.MeleeImpact( trace, HalfLifeDll.SkillData.PlrDmgCrowbar, Globals.Forward );
+
+				entity.TraceAttack( Player, HalfLifeDll.SkillData.PlrDmgCrowbar, Globals.Forward, trace, DamageClub );
 			}
 			else
 			{
-				entity.TraceAttack( Player, HalfLifeDll.SkillData.PlrDmgCrowbar / 2f, Globals.Forward, trace, DamageClub );
-
 				ScenePhysicsDamage.MeleeImpact( trace, HalfLifeDll.SkillData.PlrDmgCrowbar / 2f, Globals.Forward );
+
+				entity.TraceAttack( Player, HalfLifeDll.SkillData.PlrDmgCrowbar / 2f, Globals.Forward, trace, DamageClub );
 			}
 
 			Combat.ApplyMultiDamage( Player, Player );

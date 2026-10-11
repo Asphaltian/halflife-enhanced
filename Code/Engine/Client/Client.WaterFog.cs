@@ -103,13 +103,13 @@ partial class Client
 				continue;
 
 			if ( entity.RenderMode == RenderMode.Normal )
-				DrawBrushModelWater( entity, viewOrigin );
+				DrawBrushModelWater( entity );
 			else
 				AddTransBrush( entity, viewOrigin );
 		}
 
 		foreach ( var (entity, _) in _transBrushes )
-			DrawBrushModelWater( entity, viewOrigin );
+			DrawBrushModelWater( entity );
 	}
 
 	private void EmitWaterPolys( in Face face )
@@ -127,7 +127,7 @@ partial class Client
 
 		var aspect = width / height;
 
-		if ( Client.WidescreenYFov != 0f && aspect > 1.5f )
+		if ( WidescreenYFov != 0f && aspect > 1.5f )
 		{
 			var half = (float)(Math.Tan( fieldOfView * 0.008726646f ) * (aspect * 0.75f));
 			var degrees = (float)(Math.Atan( half ) * 57.29577951308232);
@@ -211,7 +211,7 @@ partial class Client
 				if ( _surfaceFrames[surface] != _surfaceFrameCount || (world.Faces[surface].Side != 0) != back )
 					continue;
 
-				if ( (WorldFile.SurfaceFlags[surface] & Bsp.File.SurfaceDrawTurb) != 0 && _waterChain < 0 )
+				if ( (world.SurfaceFlags[surface] & Bsp.File.SurfaceDrawTurb) != 0 && _waterChain < 0 )
 					_waterChain = surface;
 			}
 
@@ -243,7 +243,7 @@ partial class Client
 		_transBrushes.Insert( index, (entity, distance) );
 	}
 
-	private void DrawBrushModelWater( ClientEntity entity, Vector3 viewOrigin )
+	private void DrawBrushModelWater( ClientEntity entity )
 	{
 		if ( entity.RenderMode == RenderMode.TransColor )
 			return;
@@ -278,7 +278,7 @@ partial class Client
 		{
 			var surface = subModel.FirstFace + i;
 
-			if ( (WorldFile.SurfaceFlags[surface] & Bsp.File.SurfaceDrawTurb) == 0 )
+			if ( (world.SurfaceFlags[surface] & Bsp.File.SurfaceDrawTurb) == 0 )
 				continue;
 
 			var face = world.Faces[surface];

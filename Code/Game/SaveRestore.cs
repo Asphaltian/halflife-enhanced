@@ -16,6 +16,9 @@ public sealed class SaveRestoreBaseAttribute : Attribute
 
 public abstract class SaveRestoreBuffer
 {
+	[SkipHotload]
+	private static readonly Dictionary<Type, (MemberDescription Member, SaveAttribute Save)[]> FieldCache = [];
+
 	protected SaveRestoreData Data { get; }
 	protected List<SaveBlock> Header { get; }
 
@@ -24,9 +27,6 @@ public abstract class SaveRestoreBuffer
 		Data = data;
 		Header = header;
 	}
-
-	[SkipHotload]
-	private static readonly Dictionary<Type, (MemberDescription Member, SaveAttribute Save)[]> FieldCache = [];
 
 	public int EntityIndex( Edict entity )
 	{

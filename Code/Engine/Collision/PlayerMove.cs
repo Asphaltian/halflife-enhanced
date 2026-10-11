@@ -36,7 +36,7 @@ public sealed partial class PlayerMove
 	];
 
 	public Scene Scene;
-	public Action<SceneTraceResult, Vector3> SceneContact;
+	public Action<SceneTraceResult> SceneContact;
 	public Vector3 OutWishVel;
 	public float OutStepHeight;
 

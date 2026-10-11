@@ -259,6 +259,10 @@ public sealed class Hud( HalfLifeClientDll dll )
 		Dll.HookUserMsg( "TeamScore", MsgFuncTeamScore );
 		Dll.HookUserMsg( "TeamInfo", MsgFuncTeamInfo );
 		Dll.HookUserMsg( "Spectator", MsgFuncSpectator );
+		Dll.HookUserMsg( "Ragdoll", MsgFuncRagdoll );
+		Dll.HookUserMsg( "RagImpact", MsgFuncRagdollImpact );
+		Dll.HookUserMsg( "BoltImpact", MsgFuncBoltImpact );
+		Dll.HookUserMsg( "RagExplode", MsgFuncRagdollExplosion );
 		Dll.HookUserMsg( "AllowSpec", MsgFuncAllowSpec );
 		Dll.HookUserMsg( "SpecFade", MsgFuncSpecFade );
 		Dll.HookUserMsg( "ResetFade", MsgFuncResetFade );
@@ -494,6 +498,52 @@ public sealed class Hud( HalfLifeClientDll dll )
 			0 => HudDeathNotice.ColorYellow,
 			_ => HudDeathNotice.ColorGrey
 		};
+	}
+
+	private bool MsgFuncRagdoll( string name, byte[] data )
+	{
+		var message = new MessageBuffer( data );
+		var index = message.ReadShort();
+		var force = new Vector3( message.ReadFloat(), message.ReadFloat(), message.ReadFloat() );
+		var forceBone = message.ReadByte();
+
+		Engine.CreateRagdoll( index, force, forceBone );
+
+		return true;
+	}
+
+	private bool MsgFuncRagdollImpact( string name, byte[] data )
+	{
+		var message = new MessageBuffer( data );
+		var start = new Vector3( message.ReadCoord(), message.ReadCoord(), message.ReadCoord() );
+		var end = new Vector3( message.ReadCoord(), message.ReadCoord(), message.ReadCoord() );
+
+		Engine.RagdollImpact( start, end );
+
+		return true;
+	}
+
+	private bool MsgFuncBoltImpact( string name, byte[] data )
+	{
+		var message = new MessageBuffer( data );
+		var origin = new Vector3( message.ReadCoord(), message.ReadCoord(), message.ReadCoord() );
+		var direction = new Vector3( message.ReadFloat(), message.ReadFloat(), message.ReadFloat() );
+
+		Engine.BoltImpact( origin, direction );
+
+		return true;
+	}
+
+	private bool MsgFuncRagdollExplosion( string name, byte[] data )
+	{
+		var message = new MessageBuffer( data );
+		var origin = new Vector3( message.ReadCoord(), message.ReadCoord(), message.ReadCoord() );
+		var radius = message.ReadShort();
+		var magnitude = message.ReadShort();
+
+		Engine.RagdollExplosion( origin, radius, magnitude );
+
+		return true;
 	}
 
 	private bool MsgFuncSetFov( string name, byte[] data )

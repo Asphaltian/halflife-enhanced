@@ -72,5 +72,4 @@ public abstract class GameDll
 
 		throw new InvalidOperationException( "Unable to load game DLL" );
 	}
-
 }

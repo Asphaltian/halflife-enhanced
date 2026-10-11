@@ -43,17 +43,7 @@ public partial class Edict : Component
 		if ( !_hasPrevious || SkipInterpolation )
 			fraction = 1f;
 
-		var delta = Angles - _previousAngles;
-
-		for ( var i = 0; i < 3; i++ )
-		{
-			if ( delta[i] < -180f )
-				delta[i] += 360f;
-			else if ( delta[i] > 180f )
-				delta[i] -= 360f;
-		}
-
-		_renderAngles = _previousAngles + (delta * fraction);
+		_renderAngles = LerpAngles( _previousAngles, Angles, fraction );
 
 		_ownTransform = true;
 		WorldPosition = Vector3.Lerp( _previousOrigin, Origin, fraction );
@@ -112,6 +102,21 @@ public partial class Edict : Component
 		var up = (Rotation.FromAxis( Vector3.Up, yaw ) * Rotation.FromAxis( Vector3.Left, pitch )).Inverse * rotation * Vector3.Up;
 
 		return new Vector3( pitch, yaw, MathF.Atan2( -up.y, up.z ) * (180f / MathF.PI) );
+	}
+
+	internal static Vector3 LerpAngles( Vector3 from, Vector3 to, float fraction )
+	{
+		var delta = to - from;
+
+		for ( var i = 0; i < 3; i++ )
+		{
+			if ( delta[i] < -180f )
+				delta[i] += 360f;
+			else if ( delta[i] > 180f )
+				delta[i] -= 360f;
+		}
+
+		return from + (delta * fraction);
 	}
 
 	internal static Rotation ToRotation( Vector3 angles )

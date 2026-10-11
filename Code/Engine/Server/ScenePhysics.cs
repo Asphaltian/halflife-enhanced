@@ -6,6 +6,8 @@ public static class ScenePhysics
 {
 	public const string Tag = "goldsrc";
 	public const string ShadowTag = "shadow";
+	public const string WorldTag = "world";
+	public const string BoxTag = "bbox";
 
 	private const float DistEpsilon = 0.03125f;
 
@@ -21,7 +23,7 @@ public static class ScenePhysics
 			? scene.Trace.Ray( start + mins, end + mins )
 			: scene.Trace.Box( new BBox( mins, maxs ), start, end );
 
-		result = trace.WithoutTags( Tag ).Run();
+		result = trace.WithoutTags( Tag, ClientRagdoll.Tag ).Run();
 
 		if ( !result.Hit )
 			return false;

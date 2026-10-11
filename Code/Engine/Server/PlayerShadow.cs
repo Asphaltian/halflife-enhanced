@@ -28,7 +28,6 @@ public sealed class PlayerShadow : Component, IScenePhysicsEvents, Component.ICo
 	private Vector3 _currentSpeed;
 	private Vector3 _lastImpulse;
 	private bool _enable;
-	private bool _forceTeleport;
 	private bool _updatedSinceLast;
 
 	public float PushMassLimit { get; set; } = float.MaxValue;
@@ -63,8 +62,6 @@ public sealed class PlayerShadow : Component, IScenePhysicsEvents, Component.ICo
 	public void SetPosition( Vector3 position ) => WorldPosition = position;
 
 	public void SetVelocity( Vector3 velocity ) => _body.Velocity = velocity;
-
-	public void ForceTeleportToCurrentPosition() => _forceTeleport = true;
 
 	public void StepUp( float height )
 	{
@@ -181,11 +178,9 @@ public sealed class PlayerShadow : Component, IScenePhysicsEvents, Component.ICo
 
 		var deltaPosition = _targetPosition - WorldPosition;
 
-		if ( _forceTeleport || deltaPosition.LengthSquared > MaxDeltaPosition * MaxDeltaPosition )
+		if ( deltaPosition.LengthSquared > MaxDeltaPosition * MaxDeltaPosition )
 		{
 			WorldPosition = _targetPosition;
-
-			_forceTeleport = false;
 			return;
 		}
 

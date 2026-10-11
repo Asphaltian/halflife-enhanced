@@ -25,13 +25,7 @@ partial class Client
 
 		for ( var i = 0; i < WorldFile.Faces.Length; i++ )
 		{
-			var face = WorldFile.Faces[i];
-			var flags = WorldFile.SurfaceFlags[i];
-
-			if ( (flags & (Bsp.File.SurfaceDrawSky | Bsp.File.SurfaceDrawTurb)) != 0 )
-				continue;
-
-			if ( (flags & Bsp.File.SurfaceDrawTiled) != 0 && (WorldFile.TexInfos[face.TexInfo].Flags & TexInfoFlags.Special) == TexInfoFlags.Special )
+			if ( !HasLightmap( i ) )
 				continue;
 
 			var width = (WorldFile.SurfaceExtents[i].ExtentS >> 4) + 1;
@@ -44,7 +38,7 @@ partial class Client
 
 			_lightmapSurfaces[i] = (page, x, y);
 
-			CopyLightSamples( face, width, height, x, y, pages[page] );
+			CopyLightSamples( WorldFile.Faces[i], width, height, x, y, pages[page] );
 		}
 
 		if ( pages.Count == 0 )

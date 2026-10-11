@@ -337,6 +337,8 @@ public class Scientist : TalkMonster
 
 	public override int Classify() => ClassHumanPassive;
 
+	public override bool CanBecomeRagdoll() => Cvar.GetFloat( "violence_hgibs" ) != 0f;
+
 	public override void SetYawSpeed()
 	{
 		YawSpeed = Activity switch

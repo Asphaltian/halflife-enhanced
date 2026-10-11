@@ -6,19 +6,30 @@ public static partial class Combat
 {
 	private static BaseEntity _multiDamageEntity;
 	private static float _multiDamageAmount;
+	private static Vector3 _multiDamageForce;
 
 	public static int MultiDamageType { get; set; }
+	public static Vector3 DamageForce { get; set; }
 
 	public static void ClearMultiDamage()
 	{
 		_multiDamageEntity = null;
 		_multiDamageAmount = 0f;
+		_multiDamageForce = Vector3.Zero;
 		MultiDamageType = 0;
+		DamageForce = Vector3.Zero;
 	}
 
 	public static void ApplyMultiDamage( BaseEntity inflictor, BaseEntity attacker )
 	{
-		_multiDamageEntity?.TakeDamage( inflictor, attacker, _multiDamageAmount, MultiDamageType );
+		if ( _multiDamageEntity is null )
+			return;
+
+		DamageForce = _multiDamageForce;
+
+		_multiDamageEntity.TakeDamage( inflictor, attacker, _multiDamageAmount, MultiDamageType );
+
+		DamageForce = Vector3.Zero;
 	}
 
 	public static void AddMultiDamage( BaseEntity inflictor, BaseEntity entity, float damage, int damageType )
@@ -34,9 +45,13 @@ public static partial class Combat
 
 			_multiDamageEntity = entity;
 			_multiDamageAmount = 0f;
+			_multiDamageForce = Vector3.Zero;
 		}
 
 		_multiDamageAmount += damage;
+		_multiDamageForce += DamageForce;
+
+		DamageForce = Vector3.Zero;
 	}
 
 	public static void SpawnBlood( Vector3 spot, int bloodColor, float damage )
@@ -66,6 +81,39 @@ public static partial class Combat
 			Util.DecalTrace( trace, DamageDecal( entity, BaseEntity.DamageClub ) );
 		else
 			Util.GunshotDecalTrace( trace, DamageDecal( entity, BaseEntity.DamageBullet ) );
+	}
+
+	public static void RagdollImpact( Vector3 start, Vector3 end )
+	{
+		if ( GameCvars.Ragdolls == 0f )
+			return;
+
+		var server = Server.Current;
+
+		server.MessageBegin( MessageDest.Pvs, UserMessages.RagdollImpact, end );
+		server.WriteCoord( start.x );
+		server.WriteCoord( start.y );
+		server.WriteCoord( start.z );
+		server.WriteCoord( end.x );
+		server.WriteCoord( end.y );
+		server.WriteCoord( end.z );
+		server.MessageEnd();
+	}
+
+	public static void RagdollExplosion( Vector3 origin, int radius, int magnitude )
+	{
+		if ( GameCvars.Ragdolls == 0f )
+			return;
+
+		var server = Server.Current;
+
+		server.MessageBegin( MessageDest.Pas, UserMessages.RagdollExplosion, origin );
+		server.WriteCoord( origin.x );
+		server.WriteCoord( origin.y );
+		server.WriteCoord( origin.z );
+		server.WriteShort( radius );
+		server.WriteShort( magnitude );
+		server.MessageEnd();
 	}
 
 	public static void EjectBrass( Vector3 origin, Vector3 velocity, float rotation, int model, int soundType )

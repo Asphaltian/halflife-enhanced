@@ -669,8 +669,8 @@ partial class Client
 		if ( command is null || !ValidStuffText( command ) )
 			return false;
 
-		Cmd.AddText( command );
-		Cmd.AddText( "\n" );
+		Cmd.AddFilteredText( command );
+		Cmd.AddFilteredText( "\n" );
 
 		return true;
 	}

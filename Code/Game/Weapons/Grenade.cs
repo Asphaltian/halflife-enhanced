@@ -13,8 +13,12 @@ public enum SatchelCode
 public class Grenade : BaseMonster
 {
 	private const int SpawnFlagDetonate = 0x0001;
+	private const float ContactBlastRadius = 100f;
 
 	public bool RegisteredSound;
+
+	[Save( FieldType.Boolean )]
+	private bool _contact;
 
 	public override int BloodColor => DontBleed;
 
@@ -30,6 +34,8 @@ public class Grenade : BaseMonster
 		ModelName = null;
 		Solid = Solid.Not;
 		DamageMode = DamageNo;
+
+		var blastOrigin = !_contact && trace.Fraction != 1.0 ? trace.EndPos + (trace.PlaneNormal * 0.6f) : Origin;
 
 		if ( trace.Fraction != 1.0 )
 			Origin = trace.EndPos + (trace.PlaneNormal * (Damage - 24f) * 0.6f);
@@ -47,13 +53,15 @@ public class Grenade : BaseMonster
 		Server.WriteByte( TempEntity.ExplosionNone );
 		Server.MessageEnd();
 
+		Combat.RagdollExplosion( blastOrigin, (int)(_contact ? ContactBlastRadius : Damage * 2.5f), (int)Damage );
+
 		SoundEnt.InsertSound( WorldSound.Combat, Origin, BasePlayerWeapon.NormalExplosionVolume, 3f );
 
 		var owner = Owner as BaseEntity;
 
 		Owner = null;
 
-		RadiusDamage( this, owner, Damage, ClassNone, damageType );
+		Combat.RadiusDamage( Origin, this, owner, Damage, (float)(Damage * 2.5), ClassNone, damageType, blastOrigin );
 
 		Util.DecalTrace( trace, Server.RandomFloat( 0f, 1f ) < 0.5 ? Decals.Scorch1 : Decals.Scorch2 );
 
@@ -170,9 +178,9 @@ public class Grenade : BaseMonster
 			{
 				var trace = Server.Globals.Trace;
 
-				ScenePhysicsDamage.MeleeImpact( trace, 1f, Server.Globals.Forward );
-
 				Combat.ClearMultiDamage();
+				ScenePhysicsDamage.MeleeImpact( trace, 1f, Velocity );
+
 				other.TraceAttack( owner, 1f, Server.Globals.Forward, trace, DamageClub );
 				Combat.ApplyMultiDamage( this, owner );
 			}
@@ -295,6 +303,7 @@ public class Grenade : BaseMonster
 
 		grenade.SetTouch( grenade.ExplodeTouch );
 
+		grenade._contact = true;
 		grenade.Damage = HalfLifeDll.SkillData.PlrDmgM203Grenade;
 
 		return grenade;

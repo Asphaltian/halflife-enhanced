@@ -208,6 +208,7 @@ partial class Server
 			}
 
 			trace.HitGroup = _studioHulls.HitGroup( closest );
+			trace.HitBone = _studioHulls.Bone( closest );
 		}
 
 		if ( trace.Fraction != 1f )

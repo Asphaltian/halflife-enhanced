@@ -70,6 +70,7 @@ partial class BaseEntity
 	public const int DamageMortar = 1 << 23;
 	public const int DamageGibCorpse = DamageCrush | DamageFall | DamageBlast | DamageSonic | DamageClub;
 	public const int DamageShownHud = DamagePoison | DamageAcid | DamageFreeze | DamageSlowFreeze | DamageDrown | DamageBurn | DamageSlowBurn | DamageNerveGas | DamageRadiation | DamageShock;
+	public const int DamageNoPhysicsForce = DamageFall | DamageBurn | DamageDrown | DamageTimeBased | DamageCrush;
 
 	public const int ClassNone = 0;
 	public const int ClassMachine = 1;

@@ -97,11 +97,9 @@ partial class Server
 	private readonly byte[] _eventImage = new byte[EventArgs.Size];
 	private readonly byte[] _nullEventImage = new byte[EventArgs.Size];
 
-	public string EventName( int index ) => index > 0 && index < _events.Count ? _events[index] : null;
-
 	public int EventIndex( string name )
 	{
-		var index = _events.FindIndex( x => x is not null && x.Equals( name, StringComparison.OrdinalIgnoreCase ) );
+		var index = Common.IndexOfName( _events, name );
 
 		return index > 0 ? index : 0;
 	}
@@ -114,7 +112,7 @@ partial class Server
 		if ( name.Length == 0 || name[0] <= ' ' )
 			throw HostError( $"EV_Precache: Bad string '{name}'" );
 
-		var index = _events.FindIndex( x => x is not null && x.Equals( name, StringComparison.OrdinalIgnoreCase ) );
+		var index = Common.IndexOfName( _events, name );
 
 		if ( index > 0 )
 			return index;

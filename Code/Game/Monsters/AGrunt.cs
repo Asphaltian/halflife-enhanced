@@ -173,6 +173,8 @@ public class AGrunt : SquadMonster
 
 	public override void TraceAttack( BaseEntity attacker, float damage, Vector3 direction, in Trace trace, int damageType )
 	{
+		ForceBone = trace.HitBone;
+
 		if ( trace.HitGroup == 10 && (damageType & (DamageBullet | DamageSlash | DamageClub)) != 0 )
 		{
 			if ( DamageTime != Server.Globals.Time || Server.RandomLong( 0, 10 ) < 1 )
@@ -292,6 +294,8 @@ public class AGrunt : SquadMonster
 	}
 
 	public override int Classify() => ClassAlienMilitary;
+
+	public override bool CanBecomeRagdoll() => true;
 
 	public override void SetYawSpeed()
 	{

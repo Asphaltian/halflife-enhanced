@@ -214,10 +214,8 @@ partial class Client
 	private const int DemoProtocol = 5;
 	private const int DemoInfoSize = 0x1b4;
 	private const int DemoRefParamsOffset = 4;
-	private const int DemoRefParamsSize = 0xe8;
 	private const int DemoCmdOffset = 0xec;
 	private const int DemoMoveVarsOffset = 0x120;
-	private const int DemoMoveVarsSize = 0x84;
 	private const int DemoViewOffset = 0x1a4;
 	private const int DemoViewModelOffset = 0x1b0;
 	private const int DemoFrameHistory = 32;
@@ -261,6 +259,9 @@ partial class Client
 	private float _demoStartTime;
 	private int _demoStartFrame;
 	private int _forceTrack;
+	private readonly byte[] _demoClientDataImage = new byte[DemoClientDataSize];
+	private readonly byte[] _demoCommandImage = new byte[DemoCommandSize];
+
 	private DemoFile _demoFile;
 	private DemoFile _demoHeaderFile;
 	private bool _demoWaiting;
@@ -290,8 +291,6 @@ partial class Client
 	public bool DemoRecording => _demoRecording;
 
 	public bool DemoPlayback => _demoPlayback;
-
-	public bool TimeDemo => _timeDemo;
 
 	private static string Fixed( double value, int decimals ) => value.ToString( $"F{decimals}", CultureInfo.InvariantCulture );
 
@@ -656,7 +655,7 @@ partial class Client
 
 	private void WriteDemoCommand( string command )
 	{
-		var image = new byte[DemoCommandSize];
+		var image = _demoCommandImage;
 
 		StructImage.Write( image, 0, DemoCommandSize, command.Length >= DemoCommandSize ? command[..(DemoCommandSize - 1)] : command );
 
@@ -676,7 +675,7 @@ partial class Client
 		if ( _demoFile is null )
 			return;
 
-		var image = new byte[DemoClientDataSize];
+		var image = _demoClientDataImage;
 
 		StructImage.Write( image, 0, data.Origin );
 		StructImage.Write( image, 0xc, data.ViewAngles );
@@ -907,7 +906,7 @@ partial class Client
 
 			if ( command == DemoConsoleCommand )
 			{
-				var image = new byte[DemoCommandSize];
+				var image = _demoCommandImage;
 
 				_demoFile.Read( image );
 
@@ -915,8 +914,8 @@ partial class Client
 
 				if ( ValidStuffText( text ) )
 				{
-					Cmd.AddText( text );
-					Cmd.AddText( "\n" );
+					Cmd.AddFilteredText( text );
+					Cmd.AddFilteredText( "\n" );
 				}
 
 				continue;
@@ -924,7 +923,7 @@ partial class Client
 
 			if ( command == DemoClientData )
 			{
-				var image = new byte[DemoClientDataSize];
+				var image = _demoClientDataImage;
 
 				_demoFile.Read( image );
 

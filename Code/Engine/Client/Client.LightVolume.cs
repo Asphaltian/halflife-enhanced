@@ -69,7 +69,7 @@ partial class Client
 		{
 			var sample = new LightSample( (int)records[offset + 1], (int)records[offset + 2] );
 
-			list.Add( new LightVolumeProbe( (int)records[offset], sample, [.. WorldFile.Faces[sample.Face].Styles.Where( style => style != 0 && style != 255 ).Distinct()] ) );
+			list.Add( new LightVolumeProbe( (int)records[offset], sample, [.. WorldFile.Faces[sample.Face].Styles.Where( style => style != 0 && style != NoStyle ).Distinct()] ) );
 		}
 
 		var pixels = new Half[irradiance.Width * irradiance.Height * irradiance.Depth * IrradianceChannels];

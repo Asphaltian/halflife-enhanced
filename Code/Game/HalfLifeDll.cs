@@ -445,7 +445,7 @@ public sealed partial class HalfLifeDll : GameDll
 				return;
 		}
 
-		if ( command.StartsWith( "weapon_", System.StringComparison.Ordinal ) )
+		if ( command.StartsWith( "weapon_", StringComparison.Ordinal ) )
 		{
 			player.SelectItem( command );
 			return;

@@ -46,8 +46,15 @@ partial class Client
 		public int FrameCount;
 	}
 
+	[ConVar( "crosshair", ConVarFlags.Saved )]
+	private static float Crosshair { get; set; } = 1f;
+
+	[ConVar( "showpause" )]
+	private static float ShowPause { get; set; } = 1f;
+
 	private readonly List<HudSprite> _hudSprites = [];
 	private readonly List<HudDraw> _hudDraws = [];
+	private readonly SizeBuf _stringCommand = new( "", ServerClient.MessageSize, true );
 
 	private HudSprite _currentHudSprite;
 	private Color32 _hudSpriteColor;
@@ -56,18 +63,11 @@ partial class Client
 	private int _crosshairSprite;
 	private SpriteRect _crosshairRect;
 	private (int R, int G, int B) _crosshairColor;
-
-	[ConVar( "crosshair", ConVarFlags.Saved )]
-	private static float Crosshair { get; set; } = 1f;
-
-	public IReadOnlyList<HudDraw> HudDraws => _hudDraws;
-
-	[ConVar( "showpause" )]
-	private static float ShowPause { get; set; } = 1f;
-
 	private Texture _pausePic;
 	private bool _paused;
 	private bool _gameUiActiveLastCommand;
+
+	public IReadOnlyList<HudDraw> HudDraws => _hudDraws;
 
 	public int ScreenWidth => (int)Screen.Width;
 
@@ -267,15 +267,13 @@ partial class Client
 		Cmd.ForwardToServer();
 	}
 
-	private readonly SizeBuf _stringCommand = new( "", ServerClient.MessageSize, true );
-
 	public void ServerCmdUnreliable( string command )
 	{
 		Cmd.TokenizeString( command );
 
 		if ( !CanForwardToServer )
 		{
-			if ( !Cmd.Argv( 0 ).Equals( "setinfo", System.StringComparison.OrdinalIgnoreCase ) )
+			if ( !Cmd.Argv( 0 ).Equals( "setinfo", StringComparison.OrdinalIgnoreCase ) )
 				Log.Info( $"Can't \"{Cmd.Argv( 0 )}\", not connected" );
 
 			return;
@@ -298,7 +296,7 @@ partial class Client
 
 		var text = Cmd.Argc <= 1 ? "\n" : Cmd.Args;
 
-		if ( !Cmd.Argv( 0 ).Equals( "cmd", System.StringComparison.OrdinalIgnoreCase ) )
+		if ( !Cmd.Argv( 0 ).Equals( "cmd", StringComparison.OrdinalIgnoreCase ) )
 			text = $"{Cmd.Argv( 0 )} {text}";
 
 		buffer.WriteString( text );

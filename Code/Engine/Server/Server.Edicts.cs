@@ -7,13 +7,15 @@ partial class Server
 {
 	public const int DefaultMaxEdicts = 1200;
 
-	public int MaxEdicts => _maxEdicts;
 	private const int MaxKeyLength = 255;
+	private const int SpawnFlagNotInDeathmatch = 0x800;
 
 	private Edict[] _edicts = [];
 	private float[] _freeTime = [];
 	private int _numEdicts;
 	private int _maxEdicts;
+
+	public int MaxEdicts => _maxEdicts;
 
 	public int NumEdicts => _numEdicts;
 
@@ -281,8 +283,6 @@ partial class Server
 
 		Log.Info( $"{inhibited} entities inhibited" );
 	}
-
-	private const int SpawnFlagNotInDeathmatch = 0x800;
 
 	private Edict ParseEdict( string data, ref int position, int index, bool world )
 	{

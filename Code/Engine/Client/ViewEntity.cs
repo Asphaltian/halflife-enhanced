@@ -103,18 +103,15 @@ public sealed class ViewEntity : Component
 		_latched.PrevOrigin = Origin;
 		_latched.PrevAngles = Angles;
 
-		var light = Client.Current.StudioDynamicLight( Effects, RenderFx.None, 0, Origin, header.Header.Flags );
+		var light = client.StudioDynamicLight( Effects, RenderFx.None, 0, Origin, header.Header.Flags );
 
-		_renderer.Attributes.Set( "AmbientLight", (float)light.AmbientLight );
-		_renderer.Attributes.Set( "ShadeLight", (float)light.ShadeLight );
-		_renderer.Attributes.Set( "LightVector", light.LightVector );
-		_renderer.Attributes.Set( "LightColor", light.Color );
+		light.Apply( _renderer.Attributes );
 		_renderer.Attributes.SetCombo( "D_RENDER_MODE", (int)RenderMode.Normal );
 		_renderer.Attributes.Set( "NoFog", 1f );
 		_renderer.Attributes.Set( "Blend", 1f );
 		_renderer.Attributes.Set( "DepthRange", ViewModelDepthRange );
 
-		Client.Current.StudioEntityLight( playerIndex, Origin, Attachments, _renderer.Attributes );
+		client.StudioEntityLight( playerIndex, Origin, Attachments, _renderer.Attributes );
 
 		var angles = Angles;
 
@@ -127,14 +124,7 @@ public sealed class ViewEntity : Component
 
 		bones.SetupBones( header, ref _state, ref _latched, client.ClientTime, Client.StudioInterpolation );
 
-		for ( var i = 0; i < header.BodyParts.Length; i++ )
-		{
-			ref readonly var bodyPart = ref header.BodyParts[i];
-
-			_renderer.SetBodyGroup( i, Body / bodyPart.Base % bodyPart.NumModels );
-		}
-
-		_renderer.UseAnimGraph = false;
+		BoneOutput.SetBody( header, _renderer, Body, 0 );
 
 		_boneOutput.Apply( client, header, _renderer, WorldTransform, Attachments );
 

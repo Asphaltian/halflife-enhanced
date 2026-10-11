@@ -37,10 +37,10 @@ public sealed partial class ClientEntity : Component
 
 	private readonly Vector3[] _attachments = new Vector3[4];
 	private readonly BoneOutput _boneOutput = new();
+	private readonly SpriteNextView _spriteNextView = new();
 
 	private LatchedVars _latched = new() { PrevController = new byte[4] };
 	private ModelRenderer _renderer;
-	private readonly SpriteNextView _spriteNextView = new();
 	private Model _renderedModel;
 	private Vector3 _previousOrigin;
 	private Vector3 _previousAngles;
@@ -56,6 +56,8 @@ public sealed partial class ClientEntity : Component
 	public RenderFx RenderFx => (RenderFx)CurState.RenderFx;
 
 	internal Vector3 RenderAngles => _renderAngles;
+
+	internal Vector3 TrailOrigin => _latched.PrevOrigin;
 
 	internal bool Drawn => _renderer is { Enabled: true };
 
@@ -199,8 +201,6 @@ public sealed partial class ClientEntity : Component
 		}
 	}
 
-	internal Vector3 TrailOrigin => _latched.PrevOrigin;
-
 	private bool Teleported()
 	{
 		var delta = CurState.Origin - PrevState.Origin;
@@ -241,17 +241,7 @@ public sealed partial class ClientEntity : Component
 		if ( !_hasPrevious || (PacketEffects & Effects.NoInterp) == Effects.NoInterp )
 			fraction = 1f;
 
-		var delta = Angles - _previousAngles;
-
-		for ( var i = 0; i < 3; i++ )
-		{
-			if ( delta[i] < -180f )
-				delta[i] += 360f;
-			else if ( delta[i] > 180f )
-				delta[i] -= 360f;
-		}
-
-		_renderAngles = _previousAngles + (delta * fraction);
+		_renderAngles = Edict.LerpAngles( _previousAngles, Angles, fraction );
 
 		WorldPosition = Vector3.Lerp( _previousOrigin, Origin, fraction );
 		WorldRotation = Edict.ToRotation( _renderAngles );
@@ -312,7 +302,13 @@ public sealed partial class ClientEntity : Component
 	protected override void OnPreRender()
 	{
 		if ( !Visible )
+		{
 			Draw();
+			return;
+		}
+
+		_boneOutput.UpdateBounds( _renderer as SkinnedModelRenderer );
+		_weaponBoneOutput.UpdateBounds( _weaponRenderer );
 	}
 
 	internal void Draw()
@@ -445,48 +441,30 @@ public sealed partial class ClientEntity : Component
 		if ( !client.StudioCheckBBox( header, ref CurState, Origin, WorldTransform ) )
 			return false;
 
-		var light = Client.Current.StudioDynamicLight( (Effects)CurState.Effects, RenderFx, CurState.IUser4, CurState.MoveType == (int)MoveType.Step ? Origin : position, header.Header.Flags );
+		var light = client.StudioDynamicLight( (Effects)CurState.Effects, RenderFx, CurState.IUser4, CurState.MoveType == (int)MoveType.Step ? Origin : position, header.Header.Flags );
 
 		if ( light.FloorColor is { } floorColor )
 			FloorColor = floorColor;
 
-		renderer.Attributes.Set( "AmbientLight", (float)light.AmbientLight );
-		renderer.Attributes.Set( "ShadeLight", (float)light.ShadeLight );
-		renderer.Attributes.Set( "LightVector", light.LightVector );
-		renderer.Attributes.Set( "LightColor", light.Color );
+		light.Apply( renderer.Attributes );
 
-		Client.Current.StudioEntityLight( Index, position, _attachments, renderer.Attributes );
+		client.StudioEntityLight( Index, position, _attachments, renderer.Attributes );
 
 		var bones = client.BoneSetup;
 
 		bones.SetupBones( header, ref CurState, ref _latched, time, Client.StudioInterpolation, MouthOpen );
 
-		StudioSetBody( header, renderer );
+		BoneOutput.SetBody( header, renderer, CurState.Body, CurState.Skin );
 
 		_boneOutput.Apply( client, header, renderer, WorldTransform, _attachments, RenderFx, CurState.AnimTime );
 
 		var effects = PacketEffects;
 
-		Client.Current.StudioClientEvents( header, CurState, _latched, ref effects, _attachments );
+		client.StudioClientEvents( header, CurState, _latched, ref effects, _attachments );
 
 		PacketEffects = effects;
 
 		return true;
-	}
-
-	private void StudioSetBody( Studio.File header, SkinnedModelRenderer renderer )
-	{
-		for ( var i = 0; i < header.BodyParts.Length; i++ )
-		{
-			ref readonly var bodyPart = ref header.BodyParts[i];
-
-			renderer.SetBodyGroup( i, CurState.Body / bodyPart.Base % bodyPart.NumModels );
-		}
-
-		if ( renderer.HasMaterialGroups )
-			renderer.MaterialGroup = $"Skin {CurState.Skin}";
-
-		renderer.UseAnimGraph = false;
 	}
 
 	private void StudioSetUpTransform( double time, Vector3 modelPos, Vector3 entityAngles, bool doInterp )

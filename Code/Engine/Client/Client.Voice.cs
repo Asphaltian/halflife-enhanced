@@ -81,6 +81,10 @@ partial class Client
 	private bool _voiceTweakMode;
 	private bool _voiceLocalTalkingAck;
 
+	public bool VoiceIsRecording => _voiceRecording && !_voiceTweakMode;
+
+	public int VoiceTweakSpeakingVolume { get; private set; }
+
 	public bool ShouldHearVoice( VoiceTransmitter transmitter )
 	{
 		if ( VoiceEnable == 0f )
@@ -93,8 +97,6 @@ partial class Client
 	}
 
 	private void VoiceStatus( int entityIndex, bool talking ) => _clientDll?.VoiceStatus( entityIndex, talking );
-
-	public bool VoiceIsRecording => _voiceRecording && !_voiceTweakMode;
 
 	public void VoiceRecordStart()
 	{
@@ -173,8 +175,6 @@ partial class Client
 	}
 
 	public float GetVoiceTweakControl( VoiceTweakControl control ) => control == VoiceTweakControl.OtherSpeakerScale ? VoiceScale : 1f;
-
-	public int VoiceTweakSpeakingVolume { get; private set; }
 
 	private VoiceTransmitter VoiceLocalTransmitter()
 	{

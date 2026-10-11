@@ -11,14 +11,21 @@ public sealed partial class Server : GameObjectSystem<Server>, IHotloadManaged
 	public const string GameDirectory = "valve";
 	public const string PlatformDirectory = "platform";
 	public const string FallbackDirectory = "";
+	public const int MaxClientsLimit = 32;
+
+	private const int BspHeaderSize = 124;
+	private const int BspLumps = 15;
+
+	[SkipHotload]
+	private static readonly Dictionary<string, string> MountPaths = new( StringComparer.OrdinalIgnoreCase );
+
+	private static string[] _searchPaths = [GameDirectory];
+	private static int _spawnCount;
 
 	public bool Active { get; private set; }
 	public string Name { get; private set; }
 	public double Time { get; private set; }
 	public bool Paused { get; private set; }
-	public const int MaxClientsLimit = 32;
-
-	private static int _spawnCount;
 
 	public int SpawnCount { get; private set; }
 
@@ -32,6 +39,11 @@ public sealed partial class Server : GameObjectSystem<Server>, IHotloadManaged
 
 	public Server( Scene scene ) : base( scene )
 	{
+		_pmove.PlaySound = PlayerMovePlaySound;
+		_pmove.TraceTexture = PlayerMoveTraceTexture;
+		_pmove.LoadFile = LoadMountText;
+		_pmove.Scene = scene;
+		_pmove.SceneContact = PlayerSceneContact;
 	}
 
 	void IHotloadManaged.Created( IReadOnlyDictionary<string, object> state ) => Host.Hotloaded();
@@ -58,7 +70,7 @@ public sealed partial class Server : GameObjectSystem<Server>, IHotloadManaged
 		var loader = MountUtility.FindLoader( GetMountPath( modelName ) );
 		if ( loader is null || await loader.GetOrCreate() is not byte[] data )
 		{
-			Log.Warning( $"Couldn't spawn server {modelName}" );
+			Log.Info( $"Couldn't spawn server {modelName}\n" );
 			return false;
 		}
 
@@ -230,9 +242,6 @@ public sealed partial class Server : GameObjectSystem<Server>, IHotloadManaged
 		LoadFromFile( WorldModel.Entities );
 	}
 
-	private const int BspHeaderSize = 124;
-	private const int BspLumps = 15;
-
 	public static int? MapFileCrc( string fileName, byte[] data )
 	{
 		if ( data.Length < BspHeaderSize )
@@ -309,11 +318,6 @@ public sealed partial class Server : GameObjectSystem<Server>, IHotloadManaged
 	public void LinkUserMessages() => LinkNewUserMessages();
 
 	public static bool IsMapValid( string mapName ) => MountUtility.FindLoader( GetMountPath( $"maps/{mapName}.bsp" ) ) is not null;
-
-	[SkipHotload]
-	private static readonly Dictionary<string, string> MountPaths = new( StringComparer.OrdinalIgnoreCase );
-
-	private static string[] _searchPaths = [GameDirectory];
 
 	public static void SetGameDirectory()
 	{

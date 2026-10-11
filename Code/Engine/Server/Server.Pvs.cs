@@ -207,7 +207,7 @@ partial class Server
 		if ( _fatPvs is null || _fatPvs.Length != bytes )
 			_fatPvs = new byte[bytes];
 		else
-			System.Array.Clear( _fatPvs );
+			Array.Clear( _fatPvs );
 
 		AddToFatPvs( origin, 0 );
 

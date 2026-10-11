@@ -226,6 +226,7 @@ partial class BaseEntity
 			if ( trace.Fraction != 1f )
 			{
 				ScenePhysicsDamage.BulletImpact( trace, bulletType, direction );
+				Combat.RagdollImpact( source, trace.EndPos );
 
 				var entity = (BaseEntity)trace.Ent;
 
@@ -340,6 +341,7 @@ partial class BaseEntity
 			if ( trace.Fraction != 1f )
 			{
 				ScenePhysicsDamage.BulletImpact( trace, bulletType, direction );
+				Combat.RagdollImpact( source, trace.EndPos );
 
 				var entity = (BaseEntity)trace.Ent;
 

@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace GoldSrc;
 
-public sealed partial class Client
+partial class Client
 {
 	private const float MinGamma = 1.8f;
 	private const float MaxGamma = 3f;
@@ -11,6 +11,7 @@ public sealed partial class Client
 	private const float MaxMultiplayerBrightness = 2f;
 	private const int GlNearest = 0x2600;
 	private const int GlLinear = 0x2601;
+	private const int GlLinearMipmapLinear = 0x2703;
 
 	[SkipHotload]
 	private static readonly (string Name, int Minimize, int Maximize)[] TextureModes =
@@ -25,7 +26,7 @@ public sealed partial class Client
 
 	private static string _textureMode = "GL_LINEAR_MIPMAP_LINEAR";
 	private static float _preferTextureFiltering = 1f;
-	private static int _filterMin = 0x2703;
+	private static int _filterMin = GlLinearMipmapLinear;
 	private static int _filterMax = GlLinear;
 	private static float _uploadGamma = 2.2f;
 	private static float _uploadTexGamma = 2f;

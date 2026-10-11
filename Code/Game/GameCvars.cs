@@ -809,6 +809,9 @@ public static class GameCvars
 	[ConVar( "sk_player_leg3" )]
 	private static float SkPlayerLeg3 { get; set; } = 1f;
 
+	[ConVar( "hl1_ragdolls", ConVarFlags.Saved )]
+	public static float Ragdolls { get; set; }
+
 	[ConVar( "sv_pushable_fixed_tick_fudge" )]
 	private static float SvPushableFixedTickFudge { get; set; } = 15f;
 }

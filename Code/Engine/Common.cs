@@ -78,7 +78,7 @@ public static class Common
 		if ( position >= file.Length )
 			return null;
 
-		var size = System.Math.Min( bufferSize - 1, file.Length - position );
+		var size = Math.Min( bufferSize - 1, file.Length - position );
 		var newLine = file.IndexOf( '\n', position, size );
 		var length = newLine < 0 ? size : newLine - position + 1;
 
@@ -225,6 +225,17 @@ public static class Common
 	private static char Peek( string value, int position )
 	{
 		return position < value.Length ? value[position] : '\0';
+	}
+
+	public static int IndexOfName( List<string> names, string name )
+	{
+		for ( var i = 0; i < names.Count; i++ )
+		{
+			if ( name.Equals( names[i], StringComparison.OrdinalIgnoreCase ) )
+				return i;
+		}
+
+		return -1;
 	}
 
 	public static string FileBase( string path )

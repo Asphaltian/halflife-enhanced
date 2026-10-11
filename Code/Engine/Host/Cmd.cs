@@ -9,9 +9,22 @@ public static class Cmd
 	private const int MaxArgs = 80;
 	private const int MaxArgLength = 515;
 
+	private static readonly string[] PrivilegedCommands =
+	[
+		"connect", "retry", "rcon", "exec", "alias", "quit", "_restart", "_setrenderer", "_setvideomode", "_setgamedir",
+		"_sethdmodels", "_setaddons_folder", "kill", "motd", "motd_write", "writecfg", "bind", "unbind", "unbindall"
+	];
+
+	private static readonly string[] FilteredCommands = ["removedemo", "cd", "say", "setinfo", "timerefresh"];
+	private static readonly string[] PrivilegedCvars = ["sv_logsecret", "rcon_address", "rcon_port", "cl_filterstuffcmd", "rcon_password"];
+	private static readonly string[] FilteredCvars = ["sys_ticrate", "fps_max", "developer", "rate", "ex_interp", "volume", "MP3Volume", "speak_enabled", "voice_enable"];
+	private static readonly string[] FilteredPrefixes = ["cl_", "gl_", "m_", "r_", "hud_"];
+
 	private static StringBuilder _text = new();
+	private static StringBuilder _filteredText = new();
 	private static List<string> _arguments = [];
 	private static HashSet<string> _members;
+	private static HashSet<string> _commands;
 	private static HashSet<string> _hudCommands;
 
 	private const string HudCommandNamespace = "HalfLife";
@@ -23,12 +36,15 @@ public static class Cmd
 
 	public static bool FromClient { get; private set; }
 
+	public static bool Privileged { get; private set; } = true;
+
 	public static int Argc => _arguments.Count;
 	public static string Args { get; private set; }
 
 	public static void Hotloaded()
 	{
 		_members = null;
+		_commands = null;
 		_hudCommands = null;
 	}
 
@@ -36,18 +52,28 @@ public static class Cmd
 
 	public static void AddText( string text ) => _text.Append( text );
 
-	public static void InsertText( string text ) => _text.Insert( 0, text );
+	public static void AddFilteredText( string text ) => _filteredText.Append( text );
+
+	public static void InsertText( string text ) => (Privileged ? _text : _filteredText).Insert( 0, text );
 
 	public static void Execute()
 	{
-		while ( _text.Length > 0 )
+		Execute( _text, true, -1 );
+		Execute( _filteredText, false, 1 );
+	}
+
+	private static void Execute( StringBuilder buffer, bool privileged, int maxCommands )
+	{
+		var count = 0;
+
+		while ( buffer.Length > 0 )
 		{
 			var quoted = false;
 			int end;
 
-			for ( end = 0; end < _text.Length; end++ )
+			for ( end = 0; end < buffer.Length; end++ )
 			{
-				var c = _text[end];
+				var c = buffer[end];
 
 				if ( c == '"' )
 					quoted = !quoted;
@@ -56,43 +82,113 @@ public static class Cmd
 					break;
 			}
 
-			var line = _text.ToString( 0, Math.Min( end, MaxLineLength ) );
+			var line = buffer.ToString( 0, Math.Min( end, MaxLineLength ) );
 
-			_text.Remove( 0, end == _text.Length ? end : end + 1 );
+			buffer.Remove( 0, end == buffer.Length ? end : end + 1 );
 
-			ExecuteString( line );
+			ExecuteString( line, privileged );
 
-			if ( _wait )
-			{
-				_wait = false;
-				break;
-			}
+			count++;
+
+			var stop = _wait || (maxCommands > 0 && count >= maxCommands);
+
+			_wait = false;
+
+			if ( stop )
+				return;
+		}
+	}
+
+	private static void LoadConsoleMembers()
+	{
+		_members = new HashSet<string>( StringComparer.OrdinalIgnoreCase );
+		_commands = new HashSet<string>( StringComparer.OrdinalIgnoreCase );
+
+		foreach ( var attribute in Game.TypeLibrary.GetMemberAttributes<ConVarAttribute>( true ) )
+		{
+			if ( attribute.Name is null )
+				continue;
+
+			_members.Add( attribute.Name );
+
+			if ( attribute is ConCmdAttribute )
+				_commands.Add( attribute.Name );
 		}
 	}
 
 	private static bool IsConsoleMember( string name )
 	{
 		if ( _members is null )
-		{
-			_members = new HashSet<string>( StringComparer.OrdinalIgnoreCase );
-
-			foreach ( var attribute in Game.TypeLibrary.GetMemberAttributes<ConVarAttribute>( true ) )
-			{
-				if ( attribute.Name is not null )
-					_members.Add( attribute.Name );
-			}
-		}
+			LoadConsoleMembers();
 
 		return _members.Contains( name );
 	}
 
-	public static void ExecuteString( string text )
+	private static bool Contains( string[] names, string name )
+	{
+		foreach ( var entry in names )
+		{
+			if ( entry.Equals( name, StringComparison.OrdinalIgnoreCase ) )
+				return true;
+		}
+
+		return false;
+	}
+
+	private static bool HasFilteredPrefix( string name )
+	{
+		foreach ( var prefix in FilteredPrefixes )
+		{
+			if ( name.StartsWith( prefix, StringComparison.OrdinalIgnoreCase ) )
+				return true;
+		}
+
+		return false;
+	}
+
+	private static bool RefusedUnprivileged( string name, string text )
+	{
+		var filter = Cvar.GetFloat( "cl_filterstuffcmd" ) > 0f;
+
+		var prefixed = IsConsoleMember( name ) && filter && HasFilteredPrefix( name );
+		var command = _commands.Contains( name );
+
+		if ( Contains( PrivilegedCommands, name ) || (filter && Contains( FilteredCommands, name )) || (prefixed && command) )
+		{
+			Log.Info( $"Could not execute privileged command {text}\n" );
+
+			return true;
+		}
+
+		if ( Contains( PrivilegedCvars, name ) || (filter && Contains( FilteredCvars, name )) || (prefixed && !command) )
+		{
+			Log.Info( $"{name} is a privileged variable\n" );
+
+			return true;
+		}
+
+		return false;
+	}
+
+	public static void ExecuteString( string text, bool privileged = true )
 	{
 		TokenizeString( text );
 
 		if ( Argc == 0 )
 			return;
 
+		if ( !privileged && RefusedUnprivileged( Argv( 0 ), text ) )
+			return;
+
+		Privileged = privileged;
+
+		Dispatch();
+
+		Privileged = true;
+	}
+
+	private static void Dispatch()
+	{
 		if ( Argv( 0 )[0] is '+' or '-' && ClientDll.Loaded is { } client && client.KeyCommand( Argv( 0 )[1..], Argv( 0 )[0] == '+' ) )
 		{
 			Client.Current?.RecordHudCommand( Argv( 0 ) );

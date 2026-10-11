@@ -39,26 +39,39 @@ public static class ScenePhysicsDamage
 			return;
 		}
 
-		if ( trace.Body is not { MotionEnabled: true } body )
-			return;
-
-		body.ApplyImpulseAt( trace.EndPos, Util.Normalize( direction ) * (DamageForce( bulletType ) * PushScale) );
+		Impact( trace, trace.EndPos, Util.Normalize( direction ) * (DamageForce( bulletType ) * PushScale) );
 	}
 
 	public static void HornetImpact( in Trace trace, Vector3 velocity, Vector3 origin )
 	{
-		if ( trace.Body is not { MotionEnabled: true } body )
-			return;
-
-		body.ApplyImpulseAt( origin, Util.Normalize( velocity ) * (BulletImpulse( 100f, 1200f ) * PushScale) );
+		Impact( trace, origin, Util.Normalize( velocity ) * (BulletImpulse( 100f, 1200f ) * PushScale) );
 	}
 
 	public static void MeleeImpact( in Trace trace, float damage, Vector3 direction )
 	{
-		if ( trace.Body is not { MotionEnabled: true } body )
-			return;
+		Impact( trace, trace.EndPos, MeleeForce( damage, direction ) );
+	}
 
-		body.ApplyImpulseAt( trace.EndPos, Util.Normalize( direction ) * (damage * ImpulseScale( ForceTargetMass, ForceSpeedPerDamage ) * PushScale) );
+	public static Vector3 MeleeForce( float damage, Vector3 direction )
+	{
+		return Util.Normalize( direction ) * (damage * ImpulseScale( ForceTargetMass, ForceSpeedPerDamage ) * PushScale);
+	}
+
+	public static Vector3 ExplosiveForce( float damage, Vector3 direction )
+	{
+		var forceScale = MathF.Min( damage * ImpulseScale( ForceTargetMass, ForceSpeedPerDamage ), ImpulseScale( ForceTargetMass, ExplosiveClampSpeed ) );
+
+		forceScale *= Game.Random.Float( 0.85f, 1.15f );
+
+		return Util.Normalize( direction ) * (forceScale * PushScale);
+	}
+
+	private static void Impact( in Trace trace, Vector3 position, Vector3 force )
+	{
+		Combat.DamageForce = force;
+
+		if ( trace.Body is { MotionEnabled: true } body )
+			body.ApplyImpulseAt( position, force );
 	}
 
 	public static void Explosion( Vector3 source, BaseEntity inflictor, float damage, float radius, float falloff )
@@ -71,16 +84,10 @@ public static class ScenePhysicsDamage
 			if ( trace.Fraction != 1f && trace.Body != body )
 				continue;
 
-			var adjustedDamage = damage - (MathLib.Length( source - trace.EndPos ) * falloff);
-
-			if ( adjustedDamage <= 0f )
+			if ( damage - (MathLib.Length( source - trace.EndPos ) * falloff) <= 0f )
 				continue;
 
-			var forceScale = MathF.Min( adjustedDamage * ImpulseScale( ForceTargetMass, ForceSpeedPerDamage ), ImpulseScale( ForceTargetMass, ExplosiveClampSpeed ) );
-
-			forceScale *= Game.Random.Float( 0.85f, 1.15f );
-
-			body.ApplyImpulseAt( source, Util.Normalize( spot - source ) * (forceScale * PushScale) );
+			body.ApplyImpulseAt( source, ExplosiveForce( damage, spot - source ) );
 		}
 	}
 }

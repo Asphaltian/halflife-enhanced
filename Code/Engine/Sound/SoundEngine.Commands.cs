@@ -128,7 +128,7 @@ partial class SoundEngine
 
 	private void Say()
 	{
-		if ( NoSound != 0f || Cmd.Argc < 2 || SpeakEnabledCvar == 0f )
+		if ( NoSoundCvar != 0f || Cmd.Argc < 2 || SpeakEnabledCvar == 0f )
 			return;
 
 		if ( SentenceSound( "S_Say" ) is not { } sfx )
@@ -139,7 +139,7 @@ partial class SoundEngine
 
 	private void SayReliable()
 	{
-		if ( NoSound != 0f || Cmd.Argc < 2 || SpeakEnabledCvar == 0f )
+		if ( NoSoundCvar != 0f || Cmd.Argc < 2 || SpeakEnabledCvar == 0f )
 			return;
 
 		if ( SentenceSound( "S_Say_Reliable" ) is not { } sfx )

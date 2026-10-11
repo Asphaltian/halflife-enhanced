@@ -21,6 +21,9 @@ partial class Edict
 
 		var brush = Solid == Solid.Bsp && server.GetModel( ModelIndex ) is not null;
 
+		if ( brush != Tags.Has( ScenePhysics.WorldTag ) )
+			Tags.Set( ScenePhysics.WorldTag, brush );
+
 		if ( brush && _brushCollider is null )
 		{
 			_brushCollider = AddComponent<ModelCollider>();
@@ -41,7 +44,10 @@ partial class Edict
 		var box = !brush && (Index < 1 || Index > server.MaxClients) && Solid is Solid.BBox or Solid.SlideBox && Size != Vector3.Zero;
 
 		if ( box && _boxCollider is null )
+		{
 			_boxCollider = new GameObject( GameObject, true, "bbox" ).AddComponent<BoxCollider>();
+			_boxCollider.Tags.Add( ScenePhysics.BoxTag );
+		}
 
 		if ( _boxCollider is null )
 			return;

@@ -113,6 +113,8 @@ public class Ichthyosaur : FlyingMonster
 
 	public override int Classify() => ClassAlienMonster;
 
+	public override bool CanBecomeRagdoll() => true;
+
 	public override bool CheckMeleeAttack1( float dot, float distance ) => dot >= 0.7 && _enemyTouched > Server.Globals.Time - 0.2;
 
 	public void BiteTouch( BaseEntity other )

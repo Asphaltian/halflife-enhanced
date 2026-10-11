@@ -56,10 +56,39 @@ partial class Client
 		"svc_sendextrainfo", "svc_timescale", "svc_resourcelocation", "svc_sendcvarvalue", "svc_sendcvarvalue2", "svc_exec"
 	];
 
+	private const int VersionMessage = 4;
+	private const int StopSoundMessage = 16;
+	private const int DamageMessage = 19;
+	private const int SpawnStaticMessage = 20;
+	private const int KilledMonsterMessage = 27;
+	private const int FoundSecretMessage = 28;
+	private const int FinaleMessage = 31;
+	private const int CutsceneMessage = 34;
+	private const int DecalNameMessage = 36;
+
+	private const int IntermissionScoreboard = 1;
+	private const int IntermissionFinale = 2;
+	private const int IntermissionCutscene = 3;
+
+	private const int MessageBuckets = 64;
+	private const int UserMessageBucket = MessageBuckets - 1;
+	private const int MaxSkyNameLength = 31;
+
+	[ConVar( "gl_zmax" )]
+	private static float ZMax { get; set; } = 4096f;
+
+	[ConVar( "gl_wateramp", ConVarFlags.Saved )]
+	private static float WaterAmp { get; set; } = 0.3f;
+
 	private readonly MessageReader _netMessage = new();
 	private readonly PlayerInfo[] _players = new PlayerInfo[Server.MaxClientsLimit];
 	private readonly byte[] _userMessageData = new byte[Server.MaxUserMessageSize];
+	private readonly int[] _messageCounts = new int[MessageBuckets];
+	private readonly int[] _messageBytes = new int[MessageBuckets];
+	private readonly int[] _packetMessageBytes = new int[MessageBuckets];
+	private readonly MoveVars _moveVars = new();
 
+	private int _userMessageCount;
 	private int _viewEntity;
 
 	public int ViewEntityIndex => _viewEntity;
@@ -127,14 +156,6 @@ partial class Client
 
 		message.EndBitReading();
 	}
-
-	private const int MessageBuckets = 64;
-	private const int UserMessageBucket = MessageBuckets - 1;
-
-	private readonly int[] _messageCounts = new int[MessageBuckets];
-	private readonly int[] _messageBytes = new int[MessageBuckets];
-	private readonly int[] _packetMessageBytes = new int[MessageBuckets];
-	private int _userMessageCount;
 
 	private void ClearMessageStats()
 	{
@@ -263,6 +284,45 @@ partial class Client
 				case Server.DisconnectMessage:
 					ParseDisconnect( message );
 					break;
+
+				case VersionMessage:
+					ParseVersion( message );
+					break;
+
+				case StopSoundMessage:
+					{
+						var entityChannel = message.ReadShort();
+
+						Sound.StopSound( entityChannel >> 3, entityChannel & 7 );
+						break;
+					}
+
+				case DamageMessage:
+				case SpawnStaticMessage:
+				case KilledMonsterMessage:
+				case FoundSecretMessage:
+					break;
+
+				case FinaleMessage:
+					_intermission = IntermissionFinale;
+					CenterPrint( message.ReadString() );
+					break;
+
+				case CutsceneMessage:
+					_intermission = IntermissionCutscene;
+					CenterPrint( message.ReadString() );
+					break;
+
+				case DecalNameMessage:
+					{
+						var index = message.ReadByte();
+						var name = message.ReadString();
+
+						if ( index < MaxDecalNames )
+							_decalNames[index] = name.Length > MaxDecalNameLength ? name[..MaxDecalNameLength] : name;
+
+						break;
+					}
 
 				case Server.EventMessage:
 					ParseEvent( message );
@@ -414,7 +474,7 @@ partial class Client
 					break;
 
 				case Server.IntermissionMessage:
-					_intermission = 1;
+					_intermission = IntermissionScoreboard;
 					break;
 
 				case Server.CdTrackMessage:
@@ -467,16 +527,6 @@ partial class Client
 			}
 		}
 	}
-
-	private const int MaxSkyNameLength = 31;
-
-	[ConVar( "gl_zmax" )]
-	private static float ZMax { get; set; } = 4096f;
-
-	[ConVar( "gl_wateramp", ConVarFlags.Saved )]
-	private static float WaterAmp { get; set; } = 0.3f;
-
-	private readonly MoveVars _moveVars = new();
 
 	private void ParseNewMoveVars( MessageReader message )
 	{
@@ -575,7 +625,18 @@ partial class Client
 		if ( id >= 256 )
 			throw HostError( $"DispatchUserMsg:  Illegal User Msg {id}\n" );
 
-		if ( _userMessages.Find( entry => entry.Id == id ) is not { } userMessage )
+		ClientUserMessage userMessage = null;
+
+		foreach ( var entry in _userMessages )
+		{
+			if ( entry.Id != id )
+				continue;
+
+			userMessage = entry;
+			break;
+		}
+
+		if ( userMessage is null )
 			throw HostError( $"UserMsg: Not Present on Client {id}\n" );
 
 		var size = userMessage.Size;
@@ -589,6 +650,14 @@ partial class Client
 		message.ReadBuf( size, _userMessageData );
 
 		_clientDll.DispatchUserMsg( new UserMessage( userMessage.Id, userMessage.Size, userMessage.Name ), _userMessageData.AsSpan( 0, Math.Max( size, 0 ) ).ToArray() );
+	}
+
+	private static void ParseVersion( MessageReader message )
+	{
+		var protocol = message.ReadLong();
+
+		if ( protocol != Host.ProtocolVersion )
+			throw HostError( $"CL_Parse_Version: Server is protocol {protocol} instead of {Host.ProtocolVersion}\n" );
 	}
 
 	private static void ParseDisconnect( MessageReader message )

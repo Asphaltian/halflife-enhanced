@@ -137,11 +137,13 @@ partial class Client
 	private static readonly string[] ShotShellSounds = ["weapons/sshell1.wav", "weapons/sshell2.wav", "weapons/sshell3.wav"];
 
 	private readonly List<TempEnt> _visibleTempEntities = [];
-	private readonly List<ClientModelRenderer> _tempEntityRenderers = [];
+	private readonly List<TempEntRenderer> _tempEntityRenderers = [];
 
 	private TempEnt _freeTempEntities;
 	private Model[] _muzzleFlash;
 	private TempEnt _activeTempEntities;
+	private Func<TempEnt, bool> _addVisibleEntity;
+	private Action<TempEnt, float> _tempEntPlaySound;
 
 	private void ClearTempEntities()
 	{
@@ -408,7 +410,7 @@ partial class Client
 
 		MarkViewLeaves( _viewOrigin );
 
-		_clientDll.TempEntUpdate( ClientTime - _oldTime, ClientTime, _moveVars.Gravity, ref _freeTempEntities, ref _activeTempEntities, AddVisibleEntity, TempEntPlaySound );
+		_clientDll.TempEntUpdate( ClientTime - _oldTime, ClientTime, _moveVars.Gravity, ref _freeTempEntities, ref _activeTempEntities, _addVisibleEntity ??= AddVisibleEntity, _tempEntPlaySound ??= TempEntPlaySound );
 	}
 
 	private bool AddVisibleEntity( TempEnt temp )
@@ -503,7 +505,7 @@ partial class Client
 	{
 		while ( _tempEntityRenderers.Count <= index )
 		{
-			var renderer = new GameObject( true, "tempent" ).AddComponent<ClientModelRenderer>();
+			var renderer = new GameObject( true, "tempent" ).AddComponent<TempEntRenderer>();
 
 			renderer.GameObject.NetworkMode = NetworkMode.Never;
 

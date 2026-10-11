@@ -37,14 +37,14 @@ partial class Client
 	public const int MaxELights = 64;
 
 	private const int MaxLocalLights = 3;
+	private const float FullBrightLight = 65280f;
+
+	private static readonly string[] LocalLightNames = ["LocalLight0", "LocalLight1", "LocalLight2"];
+	private static readonly string[] LocalLightColorNames = ["LocalLightColor0", "LocalLightColor1", "LocalLightColor2"];
 
 	private readonly DLight[] _dlights = CreateLights( MaxDLights );
 	private readonly DLight[] _elights = CreateLights( MaxELights );
-
-	private const float FullBrightLight = 65280f;
-
 	private readonly PointLight[] _sceneLights = new PointLight[MaxDLights];
-
 	private readonly Vector4[] _localLights = new Vector4[MaxLocalLights];
 	private readonly Vector3[] _localLinearLights = new Vector3[MaxLocalLights];
 	private readonly float[] _localLightStrengths = new float[MaxLocalLights];
@@ -265,14 +265,14 @@ partial class Client
 
 		for ( var i = 0; i < _numLocalLights; i++ )
 		{
-			attributes.Set( $"LocalLight{i}", _localLights[i] );
-			attributes.Set( $"LocalLightColor{i}", _localLinearLights[i] );
+			attributes.Set( LocalLightNames[i], _localLights[i] );
+			attributes.Set( LocalLightColorNames[i], _localLinearLights[i] );
 		}
 	}
 
 	private static int LinearGamma( int index )
 	{
-		return (int)(Math.Pow( index / 1023.0, Client.Gamma ) * 1023.0);
+		return (int)(Math.Pow( index / 1023.0, Gamma ) * 1023.0);
 	}
 }
 
@@ -374,7 +374,6 @@ partial class Client
 		_surfaceDlightBits = new int[WorldFile.Faces.Length];
 		_surfaceDlightFrame = new int[WorldFile.Faces.Length];
 		_surfaceDlightOrigin = new Vector3[WorldFile.Faces.Length];
-
 	}
 
 	private void MarkLights( Vector3 origin, DLight light, int bit, int node, Vector3 entityOrigin )

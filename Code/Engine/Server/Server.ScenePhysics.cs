@@ -10,12 +10,12 @@ partial class Server
 	{
 		foreach ( var gameObject in Scene.FindInPhysics( new Sphere( origin, radius ) ) )
 		{
-			if ( !gameObject.Tags.Has( ScenePhysics.Tag ) && gameObject.GetComponent<Rigidbody>() is { MotionEnabled: true } body )
+			if ( !gameObject.Tags.Has( ScenePhysics.Tag ) && !gameObject.Tags.Has( ClientRagdoll.Tag ) && gameObject.GetComponent<Rigidbody>() is { MotionEnabled: true } body )
 				yield return body;
 		}
 	}
 
-	private void PlayerSceneContact( SceneTraceResult hit, Vector3 velocity )
+	private void PlayerSceneContact( SceneTraceResult hit )
 	{
 		if ( hit.Collider?.Rigidbody is { MotionEnabled: true } body && body != _groundBody )
 			_touchedPhysObject = true;

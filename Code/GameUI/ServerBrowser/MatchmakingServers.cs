@@ -178,18 +178,21 @@ public static class MatchmakingServers
 			query.Cancelled = true;
 	}
 
-	private static async Task RunPing( ServerQuery query, ulong ownerId, IMatchmakingPingResponse response )
+	private static async Task<List<LobbyInformation>> QueryLobbies()
 	{
-		List<LobbyInformation> lobbies;
-
 		try
 		{
-			lobbies = await Networking.QueryLobbies();
+			return await Networking.QueryLobbies();
 		}
 		catch ( Exception )
 		{
-			lobbies = null;
+			return null;
 		}
+	}
+
+	private static async Task RunPing( ServerQuery query, ulong ownerId, IMatchmakingPingResponse response )
+	{
+		var lobbies = await QueryLobbies();
 
 		if ( query.Cancelled )
 			return;
@@ -248,16 +251,7 @@ public static class MatchmakingServers
 
 		request.Refreshing = true;
 
-		List<LobbyInformation> lobbies;
-
-		try
-		{
-			lobbies = await Networking.QueryLobbies();
-		}
-		catch ( Exception )
-		{
-			lobbies = null;
-		}
+		var lobbies = await QueryLobbies();
 
 		if ( request.Released || request.Query != query )
 			return;

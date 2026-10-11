@@ -205,9 +205,6 @@ partial class Client
 		pmove.VectorUser3 = from.Client.VUser3;
 		pmove.VectorUser4 = from.Client.VUser4;
 
-		pmove.PlaySound = ClientPlayerMoveSound;
-		pmove.TraceTexture = TraceTexture;
-
 		_clientDll.PlayerMove( pmove, false );
 
 		_predictedGround = pmove.OnGround;
