@@ -285,24 +285,24 @@ public sealed class Restore( SaveRestoreData data, List<SaveBlock> header = null
 				return FunctionFromName( (string)value, target, memberType );
 
 			case FieldType.ModelName:
-			{
-				var model = Server.AllocString( (string)value );
+				{
+					var model = Server.AllocString( (string)value );
 
-				if ( Precache && model is { Length: > 0 } && target is Edict modelOwner )
-					modelOwner.Server.PrecacheModel( model );
+					if ( Precache && model is { Length: > 0 } && target is Edict modelOwner )
+						modelOwner.Server.PrecacheModel( model );
 
-				return model;
-			}
+					return model;
+				}
 
 			case FieldType.SoundName:
-			{
-				var sound = Server.AllocString( (string)value );
+				{
+					var sound = Server.AllocString( (string)value );
 
-				if ( Precache && sound is { Length: > 0 } && target is Edict soundOwner )
-					soundOwner.Server.PrecacheSound( sound );
+					if ( Precache && sound is { Length: > 0 } && target is Edict soundOwner )
+						soundOwner.Server.PrecacheSound( sound );
 
-				return sound;
-			}
+					return sound;
+				}
 
 			case FieldType.String:
 				return Server.AllocString( (string)value );

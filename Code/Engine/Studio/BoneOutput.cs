@@ -71,23 +71,23 @@ public sealed class BoneOutput
 				return false;
 
 			case RenderFx.Explode:
-			{
-				var scale = (float)(((client.ClientTime - animTime) * 10.0) + 1.0);
-
-				if ( scale > 2f )
-					scale = 2f;
-
-				var axis = root.Rotation * new Vector3( 0f, 1f, 0f );
-
-				for ( var i = 0; i < FxRows; i++ )
 				{
-					var row = FxRow( bone, i ) + new Vector4( axis * (axis[i] * (scale - 1f)), 0f );
+					var scale = (float)(((client.ClientTime - animTime) * 10.0) + 1.0);
 
-					SetFxRow( bone, i, row with { w = origin[i] - Vector3.Dot( (Vector3)row, origin ) } );
+					if ( scale > 2f )
+						scale = 2f;
+
+					var axis = root.Rotation * new Vector3( 0f, 1f, 0f );
+
+					for ( var i = 0; i < FxRows; i++ )
+					{
+						var row = FxRow( bone, i ) + new Vector4( axis * (axis[i] * (scale - 1f)), 0f );
+
+						SetFxRow( bone, i, row with { w = origin[i] - Vector3.Dot( (Vector3)row, origin ) } );
+					}
+
+					return true;
 				}
-
-				return true;
-			}
 		}
 
 		return false;

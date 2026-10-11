@@ -1,5 +1,3 @@
-using System;
-
 namespace GoldSrc;
 
 partial class SoundEngine

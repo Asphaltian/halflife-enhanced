@@ -1,4 +1,3 @@
-using GoldSrc;
 using GoldSrc.Vgui1;
 
 namespace HalfLife;

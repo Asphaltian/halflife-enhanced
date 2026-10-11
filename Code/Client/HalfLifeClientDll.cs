@@ -738,7 +738,7 @@ public sealed partial class HalfLifeClientDll : ClientDll
 		cmd.Buttons = (ushort)ButtonBits( true );
 
 		if ( _hud.Voice.IsInSquelchMode() )
-			cmd.Buttons &= unchecked( (ushort)~(int)InButtons.Attack );
+			cmd.Buttons &= unchecked((ushort)~(int)InButtons.Attack);
 
 		if ( InJoystick != 0f )
 		{

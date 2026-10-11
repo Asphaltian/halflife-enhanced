@@ -1,5 +1,4 @@
 using System;
-using GoldSrc;
 
 namespace HalfLife;
 

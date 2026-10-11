@@ -86,38 +86,38 @@ public sealed class MultiplayerAdvancedDialog : Frame
 			switch ( control.Type )
 			{
 				case ScriptObjectType.Bool:
-				{
-					var box = new CheckButton( Vgui, control, "DescCheckButton", scriptObject.Prompt );
+					{
+						var box = new CheckButton( Vgui, control, "DescCheckButton", scriptObject.Prompt );
 
-					box.SetSelected( scriptObject.DefValueFloat != 0f );
+						box.SetSelected( scriptObject.DefValueFloat != 0f );
 
-					control.Control = box;
-					break;
-				}
+						control.Control = box;
+						break;
+					}
 
 				case ScriptObjectType.Number:
 				case ScriptObjectType.String:
-				{
-					var edit = new TextEntry( Vgui, control, "DescTextEntry" );
+					{
+						var edit = new TextEntry( Vgui, control, "DescTextEntry" );
 
-					edit.InsertString( scriptObject.DefValue );
+						edit.InsertString( scriptObject.DefValue );
 
-					control.Control = edit;
-					break;
-				}
+						control.Control = edit;
+						break;
+					}
 
 				case ScriptObjectType.List:
-				{
-					var combo = new ComboBox( Vgui, control, "DescComboBox", 5, false );
+					{
+						var combo = new ComboBox( Vgui, control, "DescComboBox", 5, false );
 
-					foreach ( var item in scriptObject.ListItems )
-						combo.AddItem( item.ItemText );
+						foreach ( var item in scriptObject.ListItems )
+							combo.AddItem( item.ItemText );
 
-					combo.ActivateItemByRow( (int)scriptObject.DefValueFloat );
+						combo.ActivateItemByRow( (int)scriptObject.DefValueFloat );
 
-					control.Control = combo;
-					break;
-				}
+						control.Control = combo;
+						break;
+					}
 			}
 
 			if ( control.Type != ScriptObjectType.Bool )
@@ -162,12 +162,12 @@ public sealed class MultiplayerAdvancedDialog : Frame
 					break;
 
 				case ScriptObjectType.List:
-				{
-					var index = ((ComboBox)control.Control).GetActiveItem();
+					{
+						var index = ((ComboBox)control.Control).GetActiveItem();
 
-					value = index < scriptObject.ListItems.Count ? scriptObject.ListItems[Math.Max( index, 0 )].Value : scriptObject.DefValue;
-					break;
-				}
+						value = index < scriptObject.ListItems.Count ? scriptObject.ListItems[Math.Max( index, 0 )].Value : scriptObject.DefValue;
+						break;
+					}
 
 				default:
 					value = scriptObject.DefValue;

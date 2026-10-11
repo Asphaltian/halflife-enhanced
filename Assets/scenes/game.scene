@@ -47,7 +47,7 @@
           "ZNear": 4
         },
         {
-          "__type": "GammaSpace",
+          "__type": "GoldSrc.GammaSpace",
           "__guid": "1aa78d10-0cbb-49bd-a1ee-22dc78721e70",
           "__enabled": true,
           "Flags": 0,

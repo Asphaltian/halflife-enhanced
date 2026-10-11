@@ -769,18 +769,18 @@ public sealed class Interpreter
 				return value > 0 ? -_gs.Phase : value;
 
 			case RoundSuper45:
-			{
-				var offset = (short)(_gs.Threshold - _gs.Phase);
-
-				if ( distance >= 0 )
 				{
-					value = VectorMul( ShortFracDiv( (short)(offset + (short)distance), (short)_gs.GridPeriod ) & ~0x3F, _gs.GridPeriod ) + (short)_gs.Phase;
-					return value < 0 ? (short)_gs.Phase : value;
-				}
+					var offset = (short)(_gs.Threshold - _gs.Phase);
 
-				value = -(VectorMul( ShortFracDiv( (short)(offset - (short)distance), (short)_gs.GridPeriod ) & ~0x3F, _gs.GridPeriod ) + (short)_gs.Phase);
-				return value > 0 ? -(short)_gs.Phase : value;
-			}
+					if ( distance >= 0 )
+					{
+						value = VectorMul( ShortFracDiv( (short)(offset + (short)distance), (short)_gs.GridPeriod ) & ~0x3F, _gs.GridPeriod ) + (short)_gs.Phase;
+						return value < 0 ? (short)_gs.Phase : value;
+					}
+
+					value = -(VectorMul( ShortFracDiv( (short)(offset - (short)distance), (short)_gs.GridPeriod ) & ~0x3F, _gs.GridPeriod ) + (short)_gs.Phase);
+					return value > 0 ? -(short)_gs.Phase : value;
+				}
 
 			default:
 				return distance;
@@ -1274,53 +1274,53 @@ public sealed class Interpreter
 			case 0x07:
 			case 0x08:
 			case 0x09:
-			{
-				var point2 = Pop();
-				var point1 = Pop();
+				{
+					var point2 = Pop();
+					var point1 = Pop();
 
-				if ( !CheckPoint( _zp2, point2 ) || !CheckPoint( _zp1, point1 ) )
+					if ( !CheckPoint( _zp2, point2 ) || !CheckPoint( _zp1, point1 ) )
+						break;
+
+					Normalize( _zp1.CurX[point1] - _zp2.CurX[point2], _zp1.CurY[point1] - _zp2.CurY[point2], out var x, out var y );
+
+					if ( (opcode & 1) != 0 )
+						(x, y) = (-y, x);
+
+					if ( opcode <= 0x07 )
+					{
+						_gs.ProjX = _gs.DualX = x;
+						_gs.ProjY = _gs.DualY = y;
+					}
+					else
+					{
+						_gs.FreeX = x;
+						_gs.FreeY = y;
+					}
+
+					ComputePfProj();
 					break;
-
-				Normalize( _zp1.CurX[point1] - _zp2.CurX[point2], _zp1.CurY[point1] - _zp2.CurY[point2], out var x, out var y );
-
-				if ( (opcode & 1) != 0 )
-					(x, y) = (-y, x);
-
-				if ( opcode <= 0x07 )
-				{
-					_gs.ProjX = _gs.DualX = x;
-					_gs.ProjY = _gs.DualY = y;
 				}
-				else
-				{
-					_gs.FreeX = x;
-					_gs.FreeY = y;
-				}
-
-				ComputePfProj();
-				break;
-			}
 
 			case 0x0A:
 			case 0x0B:
-			{
-				var y = (short)Pop();
-				var x = (short)Pop();
-
-				if ( opcode == 0x0A )
 				{
-					_gs.ProjX = _gs.DualX = x;
-					_gs.ProjY = _gs.DualY = y;
-				}
-				else
-				{
-					_gs.FreeX = x;
-					_gs.FreeY = y;
-				}
+					var y = (short)Pop();
+					var x = (short)Pop();
 
-				ComputePfProj();
-				break;
-			}
+					if ( opcode == 0x0A )
+					{
+						_gs.ProjX = _gs.DualX = x;
+						_gs.ProjY = _gs.DualY = y;
+					}
+					else
+					{
+						_gs.FreeX = x;
+						_gs.FreeY = y;
+					}
+
+					ComputePfProj();
+					break;
+				}
 
 			case 0x0C:
 				Push( _gs.ProjX );
@@ -1358,35 +1358,35 @@ public sealed class Interpreter
 			case 0x14:
 			case 0x15:
 			case 0x16:
-			{
-				var index = Pop();
-
-				if ( (uint)index > 1 )
 				{
-					Fail();
+					var index = Pop();
+
+					if ( (uint)index > 1 )
+					{
+						Fail();
+						break;
+					}
+
+					if ( opcode is 0x13 or 0x16 )
+					{
+						_gs.Gep0 = index;
+						_zp0 = ZoneFor( index );
+					}
+
+					if ( opcode is 0x14 or 0x16 )
+					{
+						_gs.Gep1 = index;
+						_zp1 = ZoneFor( index );
+					}
+
+					if ( opcode is 0x15 or 0x16 )
+					{
+						_gs.Gep2 = index;
+						_zp2 = ZoneFor( index );
+					}
+
 					break;
 				}
-
-				if ( opcode is 0x13 or 0x16 )
-				{
-					_gs.Gep0 = index;
-					_zp0 = ZoneFor( index );
-				}
-
-				if ( opcode is 0x14 or 0x16 )
-				{
-					_gs.Gep1 = index;
-					_zp1 = ZoneFor( index );
-				}
-
-				if ( opcode is 0x15 or 0x16 )
-				{
-					_gs.Gep2 = index;
-					_zp2 = ZoneFor( index );
-				}
-
-				break;
-			}
 
 			case 0x17:
 				_gs.Loop = Pop();
@@ -1425,13 +1425,13 @@ public sealed class Interpreter
 				break;
 
 			case 0x20:
-			{
-				var value = Pop();
+				{
+					var value = Pop();
 
-				Push( value );
-				Push( value );
-				break;
-			}
+					Push( value );
+					Push( value );
+					break;
+				}
 
 			case 0x21:
 				Pop();
@@ -1442,115 +1442,115 @@ public sealed class Interpreter
 				break;
 
 			case 0x23:
-			{
-				var a = Pop();
-				var b = Pop();
+				{
+					var a = Pop();
+					var b = Pop();
 
-				Push( a );
-				Push( b );
-				break;
-			}
+					Push( a );
+					Push( b );
+					break;
+				}
 
 			case 0x24:
 				Push( _top );
 				break;
 
 			case 0x25:
-			{
-				var index = _stack[_top - 1];
-
-				if ( index < 0 || index > _top - 1 )
 				{
-					Fail();
+					var index = _stack[_top - 1];
+
+					if ( index < 0 || index > _top - 1 )
+					{
+						Fail();
+						break;
+					}
+
+					_stack[_top - 1] = _stack[_top - 1 - index];
 					break;
 				}
-
-				_stack[_top - 1] = _stack[_top - 1 - index];
-				break;
-			}
 
 			case 0x26:
-			{
-				var index = _stack[_top - 1];
-
-				if ( index < 0 || index > _top - 1 )
 				{
-					Fail();
+					var index = _stack[_top - 1];
+
+					if ( index < 0 || index > _top - 1 )
+					{
+						Fail();
+						break;
+					}
+
+					if ( index == 0 )
+						break;
+
+					var value = _stack[_top - 1 - index];
+
+					Array.Copy( _stack, _top - index, _stack, _top - 1 - index, index - 1 );
+					_stack[_top - 2] = value;
+					_top--;
 					break;
 				}
-
-				if ( index == 0 )
-					break;
-
-				var value = _stack[_top - 1 - index];
-
-				Array.Copy( _stack, _top - index, _stack, _top - 1 - index, index - 1 );
-				_stack[_top - 2] = value;
-				_top--;
-				break;
-			}
 
 			case 0x27:
-			{
-				var point2 = Pop();
-				var point1 = Pop();
-
-				if ( !CheckPoint( _zp1, point2 ) || !CheckPoint( _zp0, point1 ) )
-					break;
-
-				var distance = Project( _zp1.CurX[point2] - _zp0.CurX[point1], _zp1.CurY[point2] - _zp0.CurY[point1] );
-
-				MovePoint( _zp0, point1, distance >> 1 );
-				MovePoint( _zp1, point2, (distance >> 1) - distance );
-				break;
-			}
-
-			case 0x28:
-			{
-				if ( _phase != GlyphProgram )
 				{
-					Fail();
+					var point2 = Pop();
+					var point1 = Pop();
+
+					if ( !CheckPoint( _zp1, point2 ) || !CheckPoint( _zp0, point1 ) )
+						break;
+
+					var distance = Project( _zp1.CurX[point2] - _zp0.CurX[point1], _zp1.CurY[point2] - _zp0.CurY[point1] );
+
+					MovePoint( _zp0, point1, distance >> 1 );
+					MovePoint( _zp1, point2, (distance >> 1) - distance );
 					break;
 				}
 
-				var phantom = GlyphZone.Contours[GlyphZone.ContourCount - 1] + 1;
+			case 0x28:
+				{
+					if ( _phase != GlyphProgram )
+					{
+						Fail();
+						break;
+					}
 
-				Push( GlyphZone.OrgX[phantom + 1] - GlyphZone.OrgX[phantom] );
-				break;
-			}
+					var phantom = GlyphZone.Contours[GlyphZone.ContourCount - 1] + 1;
+
+					Push( GlyphZone.OrgX[phantom + 1] - GlyphZone.OrgX[phantom] );
+					break;
+				}
 
 			case 0x29:
-			{
-				var point = Pop();
-				var mask = 0xFF;
+				{
+					var point = Pop();
+					var mask = 0xFF;
 
-				if ( !CheckPoint( _zp0, point ) )
+					if ( !CheckPoint( _zp0, point ) )
+						break;
+
+					if ( _gs.FreeX != 0 )
+						mask &= ~Zone.TouchX;
+
+					if ( _gs.FreeY != 0 )
+						mask &= ~Zone.TouchY;
+
+					_zp0.Tags[point] &= (byte)mask;
 					break;
-
-				if ( _gs.FreeX != 0 )
-					mask &= ~Zone.TouchX;
-
-				if ( _gs.FreeY != 0 )
-					mask &= ~Zone.TouchY;
-
-				_zp0.Tags[point] &= (byte)mask;
-				break;
-			}
+				}
 
 			case 0x2A:
 			case 0x2B:
-			{
-				var function = Pop();
-
-				if ( function < 0 || function >= _functionLimit )
 				{
-					Fail();
+					var function = Pop();
+
+					if ( function < 0 || function >= _functionLimit )
+					{
+						Fail();
+						break;
+					}
+
+					Call( _functions[function], opcode == 0x2A ? Pop() : 1 );
 					break;
 				}
-
-				Call( _functions[function], opcode == 0x2A ? Pop() : 1 );
-				break;
-			}
 
 			case 0x2C:
 			case 0x89:
@@ -1563,24 +1563,24 @@ public sealed class Interpreter
 
 			case 0x2E:
 			case 0x2F:
-			{
-				var point = Pop();
-				var distance = 0;
-
-				if ( !CheckPoint( _zp0, point ) )
-					break;
-
-				if ( (opcode & 1) != 0 )
 				{
-					var current = Project( _zp0.CurX[point], _zp0.CurY[point] );
+					var point = Pop();
+					var distance = 0;
 
-					distance = Round( current ) - current;
+					if ( !CheckPoint( _zp0, point ) )
+						break;
+
+					if ( (opcode & 1) != 0 )
+					{
+						var current = Project( _zp0.CurX[point], _zp0.CurY[point] );
+
+						distance = Round( current ) - current;
+					}
+
+					MovePoint( _zp0, point, distance );
+					_gs.Rp0 = _gs.Rp1 = point;
+					break;
 				}
-
-				MovePoint( _zp0, point, distance );
-				_gs.Rp0 = _gs.Rp1 = point;
-				break;
-			}
 
 			case 0x30:
 			case 0x31:
@@ -1603,24 +1603,24 @@ public sealed class Interpreter
 				break;
 
 			case 0x38:
-			{
-				var distance = Pop();
-				var dx = VectorMul( distance, _gs.FreeX );
-				var dy = VectorMul( distance, _gs.FreeY );
-
-				for ( ; _gs.Loop > 0; _gs.Loop-- )
 				{
-					var point = Pop();
+					var distance = Pop();
+					var dx = VectorMul( distance, _gs.FreeX );
+					var dy = VectorMul( distance, _gs.FreeY );
 
-					if ( !CheckPoint( _zp2, point ) )
-						return;
+					for ( ; _gs.Loop > 0; _gs.Loop-- )
+					{
+						var point = Pop();
 
-					MoveBy( _zp2, point, dx, dy, true );
+						if ( !CheckPoint( _zp2, point ) )
+							return;
+
+						MoveBy( _zp2, point, dx, dy, true );
+					}
+
+					_gs.Loop = 1;
+					break;
 				}
-
-				_gs.Loop = 1;
-				break;
-			}
 
 			case 0x39:
 				InterpolatePoints();
@@ -1628,33 +1628,33 @@ public sealed class Interpreter
 
 			case 0x3A:
 			case 0x3B:
-			{
-				var distance = Pop();
-				var point = Pop();
-
-				if ( !CheckPoint( _zp1, point ) || !CheckPoint( _zp0, _gs.Rp0 ) )
-					break;
-
-				if ( _gs.Gep1 == 0 )
 				{
-					_zp1.OrgX[point] = _zp0.OrgX[_gs.Rp0] + VectorMul( distance, _gs.ProjX );
-					_zp1.OrgY[point] = _zp0.OrgY[_gs.Rp0] + VectorMul( distance, _gs.ProjY );
-					_zp1.CurX[point] = _zp1.OrgX[point];
-					_zp1.CurY[point] = _zp1.OrgY[point];
+					var distance = Pop();
+					var point = Pop();
+
+					if ( !CheckPoint( _zp1, point ) || !CheckPoint( _zp0, _gs.Rp0 ) )
+						break;
+
+					if ( _gs.Gep1 == 0 )
+					{
+						_zp1.OrgX[point] = _zp0.OrgX[_gs.Rp0] + VectorMul( distance, _gs.ProjX );
+						_zp1.OrgY[point] = _zp0.OrgY[_gs.Rp0] + VectorMul( distance, _gs.ProjY );
+						_zp1.CurX[point] = _zp1.OrgX[point];
+						_zp1.CurY[point] = _zp1.OrgY[point];
+					}
+
+					var current = Project( _zp1.CurX[point] - _zp0.CurX[_gs.Rp0], _zp1.CurY[point] - _zp0.CurY[_gs.Rp0] );
+
+					MovePoint( _zp1, point, distance - current );
+
+					_gs.Rp1 = _gs.Rp0;
+					_gs.Rp2 = point;
+
+					if ( (opcode & 1) != 0 )
+						_gs.Rp0 = point;
+
+					break;
 				}
-
-				var current = Project( _zp1.CurX[point] - _zp0.CurX[_gs.Rp0], _zp1.CurY[point] - _zp0.CurY[_gs.Rp0] );
-
-				MovePoint( _zp1, point, distance - current );
-
-				_gs.Rp1 = _gs.Rp0;
-				_gs.Rp2 = point;
-
-				if ( (opcode & 1) != 0 )
-					_gs.Rp0 = point;
-
-				break;
-			}
 
 			case 0x3C:
 				if ( !CheckPoint( _zp0, _gs.Rp0 ) )
@@ -1681,37 +1681,37 @@ public sealed class Interpreter
 
 			case 0x3E:
 			case 0x3F:
-			{
-				var entry = Pop();
-				var point = Pop();
+				{
+					var entry = Pop();
+					var point = Pop();
 
-				if ( !CheckCvt( entry ) || !CheckPoint( _zp0, point ) )
+					if ( !CheckCvt( entry ) || !CheckPoint( _zp0, point ) )
+						break;
+
+					var distance = _cvt[entry];
+
+					if ( _gs.Gep0 == 0 )
+					{
+						_zp0.OrgX[point] = VectorMul( distance, _gs.ProjX );
+						_zp0.OrgY[point] = VectorMul( distance, _gs.ProjY );
+						_zp0.CurX[point] = _zp0.OrgX[point];
+						_zp0.CurY[point] = _zp0.OrgY[point];
+					}
+
+					var original = Project( _zp0.CurX[point], _zp0.CurY[point] );
+
+					if ( (opcode & 1) != 0 )
+					{
+						if ( Math.Abs( distance - original ) > _gs.ControlValueCutIn )
+							distance = original;
+
+						distance = Round( distance );
+					}
+
+					MovePoint( _zp0, point, distance - original );
+					_gs.Rp0 = _gs.Rp1 = point;
 					break;
-
-				var distance = _cvt[entry];
-
-				if ( _gs.Gep0 == 0 )
-				{
-					_zp0.OrgX[point] = VectorMul( distance, _gs.ProjX );
-					_zp0.OrgY[point] = VectorMul( distance, _gs.ProjY );
-					_zp0.CurX[point] = _zp0.OrgX[point];
-					_zp0.CurY[point] = _zp0.OrgY[point];
 				}
-
-				var original = Project( _zp0.CurX[point], _zp0.CurY[point] );
-
-				if ( (opcode & 1) != 0 )
-				{
-					if ( Math.Abs( distance - original ) > _gs.ControlValueCutIn )
-						distance = original;
-
-					distance = Round( distance );
-				}
-
-				MovePoint( _zp0, point, distance - original );
-				_gs.Rp0 = _gs.Rp1 = point;
-				break;
-			}
 
 			case 0x40:
 			case 0x41:
@@ -1729,121 +1729,121 @@ public sealed class Interpreter
 				break;
 
 			case 0x42:
-			{
-				var value = Pop();
-				var index = Pop();
-
-				if ( index < 0 || index >= _storageLimit )
 				{
-					Fail();
+					var value = Pop();
+					var index = Pop();
+
+					if ( index < 0 || index >= _storageLimit )
+					{
+						Fail();
+						break;
+					}
+
+					_storage[index] = value;
 					break;
 				}
-
-				_storage[index] = value;
-				break;
-			}
 
 			case 0x43:
-			{
-				var index = Pop();
-
-				if ( index < 0 || index >= _storageLimit )
 				{
-					Fail();
+					var index = Pop();
+
+					if ( index < 0 || index >= _storageLimit )
+					{
+						Fail();
+						break;
+					}
+
+					Push( _storage[index] );
 					break;
 				}
-
-				Push( _storage[index] );
-				break;
-			}
 
 			case 0x44:
-			{
-				var value = Pop();
-				var index = Pop();
-
-				if ( CheckCvt( index ) )
-					_cvt[index] = value;
-
-				break;
-			}
-
-			case 0x45:
-			{
-				var index = Pop();
-
-				if ( index < 0 || (index >= _cvt.Length && index >= 0x100) )
 				{
-					Fail();
+					var value = Pop();
+					var index = Pop();
+
+					if ( CheckCvt( index ) )
+						_cvt[index] = value;
+
 					break;
 				}
 
-				Push( index < _cvt.Length ? _cvt[index] : 0 );
-				break;
-			}
+			case 0x45:
+				{
+					var index = Pop();
+
+					if ( index < 0 || (index >= _cvt.Length && index >= 0x100) )
+					{
+						Fail();
+						break;
+					}
+
+					Push( index < _cvt.Length ? _cvt[index] : 0 );
+					break;
+				}
 
 			case 0x46:
 			case 0x47:
-			{
-				var point = Pop();
-
-				if ( !CheckPoint( _zp2, point ) )
-					break;
-
-				Push( opcode == 0x46
-					? Project( _zp2.CurX[point], _zp2.CurY[point] )
-					: DualProject( _zp2.OrgX[point], _zp2.OrgY[point] ) );
-
-				break;
-			}
-
-			case 0x48:
-			{
-				var value = Pop();
-				var point = Pop();
-
-				if ( !CheckPoint( _zp2, point ) )
-					break;
-
-				var current = Project( _zp2.CurX[point], _zp2.CurY[point] );
-
-				MovePoint( _zp2, point, value - current );
-
-				if ( _zp2 == _twilight )
 				{
-					_zp2.OrgX[point] = _zp2.CurX[point];
-					_zp2.OrgY[point] = _zp2.CurY[point];
+					var point = Pop();
+
+					if ( !CheckPoint( _zp2, point ) )
+						break;
+
+					Push( opcode == 0x46
+						? Project( _zp2.CurX[point], _zp2.CurY[point] )
+						: DualProject( _zp2.OrgX[point], _zp2.OrgY[point] ) );
+
+					break;
 				}
 
-				break;
-			}
+			case 0x48:
+				{
+					var value = Pop();
+					var point = Pop();
+
+					if ( !CheckPoint( _zp2, point ) )
+						break;
+
+					var current = Project( _zp2.CurX[point], _zp2.CurY[point] );
+
+					MovePoint( _zp2, point, value - current );
+
+					if ( _zp2 == _twilight )
+					{
+						_zp2.OrgX[point] = _zp2.CurX[point];
+						_zp2.OrgY[point] = _zp2.CurY[point];
+					}
+
+					break;
+				}
 
 			case 0x49:
 			case 0x4A:
-			{
-				var point1 = Pop();
-				var point2 = Pop();
-				int distance;
+				{
+					var point1 = Pop();
+					var point2 = Pop();
+					int distance;
 
-				if ( !CheckPoint( _zp1, point1 ) || !CheckPoint( _zp0, point2 ) )
+					if ( !CheckPoint( _zp1, point1 ) || !CheckPoint( _zp0, point2 ) )
+						break;
+
+					if ( (opcode & 1) != 0 )
+					{
+						distance = Project( _zp0.CurX[point2] - _zp1.CurX[point1], _zp0.CurY[point2] - _zp1.CurY[point1] );
+					}
+					else if ( _gs.Gep0 == 0 || _gs.Gep1 == 0 )
+					{
+						distance = DualProject( _zp0.OrgX[point2] - _zp1.OrgX[point1], _zp0.OrgY[point2] - _zp1.OrgY[point1] );
+					}
+					else
+					{
+						distance = ScaleOriginal( DualProject( _zp0.OrusX[point2] - _zp1.OrusX[point1], _zp0.OrusY[point2] - _zp1.OrusY[point1] ) );
+					}
+
+					Push( distance );
 					break;
-
-				if ( (opcode & 1) != 0 )
-				{
-					distance = Project( _zp0.CurX[point2] - _zp1.CurX[point1], _zp0.CurY[point2] - _zp1.CurY[point1] );
 				}
-				else if ( _gs.Gep0 == 0 || _gs.Gep1 == 0 )
-				{
-					distance = DualProject( _zp0.OrgX[point2] - _zp1.OrgX[point1], _zp0.OrgY[point2] - _zp1.OrgY[point1] );
-				}
-				else
-				{
-					distance = ScaleOriginal( DualProject( _zp0.OrusX[point2] - _zp1.OrusX[point1], _zp0.OrusY[point2] - _zp1.OrusY[point1] ) );
-				}
-
-				Push( distance );
-				break;
-			}
 
 			case 0x4B:
 				Push( _pixelsPerEm );
@@ -1866,58 +1866,58 @@ public sealed class Interpreter
 				break;
 
 			case 0x50:
-			{
-				var b = Pop();
-				var a = Pop();
+				{
+					var b = Pop();
+					var a = Pop();
 
-				Push( a < b ? 1 : 0 );
-				break;
-			}
+					Push( a < b ? 1 : 0 );
+					break;
+				}
 
 			case 0x51:
-			{
-				var b = Pop();
-				var a = Pop();
+				{
+					var b = Pop();
+					var a = Pop();
 
-				Push( a <= b ? 1 : 0 );
-				break;
-			}
+					Push( a <= b ? 1 : 0 );
+					break;
+				}
 
 			case 0x52:
-			{
-				var b = Pop();
-				var a = Pop();
+				{
+					var b = Pop();
+					var a = Pop();
 
-				Push( a > b ? 1 : 0 );
-				break;
-			}
+					Push( a > b ? 1 : 0 );
+					break;
+				}
 
 			case 0x53:
-			{
-				var b = Pop();
-				var a = Pop();
+				{
+					var b = Pop();
+					var a = Pop();
 
-				Push( a >= b ? 1 : 0 );
-				break;
-			}
+					Push( a >= b ? 1 : 0 );
+					break;
+				}
 
 			case 0x54:
-			{
-				var b = Pop();
-				var a = Pop();
+				{
+					var b = Pop();
+					var a = Pop();
 
-				Push( a == b ? 1 : 0 );
-				break;
-			}
+					Push( a == b ? 1 : 0 );
+					break;
+				}
 
 			case 0x55:
-			{
-				var b = Pop();
-				var a = Pop();
+				{
+					var b = Pop();
+					var a = Pop();
 
-				Push( a != b ? 1 : 0 );
-				break;
-			}
+					Push( a != b ? 1 : 0 );
+					break;
+				}
 
 			case 0x56:
 				Push( (RoundGrid( Pop() ) >> 6) & 1 );
@@ -1937,22 +1937,22 @@ public sealed class Interpreter
 				break;
 
 			case 0x5A:
-			{
-				var b = Pop();
-				var a = Pop();
+				{
+					var b = Pop();
+					var a = Pop();
 
-				Push( a != 0 && b != 0 ? 1 : 0 );
-				break;
-			}
+					Push( a != 0 && b != 0 ? 1 : 0 );
+					break;
+				}
 
 			case 0x5B:
-			{
-				var b = Pop();
-				var a = Pop();
+				{
+					var b = Pop();
+					var a = Pop();
 
-				Push( a != 0 || b != 0 ? 1 : 0 );
-				break;
-			}
+					Push( a != 0 || b != 0 ? 1 : 0 );
+					break;
+				}
 
 			case 0x5C:
 				Push( Pop() == 0 ? 1 : 0 );
@@ -1973,46 +1973,46 @@ public sealed class Interpreter
 				break;
 
 			case 0x60:
-			{
-				var b = Pop();
-				var a = Pop();
-
-				Push( a + b );
-				break;
-			}
-
-			case 0x61:
-			{
-				var b = Pop();
-				var a = Pop();
-
-				Push( a - b );
-				break;
-			}
-
-			case 0x62:
-			{
-				var b = Pop();
-				var a = Pop();
-
-				if ( b == 0 )
 				{
-					Fail();
+					var b = Pop();
+					var a = Pop();
+
+					Push( a + b );
 					break;
 				}
 
-				Push( (int)(((long)a << 6) / b) );
-				break;
-			}
+			case 0x61:
+				{
+					var b = Pop();
+					var a = Pop();
+
+					Push( a - b );
+					break;
+				}
+
+			case 0x62:
+				{
+					var b = Pop();
+					var a = Pop();
+
+					if ( b == 0 )
+					{
+						Fail();
+						break;
+					}
+
+					Push( (int)(((long)a << 6) / b) );
+					break;
+				}
 
 			case 0x63:
-			{
-				var b = Pop();
-				var a = Pop();
+				{
+					var b = Pop();
+					var a = Pop();
 
-				Push( Fixed.Mul26Dot6( a, b ) );
-				break;
-			}
+					Push( Fixed.Mul26Dot6( a, b ) );
+					break;
+				}
 
 			case 0x64:
 				Push( Math.Abs( Pop() ) );
@@ -2044,15 +2044,15 @@ public sealed class Interpreter
 				break;
 
 			case 0x70:
-			{
-				var value = Pop();
-				var index = Pop();
+				{
+					var value = Pop();
+					var index = Pop();
 
-				if ( CheckCvt( index ) )
-					_cvt[index] = _scale.Apply( value );
+					if ( CheckCvt( index ) )
+						_cvt[index] = _scale.Apply( value );
 
-				break;
-			}
+					break;
+				}
 
 			case 0x73:
 			case 0x74:
@@ -2071,26 +2071,26 @@ public sealed class Interpreter
 				break;
 
 			case 0x78:
-			{
-				var condition = Pop();
-				var offset = Pop();
+				{
+					var condition = Pop();
+					var offset = Pop();
 
-				if ( condition != 0 )
-					Jump( offset );
+					if ( condition != 0 )
+						Jump( offset );
 
-				break;
-			}
+					break;
+				}
 
 			case 0x79:
-			{
-				var condition = Pop();
-				var offset = Pop();
+				{
+					var condition = Pop();
+					var offset = Pop();
 
-				if ( condition == 0 )
-					Jump( offset );
+					if ( condition == 0 )
+						Jump( offset );
 
-				break;
-			}
+					break;
+				}
 
 			case 0x7A:
 				_gs.RoundState = RoundOff;
@@ -2125,23 +2125,23 @@ public sealed class Interpreter
 
 			case 0x81:
 			case 0x82:
-			{
-				var high = Pop();
-				var low = Pop();
-
-				if ( !CheckPoint( _zp0, high ) || !CheckPoint( _zp0, low ) )
-					break;
-
-				for ( var point = low; point <= high; point++ )
 				{
-					if ( opcode == 0x81 )
-						_zp0.Tags[point] |= Zone.OnCurve;
-					else
-						_zp0.Tags[point] &= unchecked((byte)~Zone.OnCurve);
-				}
+					var high = Pop();
+					var low = Pop();
 
-				break;
-			}
+					if ( !CheckPoint( _zp0, high ) || !CheckPoint( _zp0, low ) )
+						break;
+
+					for ( var point = low; point <= high; point++ )
+					{
+						if ( opcode == 0x81 )
+							_zp0.Tags[point] |= Zone.OnCurve;
+						else
+							_zp0.Tags[point] &= unchecked((byte)~Zone.OnCurve);
+					}
+
+					break;
+				}
 
 			case 0x85:
 				_gs.ScanState = (_gs.ScanState & unchecked((int)0xFFFF0000)) | Pop();
@@ -2149,93 +2149,93 @@ public sealed class Interpreter
 
 			case 0x86:
 			case 0x87:
-			{
-				var point2 = Pop();
-				var point1 = Pop();
-
-				if ( !CheckPoint( _zp2, point2 ) || !CheckPoint( _zp1, point1 ) )
-					break;
-
-				Normalize( _zp1.CurX[point1] - _zp2.CurX[point2], _zp1.CurY[point1] - _zp2.CurY[point2], out _gs.ProjX, out _gs.ProjY );
-				Normalize( _zp1.OrgX[point1] - _zp2.OrgX[point2], _zp1.OrgY[point1] - _zp2.OrgY[point2], out _gs.DualX, out _gs.DualY );
-
-				if ( (opcode & 1) != 0 )
 				{
-					(_gs.ProjX, _gs.ProjY) = (-_gs.ProjY, _gs.ProjX);
-					(_gs.DualX, _gs.DualY) = (-_gs.DualY, _gs.DualX);
+					var point2 = Pop();
+					var point1 = Pop();
+
+					if ( !CheckPoint( _zp2, point2 ) || !CheckPoint( _zp1, point1 ) )
+						break;
+
+					Normalize( _zp1.CurX[point1] - _zp2.CurX[point2], _zp1.CurY[point1] - _zp2.CurY[point2], out _gs.ProjX, out _gs.ProjY );
+					Normalize( _zp1.OrgX[point1] - _zp2.OrgX[point2], _zp1.OrgY[point1] - _zp2.OrgY[point2], out _gs.DualX, out _gs.DualY );
+
+					if ( (opcode & 1) != 0 )
+					{
+						(_gs.ProjX, _gs.ProjY) = (-_gs.ProjY, _gs.ProjX);
+						(_gs.DualX, _gs.DualY) = (-_gs.DualY, _gs.DualX);
+					}
+
+					ComputePfProj();
+					break;
 				}
 
-				ComputePfProj();
-				break;
-			}
-
 			case 0x88:
-			{
-				var selector = Pop();
+				{
+					var selector = Pop();
 
-				var result = (selector & 1) != 0 ? RasterizerVersion : 0;
+					var result = (selector & 1) != 0 ? RasterizerVersion : 0;
 
-				if ( (selector & 8) != 0 )
-					result |= 0x400;
+					if ( (selector & 8) != 0 )
+						result |= 0x400;
 
-				if ( (selector & 0x10) != 0 )
-					result |= 0x800;
+					if ( (selector & 0x10) != 0 )
+						result |= 0x800;
 
-				if ( (selector & 0x20) != 0 && Grayscale )
-					result |= 0x1000;
+					if ( (selector & 0x20) != 0 && Grayscale )
+						result |= 0x1000;
 
-				Push( result );
-				break;
-			}
+					Push( result );
+					break;
+				}
 
 			case 0x8A:
-			{
-				var a = Pop();
-				var b = Pop();
-				var c = Pop();
+				{
+					var a = Pop();
+					var b = Pop();
+					var c = Pop();
 
-				Push( b );
-				Push( a );
-				Push( c );
-				break;
-			}
+					Push( b );
+					Push( a );
+					Push( c );
+					break;
+				}
 
 			case 0x8B:
-			{
-				var b = Pop();
-				var a = Pop();
+				{
+					var b = Pop();
+					var a = Pop();
 
-				Push( Math.Max( a, b ) );
-				break;
-			}
+					Push( Math.Max( a, b ) );
+					break;
+				}
 
 			case 0x8C:
-			{
-				var b = Pop();
-				var a = Pop();
+				{
+					var b = Pop();
+					var a = Pop();
 
-				Push( Math.Min( a, b ) );
-				break;
-			}
+					Push( Math.Min( a, b ) );
+					break;
+				}
 
 			case 0x8D:
 				_gs.ScanState = (Pop() << 16) | (_gs.ScanState & 0xFFFF);
 				break;
 
 			case 0x8E:
-			{
-				var selector = Pop();
-				var value = Pop();
+				{
+					var selector = Pop();
+					var value = Pop();
 
-				if ( _phase != ControlProgram )
+					if ( _phase != ControlProgram )
+						break;
+
+					if ( selector is >= 1 and <= 3 )
+						_gs.InstructControl &= ~(1 << (selector - 1));
+
+					_gs.InstructControl |= value;
 					break;
-
-				if ( selector is >= 1 and <= 3 )
-					_gs.InstructControl &= ~(1 << (selector - 1));
-
-				_gs.InstructControl |= value;
-				break;
-			}
+				}
 
 			default:
 				Call( _instructions[opcode], 1 );

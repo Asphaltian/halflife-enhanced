@@ -1,4 +1,3 @@
-using System;
 using GoldSrc;
 using GoldSrc.Vgui1;
 

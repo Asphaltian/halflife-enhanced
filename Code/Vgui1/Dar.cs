@@ -1,5 +1,3 @@
-using System;
-
 namespace GoldSrc.Vgui1;
 
 public sealed class Dar<T>

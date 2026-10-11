@@ -303,30 +303,30 @@ public sealed class ScriptObject
 				break;
 
 			case ScriptObjectType.Number:
-			{
-				var number = CurValueFloat;
+				{
+					var number = CurValueFloat;
 
-				if ( Min != -1f && !(number > Min) )
-					number = Min;
+					if ( Min != -1f && !(number > Min) )
+						number = Min;
 
-				if ( Max != -1f && !(Max > number) )
-					number = Max;
+					if ( Max != -1f && !(Max > number) )
+						number = Max;
 
-				value = Float( number );
-				break;
-			}
+					value = Float( number );
+					break;
+				}
 
 			case ScriptObjectType.String:
 				value = StripInvalidCharacters( $"\"{CurValue}\"" );
 				break;
 
 			case ScriptObjectType.List:
-			{
-				var index = (int)CurValueFloat;
+				{
+					var index = (int)CurValueFloat;
 
-				value = index < ListItems.Count ? StripInvalidCharacters( ListItems[Math.Max( index, 0 )].Value ) : "0.0";
-				break;
-			}
+					value = index < ListItems.Count ? StripInvalidCharacters( ListItems[Math.Max( index, 0 )].Value ) : "0.0";
+					break;
+				}
 
 			default:
 				return;

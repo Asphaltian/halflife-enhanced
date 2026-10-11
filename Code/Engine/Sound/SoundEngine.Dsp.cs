@@ -1,4 +1,3 @@
-using System;
 using Sandbox.Audio;
 
 namespace GoldSrc;

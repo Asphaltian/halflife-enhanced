@@ -643,65 +643,65 @@ public sealed class HudSpectator( Hud hud ) : HudBase( hud )
 				break;
 
 			case Hltv.CmdCamera:
-			{
-				var position = new Vector3( message.ReadCoord(), message.ReadCoord(), message.ReadCoord() );
-				var angle = new Vector3( message.ReadCoord(), message.ReadCoord(), message.ReadCoord() );
-				var fov = (float)message.ReadByte();
-				var target = message.ReadShort() & 0xffff;
-
-				if ( AutoDirector != 0f )
 				{
-					SetModes( ObsRoaming, -1 );
-					SetCameraView( position, angle, fov );
+					var position = new Vector3( message.ReadCoord(), message.ReadCoord(), message.ReadCoord() );
+					var angle = new Vector3( message.ReadCoord(), message.ReadCoord(), message.ReadCoord() );
+					var fov = (float)message.ReadByte();
+					var target = message.ReadShort() & 0xffff;
 
-					_chaseEntity = target;
+					if ( AutoDirector != 0f )
+					{
+						SetModes( ObsRoaming, -1 );
+						SetCameraView( position, angle, fov );
+
+						_chaseEntity = target;
+					}
+
+					break;
 				}
 
-				break;
-			}
-
 			case Hltv.CmdMessage:
-			{
-				var text = _hudMessages[_lastHudMessage] ??= new ClientTextMessage();
+				{
+					var text = _hudMessages[_lastHudMessage] ??= new ClientTextMessage();
 
-				text.Effect = message.ReadByte();
+					text.Effect = message.ReadByte();
 
-				var color = message.ReadLong();
+					var color = message.ReadLong();
 
-				text.R1 = text.R2 = (byte)((color >> 16) & 0xff);
-				text.G1 = text.G2 = (byte)((color >> 8) & 0xff);
-				text.B1 = text.B2 = (byte)(color & 0xff);
-				text.A2 = text.A1 = 0xff;
+					text.R1 = text.R2 = (byte)((color >> 16) & 0xff);
+					text.G1 = text.G2 = (byte)((color >> 8) & 0xff);
+					text.B1 = text.B2 = (byte)(color & 0xff);
+					text.A2 = text.A1 = 0xff;
 
-				text.X = message.ReadFloat();
-				text.Y = message.ReadFloat();
-				text.FadeIn = message.ReadFloat();
-				text.FadeOut = message.ReadFloat();
-				text.HoldTime = message.ReadFloat();
-				text.FxTime = message.ReadFloat();
+					text.X = message.ReadFloat();
+					text.Y = message.ReadFloat();
+					text.FadeIn = message.ReadFloat();
+					text.FadeOut = message.ReadFloat();
+					text.HoldTime = message.ReadFloat();
+					text.FxTime = message.ReadFloat();
 
-				var content = message.ReadString();
+					var content = message.ReadString();
 
-				text.Message = content.Length > MaxHudMessageText ? content[..MaxHudMessageText] : content;
-				text.Name = "HUD_MESSAGE";
+					text.Message = content.Length > MaxHudMessageText ? content[..MaxHudMessageText] : content;
+					text.Name = "HUD_MESSAGE";
 
-				Hud.Message.MessageAdd( text );
+					Hud.Message.MessageAdd( text );
 
-				_lastHudMessage++;
-				_lastHudMessage %= MaxSpecHudMessages;
+					_lastHudMessage++;
+					_lastHudMessage %= MaxSpecHudMessages;
 
-				break;
-			}
+					break;
+				}
 
 			case Hltv.CmdSound:
-			{
-				var sample = message.ReadString();
-				var volume = message.ReadFloat();
+				{
+					var sample = message.ReadString();
+					var volume = message.ReadFloat();
 
-				Engine.PlaySound( 0, Dll.LastViewOrigin, SoundChannel.Body, sample, volume, Server.AttenuationNormal, 0, Server.PitchNormal );
+					Engine.PlaySound( 0, Dll.LastViewOrigin, SoundChannel.Body, sample, volume, Server.AttenuationNormal, 0, Server.PitchNormal );
 
-				break;
-			}
+					break;
+				}
 
 			case Hltv.CmdTimeScale:
 				message.ReadFloat();
@@ -727,54 +727,54 @@ public sealed class HudSpectator( Hud hud ) : HudBase( hud )
 				break;
 
 			case Hltv.CmdCamPath:
-			{
-				var position = new Vector3( message.ReadCoord(), message.ReadCoord(), message.ReadCoord() );
-				var angle = new Vector3( message.ReadCoord(), message.ReadCoord(), message.ReadCoord() );
-				var fov = (float)message.ReadByte();
-
-				message.ReadByte();
-
-				if ( AutoDirector != 0f )
 				{
-					SetModes( ObsRoaming, -1 );
-					SetCameraView( position, angle, fov );
-				}
-
-				break;
-			}
-
-			case Hltv.CmdWaypoints:
-			{
-				var count = message.ReadByte();
-
-				_numWayPoints = 0;
-				_wayPoint = 0;
-
-				for ( var i = 0; i < count; i++ )
-				{
-					var time = Hud.Time + ((float)(short)message.ReadShort() / 100f);
 					var position = new Vector3( message.ReadCoord(), message.ReadCoord(), message.ReadCoord() );
 					var angle = new Vector3( message.ReadCoord(), message.ReadCoord(), message.ReadCoord() );
 					var fov = (float)message.ReadByte();
-					var flags = message.ReadByte();
 
-					AddWaypoint( time, position, angle, fov, flags );
-				}
+					message.ReadByte();
 
-				if ( AutoDirector == 0f )
-				{
-					_numWayPoints = 0;
+					if ( AutoDirector != 0f )
+					{
+						SetModes( ObsRoaming, -1 );
+						SetCameraView( position, angle, fov );
+					}
+
 					break;
 				}
 
-				SetModes( ObsRoaming, -1 );
+			case Hltv.CmdWaypoints:
+				{
+					var count = message.ReadByte();
 
-				_isInterpolating = true;
+					_numWayPoints = 0;
+					_wayPoint = 0;
 
-				SetWayInterpolation( -1, 0, 1, _numWayPoints > 2 ? 2 : -1 );
+					for ( var i = 0; i < count; i++ )
+					{
+						var time = Hud.Time + ((float)(short)message.ReadShort() / 100f);
+						var position = new Vector3( message.ReadCoord(), message.ReadCoord(), message.ReadCoord() );
+						var angle = new Vector3( message.ReadCoord(), message.ReadCoord(), message.ReadCoord() );
+						var fov = (float)message.ReadByte();
+						var flags = message.ReadByte();
 
-				break;
-			}
+						AddWaypoint( time, position, angle, fov, flags );
+					}
+
+					if ( AutoDirector == 0f )
+					{
+						_numWayPoints = 0;
+						break;
+					}
+
+					SetModes( ObsRoaming, -1 );
+
+					_isInterpolating = true;
+
+					SetWayInterpolation( -1, 0, 1, _numWayPoints > 2 ? 2 : -1 );
+
+					break;
+				}
 
 			default:
 				Log.Trace( $"CHudSpectator::DirectorMessage: unknown command {command}.\n" );

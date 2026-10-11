@@ -1,5 +1,4 @@
 using System;
-using GoldSrc;
 
 namespace HalfLife;
 
@@ -351,9 +350,3 @@ partial class HalfLifeClientDll
 	[ConCmd( "snapto" )]
 	private static void SnapToCommand() => CamSnapTo = CamSnapTo == 0f ? 1f : 0f;
 }
-
-
-
-
-
-
