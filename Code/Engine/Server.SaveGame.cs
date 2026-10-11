@@ -243,7 +243,6 @@ partial class Server
 			MapCount = reader.ReadInt32()
 		};
 
-		GameDll ??= GameDll.Load();
 		GameDll.RestoreGlobalState( ReadBlocks( reader ) );
 
 		for ( var i = 0; i < header.MapCount; i++ )

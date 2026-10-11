@@ -38,7 +38,6 @@ partial class Server
 	{
 		_saveDirectory.Clear();
 
-		GameDll ??= GameDll.Load();
 		GameDll.ResetGlobalState();
 	}
 

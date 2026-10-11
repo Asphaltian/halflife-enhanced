@@ -36,6 +36,21 @@ public sealed partial class Server : GameObjectSystem<Server>, IHotloadManaged
 
 	void IHotloadManaged.Created( IReadOnlyDictionary<string, object> state ) => Host.Hotloaded();
 
+	public void InitializeGameDll()
+	{
+		Cmd.Execute();
+
+		if ( GameDll is not null )
+		{
+			Log.Trace( "Sys_InitializeGameDLL called twice, skipping second call\n" );
+			return;
+		}
+
+		GameDll = GameDll.Load();
+
+		Cmd.Execute();
+	}
+
 	public async Task<bool> SpawnServer( string mapName, string startSpot = null )
 	{
 		var modelName = $"maps/{mapName}.bsp";
@@ -88,8 +103,6 @@ public sealed partial class Server : GameObjectSystem<Server>, IHotloadManaged
 		ClearEdicts();
 
 		Paused = false;
-
-		GameDll ??= GameDll.Load();
 
 		InitDeltas();
 

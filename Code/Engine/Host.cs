@@ -104,6 +104,9 @@ public static partial class Host
 			return;
 		}
 
+		if ( server.GameDll is null )
+			server.InitializeGameDll();
+
 		if ( mapName.Length > 4 && mapName.EndsWith( ".bsp", StringComparison.OrdinalIgnoreCase ) )
 			mapName = mapName[..^4];
 
@@ -225,6 +228,9 @@ public static partial class Host
 
 			saveName = $"Half-Life-{slot}";
 		}
+
+		if ( server.GameDll is null )
+			server.InitializeGameDll();
 
 		if ( SaveFileBase( saveName ) is not { } fileBase || server.LoadGame( fileBase ) is not { } header )
 			return false;

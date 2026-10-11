@@ -411,6 +411,9 @@ public sealed partial class Client : GameObjectSystem<Client>
 
 		PushDlights();
 
+		foreach ( var entity in _visibleEntities )
+			entity.Draw();
+
 		var light = LightVec( refParams.ViewModelOrigin, refParams.ViewModelOrigin - new Vector3( 0f, 0f, 2048f ) );
 
 		_lightLevel = (byte)((Math.Min( light.Blue, 255 ) + Math.Min( light.Green, 255 ) + Math.Min( light.Red, 255 )) / 3);

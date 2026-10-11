@@ -311,6 +311,12 @@ public sealed partial class ClientEntity : Component
 
 	protected override void OnPreRender()
 	{
+		if ( !Visible )
+			Draw();
+	}
+
+	internal void Draw()
+	{
 		var client = Client.Current;
 
 		if ( !client.InLevel || !Scene.Camera.IsValid() )
