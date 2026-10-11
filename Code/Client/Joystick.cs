@@ -114,7 +114,7 @@ partial class HalfLifeClientDll
 
 			_joyOpen = true;
 
-			Log.Info( "joystick found \n\n" );
+			Con.Printf( "joystick found \n\n" );
 
 			_joyAvailable = true;
 			_joyAdvancedInit = false;
@@ -127,7 +127,7 @@ partial class HalfLifeClientDll
 			{
 				_joyAvailable = false;
 
-				Log.Trace( "joystick not found -- driver not present\n\n" );
+				Con.DPrintf( "joystick not found -- driver not present\n\n" );
 			}
 		}
 	}
@@ -165,7 +165,7 @@ partial class HalfLifeClientDll
 		}
 
 		if ( JoyName != DefaultJoyName )
-			Log.Info( $"\n{JoyName} configured\n\n" );
+			Con.Printf( $"\n{JoyName} configured\n\n" );
 
 		SetJoyAxis( JoyAxisX, JoyAdvAxisX );
 		SetJoyAxis( JoyAxisY, JoyAdvAxisY );

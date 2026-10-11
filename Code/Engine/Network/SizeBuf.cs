@@ -70,9 +70,9 @@ public sealed class SizeBuf
 		}
 
 		if ( length > MaxSize )
-			Log.Trace( $"SZ_GetSpace: {length} is > full buffer size on {name}, ignoring" );
+			Con.DPrintf( $"SZ_GetSpace: {length} is > full buffer size on {name}, ignoring" );
 
-		Log.Info( $"SZ_GetSpace: overflow on {name}\n" );
+		Con.Printf( $"SZ_GetSpace: overflow on {name}\n" );
 
 		Overflowed = true;
 		CurSize = length;

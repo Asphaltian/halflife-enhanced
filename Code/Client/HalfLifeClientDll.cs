@@ -361,7 +361,7 @@ public sealed partial class HalfLifeClientDll : ClientDll
 		}
 		else
 		{
-			Log.Trace( $"Three keys down for a button '{(char)button.Down0}' '{(char)button.Down1}' '{argument}'!" );
+			Con.DPrintf( $"Three keys down for a button '{(char)button.Down0}' '{(char)button.Down1}' '{argument}'!\n" );
 			return;
 		}
 

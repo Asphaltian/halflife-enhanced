@@ -601,7 +601,7 @@ public class Pendulum : BaseEntity
 	{
 		if ( !other.IsPlayer )
 		{
-			Util.Alert( AlertType.Console, "Not a client" );
+			Util.Alert( AlertType.Console, "Not a client\n" );
 			return;
 		}
 

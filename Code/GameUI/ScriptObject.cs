@@ -117,7 +117,7 @@ public sealed class ScriptObject
 		if ( token == expected )
 			return true;
 
-		Log.Info( $"Expecting '{{', got '{token}'" );
+		Con.Printf( $"Expecting '{{', got '{token}'" );
 
 		return false;
 	}
@@ -156,7 +156,7 @@ public sealed class ScriptObject
 
 		if ( Type == ScriptObjectType.Unknown )
 		{
-			Log.Info( $"Type '{token}' unknown" );
+			Con.Printf( $"Type '{token}' unknown" );
 			return false;
 		}
 
@@ -355,7 +355,7 @@ public class Description
 
 		if ( !token.Equals( "VERSION", StringComparison.OrdinalIgnoreCase ) )
 		{
-			Log.Info( $"Expecting 'VERSION', got '{token}'" );
+			Con.Printf( $"Expecting 'VERSION', got '{token}'" );
 			return false;
 		}
 
@@ -363,7 +363,7 @@ public class Description
 
 		if ( token.Length == 0 )
 		{
-			Log.Info( "Expecting version #" );
+			Con.Printf( "Expecting version #" );
 			return false;
 		}
 
@@ -371,7 +371,7 @@ public class Description
 
 		if ( version != ScriptVersion )
 		{
-			Log.Info( $"Version mismatch, expecting {(double)ScriptVersion:F6}, got {(double)version:F6}" );
+			Con.Printf( $"Version mismatch, expecting {(double)ScriptVersion:F6}, got {(double)version:F6}" );
 			return false;
 		}
 
@@ -382,7 +382,7 @@ public class Description
 
 		if ( !token.Equals( "DESCRIPTION", StringComparison.OrdinalIgnoreCase ) )
 		{
-			Log.Info( $"Expecting 'DESCRIPTION', got '{token}'" );
+			Con.Printf( $"Expecting 'DESCRIPTION', got '{token}'" );
 			return false;
 		}
 
@@ -390,13 +390,13 @@ public class Description
 
 		if ( token.Length == 0 )
 		{
-			Log.Info( $"Expecting '{DescriptionName}'" );
+			Con.Printf( $"Expecting '{DescriptionName}'" );
 			return false;
 		}
 
 		if ( !token.Equals( DescriptionName, StringComparison.OrdinalIgnoreCase ) )
 		{
-			Log.Info( $"Expecting {DescriptionName}, got {token}" );
+			Con.Printf( $"Expecting {DescriptionName}, got {token}" );
 			return false;
 		}
 
@@ -407,7 +407,7 @@ public class Description
 
 		if ( token != "{" )
 		{
-			Log.Info( $"Expecting '{{', got '{token}'" );
+			Con.Printf( $"Expecting '{{', got '{token}'" );
 			return false;
 		}
 

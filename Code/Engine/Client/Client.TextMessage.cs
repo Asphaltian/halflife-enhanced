@@ -169,7 +169,7 @@ partial class Client
 		}
 		else
 		{
-			Log.Trace( $"Unknown token: {text}" );
+			Con.DPrintf( $"Unknown token: {text}\n" );
 		}
 
 		return true;
@@ -209,7 +209,7 @@ partial class Client
 				{
 					if ( name.Length + nameHeapSize > MessageNameHeapSize )
 					{
-						Log.Trace( $"Error parsing file!  length > {MessageNameHeapSize} bytes" );
+						Con.DPrintf( $"Error parsing file!  length > {MessageNameHeapSize} bytes\n" );
 						return;
 					}
 
@@ -223,7 +223,7 @@ partial class Client
 				}
 				else if ( trim.StartsWith( '{' ) )
 				{
-					Log.Trace( $"Unexpected '{{' found, line {lineNumber}" );
+					Con.DPrintf( $"Unexpected '{{' found, line {lineNumber}\n" );
 					return;
 				}
 			}
@@ -236,7 +236,7 @@ partial class Client
 				}
 				else if ( trim[0] == '}' )
 				{
-					Log.Trace( $"Unexpected '}}' found, line {lineNumber}" );
+					Con.DPrintf( $"Unexpected '}}' found, line {lineNumber}\n" );
 					return;
 				}
 				else
@@ -249,7 +249,7 @@ partial class Client
 			filePosition = nextPosition;
 		}
 
-		Log.Trace( $"Parsed {messages.Count} text messages" );
+		Con.DPrintf( $"Parsed {messages.Count} text messages\n" );
 
 		for ( var i = 0; i < messages.Count; i++ )
 		{

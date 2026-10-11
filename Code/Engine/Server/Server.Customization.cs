@@ -76,7 +76,7 @@ partial class Server
 		}
 
 		if ( SvAllowUpload != 0f )
-			Log.Trace( "Verifying and uploading resources...\n" );
+			Con.DPrintf( "Verifying and uploading resources...\n" );
 
 		Span<int> sizes = stackalloc int[LastResourceKind + 1];
 
@@ -90,27 +90,27 @@ partial class Server
 
 		if ( totalSize != 0 )
 		{
-			Log.Trace( $"Custom resources total {totalSize / 1024.0:F2}K\n" );
+			Con.DPrintf( $"Custom resources total {totalSize / 1024.0:F2}K\n" );
 
 			if ( sizes[(int)ResourceKind.Model] != 0 )
-				Log.Trace( $"  Models:  {sizes[(int)ResourceKind.Model] / 1024.0:F2}K\n" );
+				Con.DPrintf( $"  Models:  {sizes[(int)ResourceKind.Model] / 1024.0:F2}K\n" );
 
 			if ( sizes[(int)ResourceKind.Sound] != 0 )
-				Log.Trace( $"  Sounds:  {sizes[(int)ResourceKind.Sound] / 1024.0:F2}K\n" );
+				Con.DPrintf( $"  Sounds:  {sizes[(int)ResourceKind.Sound] / 1024.0:F2}K\n" );
 
 			if ( sizes[(int)ResourceKind.Decal] != 0 )
-				Log.Trace( $"  Decals:  {sizes[(int)ResourceKind.Decal] / 1024.0:F2}K\n" );
+				Con.DPrintf( $"  Decals:  {sizes[(int)ResourceKind.Decal] / 1024.0:F2}K\n" );
 
 			if ( sizes[(int)ResourceKind.Skin] != 0 )
-				Log.Trace( $"  Skins :  {sizes[(int)ResourceKind.Skin] / 1024.0:F2}K\n" );
+				Con.DPrintf( $"  Skins :  {sizes[(int)ResourceKind.Skin] / 1024.0:F2}K\n" );
 
 			if ( sizes[(int)ResourceKind.Generic] != 0 )
-				Log.Trace( $"  Generic :  {sizes[(int)ResourceKind.Generic] / 1024.0:F2}K\n" );
+				Con.DPrintf( $"  Generic :  {sizes[(int)ResourceKind.Generic] / 1024.0:F2}K\n" );
 
 			if ( sizes[(int)ResourceKind.EventScript] != 0 )
-				Log.Trace( $"  Events  :  {sizes[(int)ResourceKind.EventScript] / 1024.0:F2}K\n" );
+				Con.DPrintf( $"  Events  :  {sizes[(int)ResourceKind.EventScript] / 1024.0:F2}K\n" );
 
-			Log.Trace( "----------------------\n" );
+			Con.DPrintf( "----------------------\n" );
 
 			var request = 0;
 
@@ -129,7 +129,7 @@ partial class Server
 				return;
 			}
 
-			Log.Trace( request > 1024 ? $"Resources to request: {request / 1024f:F2}K\n" : $"Resources to request: {request} bytes\n" );
+			Con.DPrintf( request > 1024 ? $"Resources to request: {request / 1024f:F2}K\n" : $"Resources to request: {request} bytes\n" );
 		}
 
 		client.Uploading = true;
@@ -153,7 +153,7 @@ partial class Server
 
 			if ( (resource.Flags & Resource.Custom) == 0 )
 			{
-				Log.Info( "Non customization in upload queue!\n" );
+				Con.Printf( "Non customization in upload queue!\n" );
 
 				MoveToOnHandList( client, resource );
 				continue;
@@ -174,7 +174,7 @@ partial class Server
 	{
 		if ( name[0] != '!' )
 		{
-			Log.Info( $"Ignoring non-customization file upload of {name}\n" );
+			Con.Printf( $"Ignoring non-customization file upload of {name}\n" );
 			return;
 		}
 
@@ -188,7 +188,7 @@ partial class Server
 
 			if ( resource.DownloadSize != data.Length )
 			{
-				Log.Info( $"SV_ProcessFile:  Downloaded {data.Length} bytes for purported {resource.DownloadSize} byte file\n" );
+				Con.Printf( $"SV_ProcessFile:  Downloaded {data.Length} bytes for purported {resource.DownloadSize} byte file\n" );
 				return;
 			}
 
@@ -199,14 +199,14 @@ partial class Server
 			MoveToOnHandList( client, resource );
 
 			if ( client.Customizations.Exists( x => x.Resource.Md5.AsSpan().SequenceEqual( resource.Md5 ) ) )
-				Log.Trace( "Duplicate resource received and ignored.\n" );
+				Con.DPrintf( "Duplicate resource received and ignored.\n" );
 			else if ( !Customization.Create( client.Customizations, resource, -1, Customization.FromHpak | Customization.WadOnly | Customization.IgnoreInit, out _ ) )
-				Log.Info( $"Error parsing custom decal from {client.Name}\n" );
+				Con.Printf( $"Error parsing custom decal from {client.Name}\n" );
 
 			return;
 		}
 
-		Log.Info( "SV_ProcessFile:  Unrequested decal\n" );
+		Con.Printf( "SV_ProcessFile:  Unrequested decal\n" );
 	}
 
 	private void CreateCustomizationList( ServerClient client )
@@ -217,13 +217,13 @@ partial class Server
 		{
 			if ( client.Customizations.Exists( x => x.Resource.Md5.AsSpan().SequenceEqual( resource.Md5 ) ) )
 			{
-				Log.Trace( $"SV_CreateCustomization list, ignoring dup. resource for player {client.Name}\n" );
+				Con.DPrintf( $"SV_CreateCustomization list, ignoring dup. resource for player {client.Name}\n" );
 				continue;
 			}
 
 			if ( !Customization.Create( client.Customizations, resource, -1, Customization.FromHpak | Customization.WadOnly, out var customization ) )
 			{
-				Log.Info( SvAllowUpload != 0f ? $"Ignoring invalid custom decal from {client.Name}\n" : $"Ignoring custom decal from {client.Name}\n" );
+				Con.Printf( SvAllowUpload != 0f ? $"Ignoring invalid custom decal from {client.Name}\n" : $"Ignoring custom decal from {client.Name}\n" );
 				continue;
 			}
 
@@ -289,7 +289,7 @@ partial class Server
 			PropagateCustomizations( client );
 
 			if ( SvAllowUpload != 0f )
-				Log.Trace( "Custom resource propagation complete.\n" );
+				Con.DPrintf( "Custom resource propagation complete.\n" );
 
 			client.UploadDoneRegistering = true;
 		}

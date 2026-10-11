@@ -54,7 +54,7 @@ public sealed partial class Server : GameObjectSystem<Server>, IHotloadManaged
 
 		if ( GameDll is not null )
 		{
-			Log.Trace( "Sys_InitializeGameDLL called twice, skipping second call\n" );
+			Con.DPrintf( "Sys_InitializeGameDLL called twice, skipping second call\n" );
 			return;
 		}
 
@@ -70,20 +70,20 @@ public sealed partial class Server : GameObjectSystem<Server>, IHotloadManaged
 		var loader = MountUtility.FindLoader( GetMountPath( modelName ) );
 		if ( loader is null || await loader.GetOrCreate() is not byte[] data )
 		{
-			Log.Info( $"Couldn't spawn server {modelName}\n" );
+			Con.Printf( $"Couldn't spawn server {modelName}\n" );
 			return false;
 		}
 
 		if ( MapChangeConfigFile.Length > 2 )
 		{
-			Log.Trace( "Executing map change config file" );
+			AlertMessage( AlertType.Console, "Executing map change config file\n" );
 			Cmd.AddText( $"exec {MapChangeConfigFile}\n" );
 		}
 
 		if ( mapName.Length > 2 )
 			Cmd.AddText( $"exec maps/{mapName}_load.cfg\n" );
 
-		Log.Info( $"Spawn Server {mapName}" );
+		Con.DPrintf( $"Spawn Server {mapName}\n" );
 
 		if ( Active && MaxClients > 1 )
 		{
@@ -95,7 +95,7 @@ public sealed partial class Server : GameObjectSystem<Server>, IHotloadManaged
 				if ( edict.HasPrivateData )
 					GameDll.ClientDisconnect( edict );
 				else
-					Log.Info( $"Skipping reconnect on {client.Name}, no pvPrivateData\n" );
+					Con.Printf( $"Skipping reconnect on {client.Name}, no pvPrivateData\n" );
 			}
 		}
 
@@ -132,7 +132,7 @@ public sealed partial class Server : GameObjectSystem<Server>, IHotloadManaged
 		{
 			if ( MapFileCrc( modelName, data ) is not { } crc )
 			{
-				Log.Info( $"Couldn't CRC server map:  {modelName}\n" );
+				Con.Printf( $"Couldn't CRC server map:  {modelName}\n" );
 				return false;
 			}
 
@@ -198,7 +198,7 @@ public sealed partial class Server : GameObjectSystem<Server>, IHotloadManaged
 	{
 		if ( DisconnectConfigFile.Length > 2 )
 		{
-			Log.Trace( "Executing disconnect config file" );
+			AlertMessage( AlertType.Console, "Executing disconnect config file\n" );
 			Cmd.AddText( $"exec {DisconnectConfigFile}\n" );
 		}
 
@@ -246,7 +246,7 @@ public sealed partial class Server : GameObjectSystem<Server>, IHotloadManaged
 	{
 		if ( data.Length < BspHeaderSize )
 		{
-			Log.Info( $"Could not read BSP header for map [{fileName}].\n" );
+			Con.Printf( $"Could not read BSP header for map [{fileName}].\n" );
 			return null;
 		}
 
@@ -254,7 +254,7 @@ public sealed partial class Server : GameObjectSystem<Server>, IHotloadManaged
 
 		if ( version != Bsp.File.QuakeVersion && version != Bsp.File.Version )
 		{
-			Log.Info( $"Map [{fileName}] has incorrect BSP version ({version} should be {Bsp.File.Version}).\n" );
+			Con.Printf( $"Map [{fileName}] has incorrect BSP version ({version} should be {Bsp.File.Version}).\n" );
 			return null;
 		}
 
@@ -310,7 +310,7 @@ public sealed partial class Server : GameObjectSystem<Server>, IHotloadManaged
 
 		Hpak.FlushHostQueue();
 
-		Log.Trace( MaxClients < 2 ? "Game started\n" : $"{MaxClients} player server started\n" );
+		Con.DPrintf( MaxClients < 2 ? "Game started\n" : $"{MaxClients} player server started\n" );
 
 		LogPrintf( $"Started map \"{Name}\" (CRC \"{_worldMapCrc}\")\n" );
 	}

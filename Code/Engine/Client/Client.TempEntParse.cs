@@ -4,6 +4,8 @@ namespace GoldSrc;
 
 partial class Client
 {
+	private readonly int[] _multiGunshotDecal = new int[1];
+
 	private static bool BloodEnabled => Cvar.GetFloat( "violence_hblood" ) != 0f || Cvar.GetFloat( "violence_ablood" ) != 0f;
 
 	private void ShootDecal( int decal, int entity, int modelIndex, Vector3 position, DecalFlags flags )
@@ -154,6 +156,16 @@ partial class Client
 					break;
 				}
 
+			case TempEntity.TarExplosion:
+				{
+					var position = message.ReadPosition();
+
+					BlobExplosion( position );
+
+					Sound.StartDynamicSound( -1, 0, Sound.PrecacheSound( ExplosionSoundNames[0] ), position, 1f, 1f, 0, 100 );
+					break;
+				}
+
 			case TempEntity.Smoke:
 				{
 					var position = message.ReadPosition();
@@ -187,6 +199,98 @@ partial class Client
 				SparkEffect( message.ReadPosition(), 8, -200, 200 );
 				break;
 
+			case TempEntity.LavaSplash:
+				LavaSplash( message.ReadPosition() );
+				break;
+
+			case TempEntity.Teleport:
+				TeleportSplash( message.ReadPosition() );
+				break;
+
+			case TempEntity.Explosion2:
+				{
+					var position = message.ReadPosition();
+					var colorStart = message.ReadByte();
+					var colorLength = message.ReadByte();
+
+					ParticleExplosion2( position, colorStart, colorLength );
+
+					var light = AllocDlight( 0 );
+
+					light.Origin = position;
+					light.Radius = 350f;
+					light.Die = (float)(ClientTime + 0.5);
+					light.Decay = 300f;
+
+					Sound.StartDynamicSound( -1, 0, Sound.PrecacheSound( ExplosionSoundNames[0] ), position, 1f, 0.6f, 0, 100 );
+					break;
+				}
+
+			case TempEntity.SpriteTrail:
+				{
+					var start = message.ReadPosition();
+					var end = message.ReadPosition();
+					var modelIndex = message.ReadShort();
+					var count = message.ReadByte();
+					var life = message.ReadByte() * 0.1f;
+					float scale = message.ReadByte();
+
+					scale = scale == 0f ? 1f : (float)(scale * 0.1);
+
+					var amplitude = message.ReadByte() * 10f;
+					float speed = (int)(message.ReadByte() * 10.0);
+
+					SpriteTrail( type, start, end, modelIndex, count, life, scale, amplitude, 255, speed );
+					break;
+				}
+
+			case TempEntity.BeamSprite:
+				{
+					var start = message.ReadPosition();
+					var end = message.ReadPosition();
+					var beamModel = message.ReadShort();
+					var spriteModel = message.ReadShort();
+
+					BeamPoints( start, end, beamModel, 0.01f, 0.4f, 0f, Server.RandomFloat( 0.5f, 0.655f ), 5f, 0, 0f, 1f, 0f, 0f );
+					TempSprite( end, Vector3.Zero, 0.1f, spriteModel, RenderMode.TransAdd, RenderFx.None, 0.35f, 0.01f, TempEntityFlags.None );
+					break;
+				}
+
+			case TempEntity.GlowSprite:
+				{
+					var position = message.ReadPosition();
+					var modelIndex = message.ReadShort();
+					var life = message.ReadByte() * 0.1f;
+					var scale = message.ReadByte() * 0.1f;
+					var alpha = message.ReadByte() * (1f / 255f);
+
+					TempSprite( position, Vector3.Zero, scale, modelIndex, RenderMode.Glow, RenderFx.NoDissipation, alpha, life, TempEntityFlags.FadeOut );
+					break;
+				}
+
+			case TempEntity.Line:
+			case TempEntity.Box:
+				{
+					var start = message.ReadPosition();
+					var end = message.ReadPosition();
+					var life = message.ReadShort() * 0.1f;
+					var r = (byte)message.ReadByte();
+					var g = (byte)message.ReadByte();
+					var b = (byte)message.ReadByte();
+					var color = (short)LookupColor( r, g, b );
+
+					if ( type == TempEntity.Line )
+					{
+						ParticleLine( start, end, color, life );
+						break;
+					}
+
+					var center = (end + start) * 0.5f;
+
+					ParticleBox( start - center, end - center, center, color, life );
+					break;
+				}
+
 			case TempEntity.StreakSplash:
 				{
 					var position = message.ReadPosition();
@@ -216,6 +320,9 @@ partial class Client
 					var entityIndex = message.ReadShort();
 					var modelIndex = message.ReadShort();
 					var density = message.ReadByte();
+
+					if ( entityIndex >= _maxEdicts )
+						throw new InvalidOperationException( $"Bubble: entity = {entityIndex}" );
 
 					FizzEffect( GetEntity( entityIndex ), modelIndex, density );
 					break;
@@ -468,6 +575,118 @@ partial class Client
 				KillAttachedTents( message.ReadByte() );
 				break;
 
+			case TempEntity.ExplodeModel:
+				{
+					var position = message.ReadPosition();
+					var speed = message.ReadCoord();
+					var modelIndex = message.ReadShort();
+					var count = message.ReadShort();
+					var life = message.ReadByte() * 0.1f;
+
+					TempSphereModel( position, speed, life, count, modelIndex );
+					break;
+				}
+
+			case TempEntity.Projectile:
+				{
+					var position = message.ReadPosition();
+					var velocity = message.ReadPosition();
+					var modelIndex = message.ReadShort();
+					var life = message.ReadByte();
+					var owner = message.ReadByte();
+
+					Projectile( position, velocity, modelIndex, life, owner, null );
+					break;
+				}
+
+			case TempEntity.Spray:
+				{
+					var position = message.ReadPosition();
+					var direction = message.ReadPosition();
+					var modelIndex = message.ReadShort();
+					var count = message.ReadByte();
+					var speed = message.ReadByte();
+					var noise = message.ReadByte();
+					var renderMode = (RenderMode)message.ReadByte();
+
+					Spray( position, direction, modelIndex, count, speed, noise, renderMode );
+					break;
+				}
+
+			case TempEntity.PlayerSprites:
+				{
+					var client = message.ReadShort();
+					var modelIndex = message.ReadShort();
+					var count = message.ReadByte();
+					var size = message.ReadByte();
+
+					PlayerSprites( client, modelIndex, count, size );
+					break;
+				}
+
+			case TempEntity.ParticleBurst:
+				{
+					var position = message.ReadPosition();
+					var radius = message.ReadShort();
+					var color = message.ReadByte();
+					var life = (float)(message.ReadByte() / 10.0);
+
+					ParticleBurst( position, radius, color, life );
+					break;
+				}
+
+			case TempEntity.FireField:
+				{
+					var position = message.ReadPosition();
+					var radius = message.ReadShort();
+					var modelIndex = message.ReadShort();
+					var count = message.ReadByte();
+					var flags = message.ReadByte();
+					var life = (float)(message.ReadByte() / 10.0);
+
+					FireField( position, radius, modelIndex, count, flags, life );
+					break;
+				}
+
+			case TempEntity.PlayerAttachment:
+				{
+					var client = message.ReadByte();
+					var heightOffset = message.ReadCoord();
+					var modelIndex = message.ReadShort();
+					var life = message.ReadShort() / 10f;
+
+					AttachTentToPlayer( client, modelIndex, heightOffset, life );
+					break;
+				}
+
+			case TempEntity.MultiGunshot:
+				{
+					var position = message.ReadPosition();
+					var x = (float)(message.ReadCoord() / 10.0);
+					var y = (float)(message.ReadCoord() / 10.0);
+					var z = (float)(message.ReadCoord() / 10.0);
+					var noiseX = (float)(message.ReadCoord() / 100.0);
+					var noiseY = (float)(message.ReadCoord() / 100.0);
+					var count = message.ReadByte();
+
+					_multiGunshotDecal[0] = message.ReadByte();
+
+					MultiGunshot( position, new Vector3( x, y, z ), new Vector3( noiseX, noiseY, 0f ), count, _multiGunshotDecal );
+					break;
+				}
+
+			case TempEntity.UserTracer:
+				{
+					var position = message.ReadPosition();
+					var velocity = message.ReadPosition();
+					var life = (float)(message.ReadByte() / 10.0);
+					var color = message.ReadByte();
+					var length = (float)(message.ReadByte() / 10.0);
+
+					UserTracerParticle( position, velocity, life, color, length, 0, null );
+					break;
+				}
+
 			case TempEntity.BreakModel:
 				{
 					var position = message.ReadPosition();
@@ -482,6 +701,9 @@ partial class Client
 					BreakModel( position, size, velocity, random, life, count, model, flags );
 					break;
 				}
+
+			default:
+				throw new InvalidOperationException( "CL_ParseTEnt: bad type" );
 		}
 	}
 }

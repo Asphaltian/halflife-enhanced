@@ -100,7 +100,7 @@ public class SoundEnt : BaseEntity
 
 		if ( _showReport )
 		{
-			Util.Alert( AlertType.AiConsole, $"Soundlist: {SoundsInList( ListTypeActive )} / {SoundsInList( ListTypeFree )}  ({SoundsInList( ListTypeActive ) - _lastActiveSounds})" );
+			Util.Alert( AlertType.AiConsole, $"Soundlist: {SoundsInList( ListTypeActive )} / {SoundsInList( ListTypeFree )}  ({SoundsInList( ListTypeActive ) - _lastActiveSounds})\n" );
 			_lastActiveSounds = SoundsInList( ListTypeActive );
 		}
 	}
@@ -123,7 +123,7 @@ public class SoundEnt : BaseEntity
 	{
 		if ( _freeSound == ListEmpty )
 		{
-			Util.Alert( AlertType.Console, "Free Sound List is full!" );
+			Util.Alert( AlertType.Console, "Free Sound List is full!\n" );
 			return ListEmpty;
 		}
 
@@ -145,7 +145,7 @@ public class SoundEnt : BaseEntity
 
 		if ( sound == ListEmpty )
 		{
-			Util.Alert( AlertType.Console, "Could not AllocSound() for InsertSound() (DLL)" );
+			Util.Alert( AlertType.Console, "Could not AllocSound() for InsertSound() (DLL)\n" );
 			return;
 		}
 
@@ -175,7 +175,7 @@ public class SoundEnt : BaseEntity
 
 			if ( sound == ListEmpty )
 			{
-				Util.Alert( AlertType.Console, "Could not AllocSound() for Client Reserve! (DLL)" );
+				Util.Alert( AlertType.Console, "Could not AllocSound() for Client Reserve! (DLL)\n" );
 				return;
 			}
 
@@ -199,7 +199,7 @@ public class SoundEnt : BaseEntity
 		}
 		else
 		{
-			Util.Alert( AlertType.Console, "Unknown Sound List Type!" );
+			Util.Alert( AlertType.Console, "Unknown Sound List Type!\n" );
 			return 0;
 		}
 
@@ -222,13 +222,13 @@ public class SoundEnt : BaseEntity
 
 		if ( index > MaxWorldSounds - 1 )
 		{
-			Util.Alert( AlertType.Console, "SoundPointerForIndex() - Index too large!" );
+			Util.Alert( AlertType.Console, "SoundPointerForIndex() - Index too large!\n" );
 			return null;
 		}
 
 		if ( index < 0 )
 		{
-			Util.Alert( AlertType.Console, "SoundPointerForIndex() - Index < 0!" );
+			Util.Alert( AlertType.Console, "SoundPointerForIndex() - Index < 0!\n" );
 			return null;
 		}
 

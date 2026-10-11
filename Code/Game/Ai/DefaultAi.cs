@@ -369,7 +369,7 @@ partial class BaseMonster
 	{
 		if ( name is null )
 		{
-			Util.Alert( AlertType.Console, $"{ClassName} set to unnamed schedule!" );
+			Util.Alert( AlertType.Console, $"{ClassName} set to unnamed schedule!\n" );
 			return null;
 		}
 
@@ -377,7 +377,7 @@ partial class BaseMonster
 		{
 			if ( schedule.Name is null )
 			{
-				Util.Alert( AlertType.Console, "Unnamed schedule!" );
+				Util.Alert( AlertType.Console, "Unnamed schedule!\n" );
 				continue;
 			}
 
@@ -397,7 +397,7 @@ partial class BaseMonster
 			case ScheduleType.AiScript:
 				if ( Cine is null )
 				{
-					Util.Alert( AlertType.AiConsole, $"Script failed for {ClassName}" );
+					Util.Alert( AlertType.AiConsole, $"Script failed for {ClassName}\n" );
 					CineCleanup();
 					return GetScheduleOfType( ScheduleType.IdleStand );
 				}
@@ -514,7 +514,7 @@ partial class BaseMonster
 				return DefaultAi.Fail;
 
 			default:
-				Util.Alert( AlertType.Console, $"GetScheduleOfType()\nNo CASE for Schedule Type {type}!" );
+				Util.Alert( AlertType.Console, $"GetScheduleOfType()\nNo CASE for Schedule Type {type}!\n" );
 				return DefaultAi.IdleStand;
 		}
 	}

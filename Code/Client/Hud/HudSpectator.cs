@@ -282,13 +282,13 @@ public sealed class HudSpectator( Hud hud ) : HudBase( hud )
 
 			if ( position < 0 )
 			{
-				Log.Trace( "UTIL_FindEntityInMap: EOF without closing brace\n" );
+				Con.DPrintf( "UTIL_FindEntityInMap: EOF without closing brace\n" );
 				return false;
 			}
 
 			if ( token[0] != '{' )
 			{
-				Log.Trace( "UTIL_FindEntityInMap: expected {\n" );
+				Con.DPrintf( "UTIL_FindEntityInMap: expected {\n" );
 				return false;
 			}
 
@@ -303,7 +303,7 @@ public sealed class HudSpectator( Hud hud ) : HudBase( hud )
 
 				if ( position < 0 )
 				{
-					Log.Trace( "UTIL_FindEntityInMap: EOF without closing brace\n" );
+					Con.DPrintf( "UTIL_FindEntityInMap: EOF without closing brace\n" );
 					return false;
 				}
 
@@ -313,13 +313,13 @@ public sealed class HudSpectator( Hud hud ) : HudBase( hud )
 
 				if ( position < 0 )
 				{
-					Log.Trace( "UTIL_FindEntityInMap: EOF without closing brace\n" );
+					Con.DPrintf( "UTIL_FindEntityInMap: EOF without closing brace\n" );
 					return false;
 				}
 
 				if ( token.Length != 0 && token[0] == '}' )
 				{
-					Log.Trace( "UTIL_FindEntityInMap: closing brace without data" );
+					Con.DPrintf( "UTIL_FindEntityInMap: closing brace without data" );
 					return false;
 				}
 
@@ -437,7 +437,7 @@ public sealed class HudSpectator( Hud hud ) : HudBase( hud )
 		_camPath[_numWayPoints].Fov = fov;
 		_camPath[_numWayPoints].Time = time;
 
-		Log.Trace( $"Added waypoint {_numWayPoints}\n" );
+		Con.DPrintf( $"Added waypoint {_numWayPoints}\n" );
 
 		_numWayPoints++;
 	}
@@ -777,7 +777,7 @@ public sealed class HudSpectator( Hud hud ) : HudBase( hud )
 				}
 
 			default:
-				Log.Trace( $"CHudSpectator::DirectorMessage: unknown command {command}.\n" );
+				Con.DPrintf( $"CHudSpectator::DirectorMessage: unknown command {command}.\n" );
 				break;
 		}
 	}
@@ -823,7 +823,7 @@ public sealed class HudSpectator( Hud hud ) : HudBase( hud )
 
 		if ( Dll.User2 == 0 )
 		{
-			Log.Trace( "No observer targets.\n" );
+			Con.DPrintf( "No observer targets.\n" );
 
 			Dll.JumpOrigin = CameraOrigin;
 			Dll.JumpAngles = CameraAngles;
@@ -871,7 +871,7 @@ public sealed class HudSpectator( Hud hud ) : HudBase( hud )
 
 		if ( Dll.User2 == 0 )
 		{
-			Log.Trace( "No observer targets.\n" );
+			Con.DPrintf( "No observer targets.\n" );
 
 			Dll.JumpOrigin = CameraOrigin;
 			Dll.JumpAngles = CameraAngles;
@@ -1123,7 +1123,7 @@ public sealed class HudSpectator( Hud hud ) : HudBase( hud )
 
 		if ( file is null )
 		{
-			Log.Trace( $"Couldn't open file {fileName}. Using default values for overiew mode.\n" );
+			Con.DPrintf( $"Couldn't open file {fileName}. Using default values for overiew mode.\n" );
 			return false;
 		}
 

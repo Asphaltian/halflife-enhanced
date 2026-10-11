@@ -569,7 +569,7 @@ public class Gargantua : BaseMonster
 
 	public override void TraceAttack( BaseEntity attacker, float damage, Vector3 direction, in Trace trace, int damageType )
 	{
-		Util.Alert( AlertType.AiConsole, "CGargantua::TraceAttack" );
+		Util.Alert( AlertType.AiConsole, "CGargantua::TraceAttack\n" );
 
 		if ( !IsAlive )
 		{
@@ -601,7 +601,7 @@ public class Gargantua : BaseMonster
 
 	public override bool TakeDamage( BaseEntity inflictor, BaseEntity attacker, float damage, int damageType )
 	{
-		Util.Alert( AlertType.AiConsole, "CGargantua::TakeDamage" );
+		Util.Alert( AlertType.AiConsole, "CGargantua::TakeDamage\n" );
 
 		if ( IsAlive )
 		{

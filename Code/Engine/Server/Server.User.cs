@@ -14,7 +14,7 @@ partial class Server
 	{
 		if ( client is null || client.Index < 1 || client.Index > MaxClients )
 		{
-			Log.Info( "tried to PF_SetPhysicsKeyValue a non-client\n" );
+			Con.Printf( "tried to PF_SetPhysicsKeyValue a non-client\n" );
 			return;
 		}
 
@@ -25,7 +25,7 @@ partial class Server
 	{
 		if ( client is null || client.Index < 1 || client.Index > MaxClients )
 		{
-			Log.Info( "tried to PF_CanSkipPlayer a non-client\n" );
+			Con.Printf( "tried to PF_CanSkipPlayer a non-client\n" );
 			return false;
 		}
 
@@ -36,7 +36,7 @@ partial class Server
 	{
 		if ( client is null || client.Index < 1 || client.Index > MaxClients )
 		{
-			Log.Info( "tried to PF_GetPhysicsInfoString a non-client\n" );
+			Con.Printf( "tried to PF_GetPhysicsInfoString a non-client\n" );
 			return "";
 		}
 
@@ -407,7 +407,7 @@ partial class Server
 			{
 				if ( _pmove.MoveEnts.Count >= PlayerMove.MaxMoveEnts )
 				{
-					Log.Trace( "SV_AddLinksToPM:  pmove->nummoveent >= MAX_MOVEENTS\n" );
+					Con.DPrintf( "SV_AddLinksToPM:  pmove->nummoveent >= MAX_MOVEENTS\n" );
 					continue;
 				}
 
@@ -417,7 +417,7 @@ partial class Server
 			{
 				if ( _pmove.PhysEnts.Count >= PlayerMove.MaxPhysEnts )
 				{
-					Log.Trace( "SV_AddLinksToPM:  pmove->numphysent >= MAX_PHYSENTS\n" );
+					Con.DPrintf( "SV_AddLinksToPM:  pmove->numphysent >= MAX_PHYSENTS\n" );
 					return;
 				}
 

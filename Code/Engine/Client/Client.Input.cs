@@ -59,7 +59,7 @@ partial class Client
 		if ( updateRate < 10f )
 		{
 			Cvar.Set( "cl_updaterate", "20" );
-			Log.Info( $"cl_updaterate minimum is {10.0:F6}, resetting to default (20)\n" );
+			Con.Printf( $"cl_updaterate minimum is {10.0:F6}, resetting to default (20)\n" );
 
 			updateRate = Cvar.GetFloat( "cl_updaterate" );
 		}
@@ -67,7 +67,7 @@ partial class Client
 		if ( updateRate > 102f )
 		{
 			Cvar.Set( "cl_updaterate", "102" );
-			Log.Info( $"cl_updaterate maximum is {102.0:F6}, resetting to maximum (102)\n" );
+			Con.Printf( $"cl_updaterate maximum is {102.0:F6}, resetting to maximum (102)\n" );
 
 			updateRate = Cvar.GetFloat( "cl_updaterate" );
 		}
@@ -86,14 +86,14 @@ partial class Client
 			msec = minimum;
 			forced = true;
 
-			Log.Info( $"ex_interp forced up to {msec} msec\n" );
+			Con.Printf( $"ex_interp forced up to {msec} msec\n" );
 		}
 		else if ( msec - 1 > maximum )
 		{
 			msec = maximum;
 			forced = true;
 
-			Log.Info( $"ex_interp forced down to {msec} msec\n" );
+			Con.Printf( $"ex_interp forced down to {msec} msec\n" );
 		}
 
 		if ( forced )

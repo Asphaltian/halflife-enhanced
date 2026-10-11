@@ -112,7 +112,7 @@ partial class Server
 	{
 		if ( index < 1 || index >= MaxModels )
 		{
-			Log.Info( "Bad sprite index!" );
+			Con.DPrintf( "Bad sprite index!\n" );
 			return 1;
 		}
 

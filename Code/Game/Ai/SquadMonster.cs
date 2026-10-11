@@ -183,7 +183,7 @@ public abstract class SquadMonster : BaseMonster
 
 		if ( enemy is null )
 		{
-			Util.Alert( AlertType.Console, "ERROR: SquadMakeEnemy() - pEnemy is NULL!" );
+			Util.Alert( AlertType.Console, "ERROR: SquadMakeEnemy() - pEnemy is NULL!\n" );
 			return;
 		}
 
@@ -314,7 +314,7 @@ public abstract class SquadMonster : BaseMonster
 		var squadSize = SquadRecruit( 1024, 4 );
 
 		if ( squadSize != 0 )
-			Util.Alert( AlertType.AiConsole, $"Squad of {squadSize} {ClassName} formed" );
+			Util.Alert( AlertType.AiConsole, $"Squad of {squadSize} {ClassName} formed\n" );
 
 		if ( IsLeader && ClassName == "monster_human_grunt" )
 		{

@@ -202,7 +202,7 @@ public static class Info
 
 			if ( position >= info.Length )
 			{
-				Log.Info( $"{key}MISSING VALUE" );
+				Con.Printf( $"{key}MISSING VALUE\n" );
 				return;
 			}
 
@@ -211,7 +211,7 @@ public static class Info
 			while ( position < info.Length && info[position] != '\\' && position - start < MaxKeyValueLength )
 				position++;
 
-			Log.Info( $"{key}{info[start..position]}" );
+			Con.Printf( $"{key}{info[start..position]}\n" );
 
 			if ( position < info.Length )
 				position++;
@@ -244,7 +244,7 @@ public static class Info
 	{
 		if ( key.Contains( '\\' ) )
 		{
-			Log.Info( "Can't use a key with a \\" );
+			Con.Printf( "Can't use a key with a \\\n" );
 			return;
 		}
 
@@ -298,7 +298,7 @@ public static class Info
 	{
 		if ( key.StartsWith( '*' ) )
 		{
-			Log.Info( "Can't set * keys" );
+			Con.Printf( "Can't set * keys\n" );
 			return;
 		}
 
@@ -309,7 +309,7 @@ public static class Info
 	{
 		if ( key.Contains( '\\' ) || value.Contains( '\\' ) )
 		{
-			Log.Info( "Can't use keys or values with a \\" );
+			Con.Printf( "Can't use keys or values with a \\\n" );
 			return;
 		}
 
@@ -318,19 +318,19 @@ public static class Info
 
 		if ( key.Contains( '"' ) || value.Contains( '"' ) )
 		{
-			Log.Info( "Can't use keys or values with a \"" );
+			Con.Printf( "Can't use keys or values with a \"\n" );
 			return;
 		}
 
 		if ( key.Length < 1 || key.Length > MaxKeyValueLength || value.Length > MaxKeyValueLength )
 		{
-			Log.Info( $"Keys and values must be < {MaxKeyValueLength + 1} characters and > 0." );
+			Con.Printf( $"Keys and values must be < {MaxKeyValueLength + 1} characters and > 0.\n" );
 			return;
 		}
 
 		if ( !Unicode.Validate( value ) )
 		{
-			Log.Info( "Values must be valid utf8 text" );
+			Con.Printf( "Values must be valid utf8 text\n" );
 			return;
 		}
 
@@ -346,7 +346,7 @@ public static class Info
 		{
 			if ( !IsKeyImportant( key ) )
 			{
-				Log.Info( "Info string length exceeded" );
+				Con.Printf( "Info string length exceeded\n" );
 				return;
 			}
 
@@ -362,7 +362,7 @@ public static class Info
 
 			if ( largest.Length == 0 )
 			{
-				Log.Info( "Info string length exceeded" );
+				Con.Printf( "Info string length exceeded\n" );
 				return;
 			}
 		}

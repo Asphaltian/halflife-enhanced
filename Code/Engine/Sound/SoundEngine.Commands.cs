@@ -116,12 +116,12 @@ partial class SoundEngine
 			var sentence = FindName( sound );
 
 			if ( sentence is null )
-				Log.Info( $"{caller}: can't find sentence name {sound}" );
+				Con.Printf( $"{caller}: can't find sentence name {sound}\n" );
 
 			return sentence;
 		}
 
-		Log.Info( $"{caller}: can't cache {TestSentence}" );
+		Con.Printf( $"{caller}: can't cache {TestSentence}\n" );
 
 		return null;
 	}
@@ -161,22 +161,22 @@ partial class SoundEngine
 
 			total += size;
 
-			Log.Info( $"{(sfx.Loop ? "L" : " ")}({sfx.Bits,2}b) {size,6} : {sfx.Name}" );
+			Con.Printf( $"{(sfx.Loop ? "L" : " ")}({sfx.Bits,2}b) {size,6} : {sfx.Name}\n" );
 		}
 
-		Log.Info( $"Total resident: {total}" );
+		Con.Printf( $"Total resident: {total}\n" );
 	}
 
 	private void SoundInfo()
 	{
 		if ( _mixer is null )
 		{
-			Log.Info( "sound system not started" );
+			Con.Printf( "sound system not started\n" );
 			return;
 		}
 
-		Log.Info( $"{1,5} stereo" );
-		Log.Info( $"{16,5} samplebits" );
-		Log.Info( $"{_totalChannels,5} total_channels" );
+		Con.Printf( $"{1,5} stereo\n" );
+		Con.Printf( $"{16,5} samplebits\n" );
+		Con.Printf( $"{_totalChannels,5} total_channels\n" );
 	}
 }

@@ -130,7 +130,7 @@ public sealed partial class PlayerMove
 		trace.DeltaVelocity = Velocity;
 
 		if ( TouchIndex.Count >= MaxPhysEnts )
-			Log.Trace( "Too many entities were touched!" );
+			Con.DPrintf( "Too many entities were touched!\n" );
 
 		TouchIndex.Add( trace );
 	}

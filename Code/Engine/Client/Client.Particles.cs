@@ -90,7 +90,8 @@ partial class Client
 		[255, 130, 90],
 		[255, 140, 90],
 		[200, 130, 90],
-		[255, 120, 70]
+		[255, 120, 70],
+		[0, 0, 128]
 	];
 
 	private readonly DynamicMesh[] _particleMeshes = new DynamicMesh[ViewCount];
@@ -117,7 +118,7 @@ partial class Client
 	{
 		if ( _freeParticles is not { } particle )
 		{
-			Log.Trace( "Not enough free particles" );
+			Con.Printf( "Not enough free particles\n" );
 			return null;
 		}
 

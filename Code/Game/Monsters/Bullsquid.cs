@@ -619,7 +619,7 @@ public class Bullsquid : BaseMonster
 				}
 				else
 				{
-					Util.Alert( AlertType.AiConsole, "GetPathToEnemy failed!!" );
+					Util.Alert( AlertType.AiConsole, "GetPathToEnemy failed!!\n" );
 					TaskFail();
 				}
 

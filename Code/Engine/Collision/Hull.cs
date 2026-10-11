@@ -192,7 +192,7 @@ public sealed partial class Hull
 			{
 				trace.Fraction = midf;
 				trace.EndPos = mid;
-				Log.Info( "Trace backed up past 0.0." );
+				Con.DPrintf( "Trace backed up past 0.0.\n" );
 				return false;
 			}
 
@@ -301,7 +301,7 @@ public sealed partial class Hull
 			{
 				trace.Fraction = midf;
 				trace.EndPos = mid;
-				Log.Info( "backup past 0" );
+				Con.DPrintf( "backup past 0\n" );
 				return false;
 			}
 

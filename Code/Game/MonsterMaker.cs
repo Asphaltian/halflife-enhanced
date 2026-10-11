@@ -101,7 +101,7 @@ public class MonsterMaker : BaseMonster
 
 		if ( Util.IsNullEnt( child ) )
 		{
-			Util.Alert( AlertType.Console, "NULL Ent in MonsterMaker!" );
+			Util.Alert( AlertType.Console, "NULL Ent in MonsterMaker!\n" );
 			return;
 		}
 

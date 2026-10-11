@@ -23,7 +23,7 @@ partial class BoneSetup
 	{
 		if ( sequence < 0 || sequence >= header.Sequences.Length )
 		{
-			Log.Info( $"SV_StudioSetupBones:  sequence {sequence}/{header.Sequences.Length} out of range for model {header.Header.Name}" );
+			Con.DPrintf( $"SV_StudioSetupBones:  sequence {sequence}/{header.Sequences.Length} out of range for model {header.Header.Name}\n" );
 			sequence = 0;
 		}
 

@@ -24,7 +24,7 @@ partial class Client
 			return;
 		}
 
-		Log.Info( "Unable to take a screenshot.\n" );
+		Con.Printf( "Unable to take a screenshot.\n" );
 	}
 
 	private void TakeSnapshot( string fileName )

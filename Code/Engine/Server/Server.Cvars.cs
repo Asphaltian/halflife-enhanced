@@ -206,15 +206,15 @@ partial class Server
 		if ( command.EndsWith( '\n' ) || command.EndsWith( ';' ) )
 			Cmd.AddText( command );
 		else
-			Log.Info( $"Error, bad server command {command}" );
+			Con.Printf( $"Error, bad server command {command}\n" );
 	}
 
 	public void EndSection( string section )
 	{
 		if ( string.IsNullOrEmpty( section ) )
-			Log.Info( " endsection with no arguments" );
+			Con.Printf( " endsection with no arguments\n" );
 		else if ( !section.Equals( "_oem_end_training", StringComparison.OrdinalIgnoreCase ) && !section.Equals( "_oem_end_logo", StringComparison.OrdinalIgnoreCase ) && !section.Equals( "_oem_end_demo", StringComparison.OrdinalIgnoreCase ) )
-			Log.Trace( " endsection with unknown Section keyvalue" );
+			Con.DPrintf( " endsection with unknown Section keyvalue\n" );
 
 		Cmd.AddText( "\ndisconnect\n" );
 	}

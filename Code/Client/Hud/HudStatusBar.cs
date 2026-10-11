@@ -18,7 +18,7 @@ public sealed class HudStatusBar( Hud hud ) : HudBase( hud )
 
 	private bool _reparseString;
 
-	[ConVar( "hud_centerid" )]
+	[ConVar( "hud_centerid", ConVarFlags.Saved )]
 	private static float CenterId { get; set; } = 0f;
 
 	public override void Init()

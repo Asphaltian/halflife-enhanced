@@ -338,7 +338,7 @@ public sealed class HudAmmo( Hud hud ) : HudBase( hud )
 	[ConVar( "hud_drawhistory_time" )]
 	private static float DrawHistoryTime { get; set; } = 5f;
 
-	[ConVar( "hud_fastswitch" )]
+	[ConVar( "hud_fastswitch", ConVarFlags.Saved )]
 	private static float FastSwitch { get; set; } = 0f;
 
 	private static HudAmmo Current => (ClientDll.Loaded as HalfLifeClientDll)?.Hud?.Ammo;

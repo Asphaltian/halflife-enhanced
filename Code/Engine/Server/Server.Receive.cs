@@ -8,7 +8,11 @@ partial class Server
 	public const int StringCommand = 3;
 	public const int DeltaCommand = 4;
 
+	private const int HltvCommand = 9;
+	private const int CvarValueCommand = 10;
+	private const int CvarValue2Command = 11;
 	private const int LastClientCommand = 11;
+	private const int MaxQueryCvarName = 254;
 	private const int MaxCommandBackup = 63;
 	private const int MaxDroppedCommands = 24;
 	private const int MaxStringCommandLength = 127;
@@ -84,7 +88,7 @@ partial class Server
 
 			if ( client.Netchan.LastReceived < dropTime )
 			{
-				Log.Info( $"{client.Name} timed out\n" );
+				Con.Printf( $"{client.Name} timed out\n" );
 				DropClient( client, false, "Timed out" );
 			}
 		}
@@ -197,7 +201,7 @@ partial class Server
 		{
 			if ( _netMessage.BadRead )
 			{
-				Log.Info( "SV_ReadClientMessage: badread\n" );
+				Con.Printf( "SV_ReadClientMessage: badread\n" );
 				return;
 			}
 
@@ -208,7 +212,7 @@ partial class Server
 
 			if ( (uint)command > LastClientCommand )
 			{
-				Log.Info( $"SV_ReadClientMessage: unknown command char ({command})\n" );
+				Con.Printf( $"SV_ReadClientMessage: unknown command char ({command})\n" );
 				DropClient( client, false, "Bad command character in client command" );
 				return;
 			}
@@ -235,6 +239,25 @@ partial class Server
 				case ResourceListCommand:
 					ParseResourceList( client );
 					break;
+
+				case HltvCommand:
+					break;
+
+				case CvarValueCommand:
+					Con.DPrintf( $"Cvar query response: name:{client.Name}, value:{_netMessage.ReadString()}\n" );
+					break;
+
+				case CvarValue2Command:
+					{
+						var requestId = _netMessage.ReadLong();
+						var cvarName = _netMessage.ReadString();
+
+						if ( cvarName.Length > MaxQueryCvarName )
+							cvarName = cvarName[..MaxQueryCvarName];
+
+						Con.DPrintf( $"Cvar query response: name:{client.Name}, request ID {requestId}, cvar:{cvarName}, value:{_netMessage.ReadString()}\n" );
+						break;
+					}
 
 				default:
 					throw new NotSupportedException( $"{ClientCommandNames[command]} is not ported" );
@@ -304,7 +327,7 @@ partial class Server
 
 		if ( length <= 0 || start + 2 + length > message.Size )
 		{
-			Log.Info( $"SV_ParseMove: invalid length: {length}\n" );
+			Con.Printf( $"SV_ParseMove: invalid length: {length}\n" );
 			DropClient( client, false, "Invalid Move message" );
 
 			message.BadRead = true;
@@ -326,7 +349,7 @@ partial class Server
 
 		if ( (uint)total >= MaxCommandBackup )
 		{
-			Log.Info( $"SV_ReadClientMessage: too many cmds {total} sent for {client.Name}/{client.Address}\n" );
+			Con.Printf( $"SV_ReadClientMessage: too many cmds {total} sent for {client.Name}/{client.Address}\n" );
 			DropClient( client, false, "CMD_MAXBACKUP hit" );
 
 			message.BadRead = true;
@@ -346,13 +369,13 @@ partial class Server
 
 		if ( message.BadRead )
 		{
-			Log.Info( $"Client {client.Name}:{client.Address} sent a bogus command packet\n" );
+			Con.Printf( $"Client {client.Name}:{client.Address} sent a bogus command packet\n" );
 			return;
 		}
 
 		if ( Common.BlockSequenceCrcByte( message.Data.AsSpan( start + 2, message.ReadCount - start - 2 ), client.Netchan.IncomingSequence ) != checksum )
 		{
-			Log.Trace( $"Failed command checksum for {client.Name}:{client.Address}\n" );
+			Con.DPrintf( $"Failed command checksum for {client.Name}:{client.Address}\n" );
 
 			message.BadRead = true;
 			return;
@@ -423,7 +446,7 @@ partial class Server
 	{
 		if ( !client.Active )
 		{
-			Log.Trace( $"{client.Name} is trying to fullupdate when not active at ({Time})\n" );
+			Con.DPrintf( $"{client.Name} is trying to fullupdate when not active at ({Time})\n" );
 			return false;
 		}
 
@@ -439,7 +462,7 @@ partial class Server
 
 		if ( elapsed < FullUpdateInterval && FullUpdateInterval < Time )
 		{
-			Log.Trace( $"{client.Name} is spamming fullupdate: ({Time}) ({last}) ({elapsed})\n" );
+			Con.DPrintf( $"{client.Name} is spamming fullupdate: ({Time}) ({last}) ({elapsed})\n" );
 			return false;
 		}
 
@@ -453,7 +476,7 @@ partial class Server
 				FullClientUpdate( other, _forceUpdate );
 		}
 
-		Log.Trace( $"Client {client.Name} started recording. Send full update.\n" );
+		Con.DPrintf( $"Client {client.Name} started recording. Send full update.\n" );
 
 		client.Netchan.CreateFragments( _forceUpdate );
 		client.Netchan.FragSend();

@@ -516,6 +516,7 @@ public sealed partial class Client : GameObjectSystem<Client>
 		_lastUpdateSequence = _netchan.IncomingSequence;
 
 		ReadPackets();
+		UpdateSoundFade();
 
 		if ( _hostAbort )
 			return;

@@ -157,7 +157,7 @@ partial class Server
 		{
 			_freeTime[index] = (float)Time;
 
-			Log.Info( $"Can't create entity: {className}" );
+			Con.DPrintf( $"Can't create entity: {className}\n" );
 			return null;
 		}
 
@@ -199,7 +199,7 @@ partial class Server
 		var type = LinkEntityToClassAttribute.Find( className );
 		if ( type is null )
 		{
-			Log.Info( $"Can't init {className}" );
+			Con.DPrintf( $"Can't init {className}\n" );
 			return null;
 		}
 
@@ -281,7 +281,7 @@ partial class Server
 			}
 		}
 
-		Log.Info( $"{inhibited} entities inhibited" );
+		Con.DPrintf( $"{inhibited} entities inhibited\n" );
 	}
 
 	private Edict ParseEdict( string data, ref int position, int index, bool world )

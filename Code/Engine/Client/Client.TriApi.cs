@@ -203,19 +203,19 @@ partial class Client
 	{
 		if ( sprite is null )
 		{
-			Log.Info( "Sprite:  no pSprite!!!\n" );
+			Con.Printf( "Sprite:  no pSprite!!!\n" );
 			return false;
 		}
 
 		if ( sprite.Frames.Length == 0 )
 		{
-			Log.Info( "Sprite:  pSprite has no frames!!!\n" );
+			Con.Printf( "Sprite:  pSprite has no frames!!!\n" );
 			return false;
 		}
 
 		if ( frame >= sprite.Frames.Length || frame < 0 )
 		{
-			Log.Trace( $"Sprite: no such frame {frame}\n" );
+			Con.DPrintf( $"Sprite: no such frame {frame}\n" );
 			frame = 0;
 		}
 

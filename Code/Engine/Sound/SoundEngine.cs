@@ -214,7 +214,7 @@ public sealed partial class SoundEngine
 
 		if ( entChannel == ChannelStream && pitch != 100 )
 		{
-			Log.Info( $"Warning: pitch shift ignored on stream sound {sfx.Name}" );
+			Con.DPrintf( $"Warning: pitch shift ignored on stream sound {sfx.Name}\n" );
 			pitch = 100;
 		}
 
@@ -222,7 +222,7 @@ public sealed partial class SoundEngine
 
 		if ( vol > 255 )
 		{
-			Log.Info( $"{caller}: {sfx.Name} volume > 255" );
+			Con.Printf( $"{caller}: {sfx.Name} volume > 255" );
 			vol = 255;
 		}
 
@@ -231,7 +231,7 @@ public sealed partial class SoundEngine
 
 		if ( pitch == 0 )
 		{
-			Log.Info( $"Warning: {caller} Ignored, called with pitch 0" );
+			Con.Printf( $"Warning: {caller} Ignored, called with pitch 0" );
 			return false;
 		}
 
@@ -363,7 +363,7 @@ public sealed partial class SoundEngine
 		{
 			if ( _totalChannels == MaxChannels )
 			{
-				Log.Info( "total_channels == MAX_CHANNELS" );
+				Con.DPrintf( "total_channels == MAX_CHANNELS\n" );
 				return;
 			}
 
@@ -642,11 +642,11 @@ public sealed partial class SoundEngine
 			if ( channel.Sfx is null || (channel.LeftVol == 0 && channel.RightVol == 0) )
 				continue;
 
-			Log.Info( $"{channel.LeftVol,3} {channel.RightVol,3} {channel.Sfx.Name}" );
+			Con.Printf( $"{channel.LeftVol,3} {channel.RightVol,3} {channel.Sfx.Name}\n" );
 			total++;
 		}
 
-		Log.Info( $"----({total})----" );
+		Con.Printf( $"----({total})----\n" );
 	}
 
 	private void MoveMouth( SfxChannel channel )

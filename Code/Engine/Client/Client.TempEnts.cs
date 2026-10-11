@@ -158,13 +158,13 @@ partial class Client
 	{
 		if ( _freeTempEntities is not { } temp )
 		{
-			Log.Trace( $"Overflow {MaxTempEntities} temporary ents!\n" );
+			Con.DPrintf( $"Overflow {MaxTempEntities} temporary ents!\n" );
 			return null;
 		}
 
 		if ( model is null )
 		{
-			Log.Info( "efx.CL_TempEntAlloc: No model" );
+			Con.DPrintf( "efx.CL_TempEntAlloc: No model\n" );
 			return null;
 		}
 
@@ -183,7 +183,7 @@ partial class Client
 	{
 		if ( _freeTempEntities is not { } temp )
 		{
-			Log.Trace( $"Overflow {MaxTempEntities} temporary ents!\n" );
+			Con.DPrintf( $"Overflow {MaxTempEntities} temporary ents!\n" );
 			return null;
 		}
 
@@ -206,7 +206,7 @@ partial class Client
 
 		if ( GetModelByIndex( modelIndex ) is not { } model )
 		{
-			Log.Trace( $"No model {modelIndex}!" );
+			Con.Printf( $"No model {modelIndex}!\n" );
 			return null;
 		}
 

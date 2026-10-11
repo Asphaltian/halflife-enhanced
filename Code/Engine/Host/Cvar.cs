@@ -76,7 +76,7 @@ public static class Cvar
 
 		if ( ConsoleSystem.GetValue( name ) is null )
 		{
-			Log.Trace( $"Cvar_Set: variable {name} not found" );
+			Con.DPrintf( $"Cvar_Set: variable {name} not found\n" );
 			return;
 		}
 

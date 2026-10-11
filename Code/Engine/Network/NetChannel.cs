@@ -196,7 +196,7 @@ public sealed class NetChannel
 
 		if ( _reliableLength != 0 )
 		{
-			Log.Trace( $"Netchan_Clear() : reliable length not 0, reliable_sequence: {_reliableLength}, incoming_reliable_acknowledged: {IncomingReliableAcknowledged}\n" );
+			Con.DPrintf( $"Netchan_Clear() : reliable length not 0, reliable_sequence: {_reliableLength}, incoming_reliable_acknowledged: {IncomingReliableAcknowledged}\n" );
 
 			_reliableLength = 0;
 			ReliableSequence ^= 1;
@@ -323,7 +323,7 @@ public sealed class NetChannel
 
 		if ( Message.Overflowed )
 		{
-			Log.Info( $"{Address}:Outgoing message overflow\n" );
+			Con.Printf( $"{Address}:Outgoing message overflow\n" );
 			return;
 		}
 
@@ -441,7 +441,7 @@ public sealed class NetChannel
 		var length = data?.CurSize ?? 0;
 
 		if ( (resending ? MaxRoutablePacket : send.MaxSize) - send.CurSize < length )
-			Log.Trace( "Netchan_Transmit:  Unreliable would overfow, ignoring\n" );
+			Con.DPrintf( "Netchan_Transmit:  Unreliable would overfow, ignoring\n" );
 		else if ( data is not null )
 			send.Write( data );
 
@@ -502,7 +502,7 @@ public sealed class NetChannel
 			if ( FragmentId( buffer ) == count || !_client )
 				continue;
 
-			Log.Info( "Netchan_CheckForCompletion:  Lost/dropped fragment would cause stall, retrying connection\n" );
+			Con.Printf( "Netchan_CheckForCompletion:  Lost/dropped fragment would cause stall, retrying connection\n" );
 
 			Cmd.AddText( "retry\n" );
 		}
@@ -640,7 +640,7 @@ public sealed class NetChannel
 
 		if ( list.Count == 0 )
 		{
-			Log.Info( "Netchan_CopyFileFragments:  Called with no fragments readied\n" );
+			Con.Printf( "Netchan_CopyFileFragments:  Called with no fragments readied\n" );
 
 			_incomingReady[FileStream] = false;
 
@@ -667,7 +667,7 @@ public sealed class NetChannel
 
 		if ( !Application.IsDedicatedServer && !serverActive && Client.AllowDownload == 0f )
 		{
-			Log.Info( "File fragment received but cl_allow_download set to 0, ignoring\n" );
+			Con.Printf( "File fragment received but cl_allow_download set to 0, ignoring\n" );
 			FlushIncoming( FileStream );
 
 			return false;
@@ -675,7 +675,7 @@ public sealed class NetChannel
 
 		if ( fileName.Length < 1 )
 		{
-			Log.Info( "File fragment received with no filename\nFlushing input queue\n" );
+			Con.Printf( "File fragment received with no filename\nFlushing input queue\n" );
 			FlushIncoming( FileStream );
 
 			return false;
@@ -683,7 +683,7 @@ public sealed class NetChannel
 
 		if ( fileName.Contains( ".." ) )
 		{
-			Log.Info( "File fragment received with relative path, ignoring\n" );
+			Con.Printf( "File fragment received with relative path, ignoring\n" );
 			FlushIncoming( FileStream );
 
 			return false;
@@ -691,7 +691,7 @@ public sealed class NetChannel
 
 		if ( fileName[0] != '!' && !Server.IsSafeFileToDownload( fileName ) )
 		{
-			Log.Info( "File fragment received with bad path, ignoring\n" );
+			Con.Printf( "File fragment received with bad path, ignoring\n" );
 			FlushIncoming( FileStream );
 
 			return false;
@@ -699,7 +699,7 @@ public sealed class NetChannel
 
 		if ( serverActive && fileName[0] != '!' )
 		{
-			Log.Info( "File fragment received with bad path, ignoring (2)\n" );
+			Con.Printf( "File fragment received with bad path, ignoring (2)\n" );
 			FlushIncoming( FileStream );
 
 			return false;
@@ -709,7 +709,7 @@ public sealed class NetChannel
 
 		if ( fileName[0] != '!' && Server.FileExists( fileName ) )
 		{
-			Log.Info( $"Can't download {fileName}, already exists\n" );
+			Con.Printf( $"Can't download {fileName}, already exists\n" );
 			FlushIncoming( FileStream );
 
 			return true;
@@ -739,13 +739,13 @@ public sealed class NetChannel
 		if ( fileName[0] == '!' )
 		{
 			if ( TempBuffer is not null )
-				Log.Trace( "Netchan_CopyFragments:  Freeing holdover tempbuffer\n" );
+				Con.DPrintf( "Netchan_CopyFragments:  Freeing holdover tempbuffer\n" );
 
 			TempBuffer = data;
 		}
 		else
 		{
-			Log.Trace( $"COM_WriteFile: {fileName}\n" );
+			Con.DPrintf( $"COM_WriteFile: {fileName}\n" );
 
 			Server.WriteFile( fileName, data );
 		}
@@ -764,7 +764,7 @@ public sealed class NetChannel
 
 		if ( list.Count == 0 )
 		{
-			Log.Info( "Netchan_CopyNormalFragments:  Called with no fragments readied\n" );
+			Con.Printf( "Netchan_CopyNormalFragments:  Called with no fragments readied\n" );
 
 			_incomingReady[NormalStream] = false;
 

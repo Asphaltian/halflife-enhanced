@@ -55,7 +55,7 @@ partial class Server
 
 		if ( edict.Solid == Solid.Bsp && GetModel( edict.ModelIndex ) is null && string.IsNullOrEmpty( edict.ModelName ) )
 		{
-			Log.Info( $"Inserted {edict.ClassName} with no model" );
+			Con.DPrintf( $"Inserted {edict.ClassName} with no model\n" );
 			return;
 		}
 

@@ -238,7 +238,7 @@ public sealed class TeamFortressViewport : Panel
 
 		if ( file is null )
 		{
-			Log.Info( $"Unable to open {menuFile}\n" );
+			Con.DPrintf( $"Unable to open {menuFile}\n" );
 			SetCurrentCommandMenu( null );
 
 			return newIndex;
@@ -268,7 +268,7 @@ public sealed class TeamFortressViewport : Panel
 
 				if ( _currentCommandMenu is null )
 				{
-					Log.Info( $"Error in {menuFile} file after '{lastButtonText}'.\n" );
+					Con.Printf( $"Error in {menuFile} file after '{lastButtonText}'.\n" );
 
 					_initialized = false;
 
@@ -372,7 +372,7 @@ public sealed class TeamFortressViewport : Panel
 				{
 					if ( _numMenus >= MaxMenus )
 					{
-						Log.Info( $"Too many menus in {menuFile} past '{lastButtonText}'\n" );
+						Con.Printf( $"Too many menus in {menuFile} past '{lastButtonText}'\n" );
 					}
 					else
 					{

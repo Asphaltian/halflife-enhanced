@@ -30,7 +30,7 @@ partial class PlayerMovement
 		trace.DeltaVelocity = impactVelocity;
 
 		if ( _pmove.TouchIndex.Count >= PlayerMove.MaxPhysEnts )
-			Log.Trace( "Too many entities were touched!" );
+			Con.DPrintf( "Too many entities were touched!\n" );
 
 		_pmove.TouchIndex.Add( trace );
 		return true;
@@ -44,24 +44,24 @@ partial class PlayerMovement
 		{
 			if ( !float.IsFinite( _pmove.Velocity[i] ) )
 			{
-				Log.Info( $"PM  Got a NaN velocity {i}" );
+				Con.Printf( $"PM  Got a NaN velocity {i}\n" );
 				_pmove.Velocity[i] = 0f;
 			}
 
 			if ( !float.IsFinite( _pmove.Origin[i] ) )
 			{
-				Log.Info( $"PM  Got a NaN origin on {i}" );
+				Con.Printf( $"PM  Got a NaN origin on {i}\n" );
 				_pmove.Origin[i] = 0f;
 			}
 
 			if ( _pmove.Velocity[i] > maxVelocity )
 			{
-				Log.Trace( $"PM  Got a velocity too high on {i}" );
+				Con.DPrintf( $"PM  Got a velocity too high on {i}\n" );
 				_pmove.Velocity[i] = maxVelocity;
 			}
 			else if ( _pmove.Velocity[i] < -maxVelocity )
 			{
-				Log.Trace( $"PM  Got a velocity too low on {i}" );
+				Con.DPrintf( $"PM  Got a velocity too low on {i}\n" );
 				_pmove.Velocity[i] = -maxVelocity;
 			}
 		}

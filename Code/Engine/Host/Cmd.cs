@@ -15,6 +15,7 @@ public static class Cmd
 		"_sethdmodels", "_setaddons_folder", "kill", "motd", "motd_write", "writecfg", "bind", "unbind", "unbindall"
 	];
 
+	private static readonly string[] DispatchedCommands = ["+voicerecord", "-voicerecord", "exec", "version", "status", "kick", "disconnect", "connect", "reconnect", "quit", "soundlist"];
 	private static readonly string[] FilteredCommands = ["removedemo", "cd", "say", "setinfo", "timerefresh"];
 	private static readonly string[] PrivilegedCvars = ["sv_logsecret", "rcon_address", "rcon_port", "cl_filterstuffcmd", "rcon_password"];
 	private static readonly string[] FilteredCvars = ["sys_ticrate", "fps_max", "developer", "rate", "ex_interp", "volume", "MP3Volume", "speak_enabled", "voice_enable"];
@@ -116,6 +117,26 @@ public static class Cmd
 		}
 	}
 
+	public static bool IsPrivilegedCvar( string name ) => Contains( PrivilegedCvars, name );
+
+	public static List<string> CommandNames()
+	{
+		if ( _members is null )
+			LoadConsoleMembers();
+
+		var names = new List<string>( _commands );
+
+		foreach ( var name in DispatchedCommands )
+		{
+			if ( !_commands.Contains( name ) )
+				names.Add( name );
+		}
+
+		names.Sort( StringComparer.OrdinalIgnoreCase );
+
+		return names;
+	}
+
 	private static bool IsConsoleMember( string name )
 	{
 		if ( _members is null )
@@ -155,14 +176,14 @@ public static class Cmd
 
 		if ( Contains( PrivilegedCommands, name ) || (filter && Contains( FilteredCommands, name )) || (prefixed && command) )
 		{
-			Log.Info( $"Could not execute privileged command {text}\n" );
+			Con.Printf( $"Could not execute privileged command {text}\n" );
 
 			return true;
 		}
 
 		if ( Contains( PrivilegedCvars, name ) || (filter && Contains( FilteredCvars, name )) || (prefixed && !command) )
 		{
-			Log.Info( $"{name} is a privileged variable\n" );
+			Con.Printf( $"{name} is a privileged variable\n" );
 
 			return true;
 		}
@@ -239,7 +260,7 @@ public static class Cmd
 		if ( Argv( 0 ).Equals( "voice_loopback", StringComparison.OrdinalIgnoreCase ) )
 		{
 			if ( Argc == 1 )
-				Log.Info( $"\"voice_loopback\" is \"{Cvar.GetString( "voice_loopback" )}\"" );
+				Con.Printf( $"\"voice_loopback\" is \"{Cvar.GetString( "voice_loopback" )}\"\n" );
 			else
 				Cvar.Set( "voice_loopback", Argv( 1 ) );
 
@@ -249,7 +270,7 @@ public static class Cmd
 		if ( Argv( 0 ).Equals( "hostname", StringComparison.OrdinalIgnoreCase ) )
 		{
 			if ( Argc == 1 )
-				Log.Info( $"\"hostname\" is \"{Cvar.GetString( "hostname" )}\"" );
+				Con.Printf( $"\"hostname\" is \"{Cvar.GetString( "hostname" )}\"\n" );
 			else
 				Cvar.Set( "hostname", Argv( 1 ) );
 
@@ -407,7 +428,7 @@ public static class Cmd
 		if ( Client.Current is not { CanForwardToServer: true } client )
 		{
 			if ( !Argv( 0 ).Equals( "setinfo", StringComparison.OrdinalIgnoreCase ) )
-				Log.Info( $"Can't \"{Argv( 0 )}\", not connected" );
+				Con.Printf( $"Can't \"{Argv( 0 )}\", not connected\n" );
 
 			return;
 		}
@@ -455,10 +476,10 @@ public static class Cmd
 	{
 		if ( arguments.Length == 0 )
 		{
-			Log.Info( "Current alias commands:" );
+			Con.Printf( "Current alias commands:\n" );
 
 			foreach ( var (name, value) in _aliases )
-				Log.Info( $"{name} : {value}" );
+				Con.Printf( $"{name} : {value}\n" );
 
 			return;
 		}
@@ -467,13 +488,13 @@ public static class Cmd
 
 		if ( alias.Length > 31 )
 		{
-			Log.Info( "Alias name is too long" );
+			Con.Printf( "Alias name is too long\n" );
 			return;
 		}
 
 		if ( ConsoleSystem.GetValue( alias ) is not null || alias.Equals( "_special", StringComparison.OrdinalIgnoreCase ) || alias.Equals( "special", StringComparison.OrdinalIgnoreCase ) )
 		{
-			Log.Info( "Alias name is invalid" );
+			Con.Printf( "Alias name is invalid\n" );
 			return;
 		}
 
@@ -500,7 +521,7 @@ public static class Cmd
 	{
 		if ( Argc != 2 )
 		{
-			Log.Info( "exec <filename> : execute a script file" );
+			Con.Printf( "exec <filename> : execute a script file\n" );
 			return;
 		}
 
@@ -508,13 +529,13 @@ public static class Cmd
 
 		if ( fileName.Contains( '\\' ) || fileName.Contains( ':' ) || fileName.Contains( '~' ) || fileName.Contains( ".." ) || fileName.StartsWith( '/' ) )
 		{
-			Log.Info( $"exec {fileName}: invalid path." );
+			Con.Printf( $"exec {fileName}: invalid path.\n" );
 			return;
 		}
 
 		if ( fileName.IndexOf( '.' ) != fileName.LastIndexOf( '.' ) )
 		{
-			Log.Info( $"exec {fileName}: invalid filename." );
+			Con.Printf( $"exec {fileName}: invalid filename.\n" );
 			return;
 		}
 
@@ -522,19 +543,19 @@ public static class Cmd
 
 		if ( extension != ".cfg" && extension != ".rc" )
 		{
-			Log.Info( $"exec {fileName}: not a .cfg or .rc file" );
+			Con.Printf( $"exec {fileName}: not a .cfg or .rc file\n" );
 			return;
 		}
 
 		if ( Server.LoadMountText( fileName ) is not { } file )
 		{
 			if ( !Array.Exists( SilentConfigs, fileName.Contains ) )
-				Log.Info( $"couldn't exec {fileName}" );
+				Con.Printf( $"couldn't exec {fileName}\n" );
 
 			return;
 		}
 
-		Log.Info( $"execing {fileName}" );
+		Con.DPrintf( $"execing {fileName}\n" );
 
 		InsertText( $"\n{file}\n" );
 	}

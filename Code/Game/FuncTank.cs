@@ -237,7 +237,7 @@ public class FuncTank : BaseEntity
 		if ( !string.IsNullOrEmpty( _master ) && !IsMasterTriggered( _master, controller ) )
 			return false;
 
-		Util.Alert( AlertType.Console, "using TANK!" );
+		Util.Alert( AlertType.Console, "using TANK!\n" );
 
 		_controller = controller;
 
@@ -263,7 +263,7 @@ public class FuncTank : BaseEntity
 
 		_controller.ActiveItem?.Deploy();
 
-		Util.Alert( AlertType.Console, "stopped using TANK" );
+		Util.Alert( AlertType.Console, "stopped using TANK\n" );
 
 		_controller.HideHud &= ~Player.HideHudWeapons;
 
@@ -625,7 +625,7 @@ public class FuncTankLaser : FuncTank
 		if ( GetLaser() is null )
 		{
 			Remove();
-			Util.Alert( AlertType.Error, "Laser tank with no env_laser!" );
+			Util.Alert( AlertType.Error, "Laser tank with no env_laser!\n" );
 			return;
 		}
 
@@ -793,7 +793,7 @@ public class FuncTankControls : BaseEntity
 
 		if ( target is null )
 		{
-			Util.Alert( AlertType.Console, $"No tank {Target}" );
+			Util.Alert( AlertType.Console, $"No tank {Target}\n" );
 			return;
 		}
 

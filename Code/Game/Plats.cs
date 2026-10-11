@@ -133,7 +133,7 @@ public class FuncPlat : BasePlatTrain
 
 	public override void Blocked( BaseEntity other )
 	{
-		Util.Alert( AlertType.AiConsole, $"{ClassName} Blocked by {other.ClassName}" );
+		Util.Alert( AlertType.AiConsole, $"{ClassName} Blocked by {other.ClassName}\n" );
 
 		other.TakeDamage( this, this, 1f, DamageCrush );
 
@@ -556,7 +556,7 @@ public class FuncTrain : BasePlatTrain
 		if ( _currentTarget is not null && _currentTarget.Speed != 0f )
 		{
 			Speed = _currentTarget.Speed;
-			Util.Alert( AlertType.AiConsole, $"Train {TargetName} speed to {Speed,4:F2}" );
+			Util.Alert( AlertType.AiConsole, $"Train {TargetName} speed to {Speed,4:F2}\n" );
 		}
 
 		_currentTarget = target;
@@ -776,7 +776,7 @@ public class FuncTrackTrain : BaseEntity
 
 		Speed = _speed * delta;
 		Next();
-		Util.Alert( AlertType.AiConsole, $"TRAIN({TargetName}), speed to {Speed:F2}" );
+		Util.Alert( AlertType.AiConsole, $"TRAIN({TargetName}), speed to {Speed:F2}\n" );
 	}
 
 	public override void OverrideReset()
@@ -872,14 +872,14 @@ public class FuncTrackTrain : BaseEntity
 
 		if ( Speed == 0f )
 		{
-			Util.Alert( AlertType.AiConsole, $"TRAIN({TargetName}): Speed is 0" );
+			Util.Alert( AlertType.AiConsole, $"TRAIN({TargetName}): Speed is 0\n" );
 			StopSound();
 			return;
 		}
 
 		if ( Path is null )
 		{
-			Util.Alert( AlertType.AiConsole, $"TRAIN({TargetName}): Lost path" );
+			Util.Alert( AlertType.AiConsole, $"TRAIN({TargetName}): Lost path\n" );
 			StopSound();
 			return;
 		}
@@ -950,7 +950,7 @@ public class FuncTrackTrain : BaseEntity
 				if ( (SpawnFlags & SpawnFlagNoControl) != 0 && fire.Speed != 0f )
 				{
 					Speed = fire.Speed;
-					Util.Alert( AlertType.AiConsole, $"TrackTrain {TargetName} speed to {Speed,4:F2}" );
+					Util.Alert( AlertType.AiConsole, $"TrackTrain {TargetName} speed to {Speed,4:F2}\n" );
 				}
 			}
 
@@ -1005,7 +1005,7 @@ public class FuncTrackTrain : BaseEntity
 
 		if ( nearest is null )
 		{
-			Util.Alert( AlertType.Console, "Can't find a nearby track !!!" );
+			Util.Alert( AlertType.Console, "Can't find a nearby track !!!\n" );
 			SetThink( null );
 			return;
 		}
@@ -1050,14 +1050,14 @@ public class FuncTrackTrain : BaseEntity
 
 		if ( track is not null )
 		{
-			Util.Alert( AlertType.AiConsole, $"at {track.TargetName}" );
+			Util.Alert( AlertType.AiConsole, $"at {track.TargetName}\n" );
 
 			if ( track.NetName is not null )
 				FireTargets( track.NetName, this, this, UseType.Toggle, 0f );
 		}
 		else
 		{
-			Util.Alert( AlertType.AiConsole, "" );
+			Util.Alert( AlertType.AiConsole, "\n" );
 		}
 	}
 
@@ -1140,7 +1140,7 @@ public class FuncTrainControls : BaseEntity
 
 		if ( target is null )
 		{
-			Util.Alert( AlertType.Console, $"No train {Target}" );
+			Util.Alert( AlertType.Console, $"No train {Target}\n" );
 			return;
 		}
 
@@ -1401,7 +1401,7 @@ public class FuncTrackChange : FuncPlatRot
 	{
 		if ( Server.FindEntityByString( null, "targetname", TrackTopName ) is not { } top )
 		{
-			Util.Alert( AlertType.Error, $"Can't find top track for track change! {TrackTopName}" );
+			Util.Alert( AlertType.Error, $"Can't find top track for track change! {TrackTopName}\n" );
 			return;
 		}
 
@@ -1409,7 +1409,7 @@ public class FuncTrackChange : FuncPlatRot
 
 		if ( Server.FindEntityByString( null, "targetname", TrackBottomName ) is not { } bottom )
 		{
-			Util.Alert( AlertType.Error, $"Can't find bottom track for track change! {TrackBottomName}" );
+			Util.Alert( AlertType.Error, $"Can't find bottom track for track change! {TrackBottomName}\n" );
 			return;
 		}
 
@@ -1419,7 +1419,7 @@ public class FuncTrackChange : FuncPlatRot
 
 		if ( Train is null )
 		{
-			Util.Alert( AlertType.Error, $"Can't find train for track change! {TrainName}" );
+			Util.Alert( AlertType.Error, $"Can't find train for track change! {TrainName}\n" );
 			return;
 		}
 

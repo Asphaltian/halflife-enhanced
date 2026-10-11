@@ -508,7 +508,7 @@ public class AGrunt : SquadMonster
 				}
 				else
 				{
-					Util.Alert( AlertType.AiConsole, "AGruntGetPathToEnemyCorpse failed!!" );
+					Util.Alert( AlertType.AiConsole, "AGruntGetPathToEnemyCorpse failed!!\n" );
 					TaskFail();
 				}
 
@@ -517,7 +517,7 @@ public class AGrunt : SquadMonster
 			case AGruntTask.SetupHideAttack:
 				if ( EnemyEntity is not BaseMonster )
 				{
-					Util.Alert( AlertType.AiConsole, "AGRunt - no enemy monster ptr!!!" );
+					Util.Alert( AlertType.AiConsole, "AGRunt - no enemy monster ptr!!!\n" );
 					TaskFail();
 					break;
 				}

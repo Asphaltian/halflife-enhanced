@@ -100,8 +100,8 @@ partial class Server
 
 		if ( Cmd.Argc < 3 || Cmd.Argc > 8 )
 		{
-			Log.Info( "Usage:  banid <minutes> <uniqueid or #userid> { kick }\n" );
-			Log.Info( "Use 0 minutes for permanent\n" );
+			Con.Printf( "Usage:  banid <minutes> <uniqueid or #userid> { kick }\n" );
+			Con.Printf( "Use 0 minutes for permanent\n" );
 			return;
 		}
 
@@ -124,7 +124,7 @@ partial class Server
 			{
 				if ( Cmd.Argc < 3 )
 				{
-					Log.Info( "Insufficient arguments to banid\n" );
+					Con.Printf( "Insufficient arguments to banid\n" );
 					return;
 				}
 
@@ -152,7 +152,7 @@ partial class Server
 
 			if ( found is null )
 			{
-				Log.Info( $"SV_BanId_f:  Couldn't find #userid {(uint)userId}\n" );
+				Con.Printf( $"SV_BanId_f:  Couldn't find #userid {(uint)userId}\n" );
 				return;
 			}
 
@@ -196,7 +196,7 @@ partial class Server
 		{
 			if ( _userFilters.Count >= MaxUserFilters )
 			{
-				Log.Info( "SV_BanId_f:  User filter list is full\n" );
+				Con.Printf( "SV_BanId_f:  User filter list is full\n" );
 				return;
 			}
 
@@ -252,7 +252,7 @@ partial class Server
 
 		if ( Cmd.Argc != 2 && Cmd.Argc != 6 )
 		{
-			Log.Info( "Usage:  removeid <uniqueid | #slotnumber>\n" );
+			Con.Printf( "Usage:  removeid <uniqueid | #slotnumber>\n" );
 			return;
 		}
 
@@ -260,7 +260,7 @@ partial class Server
 
 		if ( idString.Length == 0 )
 		{
-			Log.Info( "SV_RemoveId_f:  Id string is empty!\n" );
+			Con.Printf( "SV_RemoveId_f:  Id string is empty!\n" );
 			return;
 		}
 
@@ -270,7 +270,7 @@ partial class Server
 
 			if ( slot <= 0 || slot > _userFilters.Count )
 			{
-				Log.Info( $"SV_RemoveId_f:  invalid slot #{slot}\n" );
+				Con.Printf( $"SV_RemoveId_f:  invalid slot #{slot}\n" );
 				return;
 			}
 
@@ -278,7 +278,7 @@ partial class Server
 
 			_userFilters.RemoveAt( slot - 1 );
 
-			Log.Info( $"UserID filter removed for {idString}, id {FilterIdString( removed.IdType, removed.SteamId )}\n" );
+			Con.Printf( $"UserID filter removed for {idString}, id {FilterIdString( removed.IdType, removed.SteamId )}\n" );
 
 			return;
 		}
@@ -293,12 +293,12 @@ partial class Server
 
 			_userFilters.RemoveAt( i );
 
-			Log.Info( $"UserID filter removed for {idString}\n" );
+			Con.Printf( $"UserID filter removed for {idString}\n" );
 
 			return;
 		}
 
-		Log.Info( $"removeid: couldn't find {idString}\n" );
+		Con.Printf( $"removeid: couldn't find {idString}\n" );
 	}
 
 	[ConCmd( "listid" )]
@@ -306,11 +306,11 @@ partial class Server
 	{
 		if ( _userFilters.Count < 1 )
 		{
-			Log.Info( "UserID filter list: empty\n" );
+			Con.Printf( "UserID filter list: empty\n" );
 			return;
 		}
 
-		Log.Info( $"UserID filter list: {_userFilters.Count} entries\n" );
+		Con.Printf( $"UserID filter list: {_userFilters.Count} entries\n" );
 
 		for ( var i = 0; i < _userFilters.Count; i++ )
 		{
@@ -318,9 +318,9 @@ partial class Server
 			var id = FilterIdString( filter.IdType, filter.SteamId );
 
 			if ( filter.BanTime == 0f )
-				Log.Info( $"{i + 1} {id} : permanent\n" );
+				Con.Printf( $"{i + 1} {id} : permanent\n" );
 			else
-				Log.Info( $"{i + 1} {id} : {filter.BanTime.ToString( "F3", CultureInfo.InvariantCulture )} min\n" );
+				Con.Printf( $"{i + 1} {id} : {filter.BanTime.ToString( "F3", CultureInfo.InvariantCulture )} min\n" );
 		}
 	}
 
@@ -331,13 +331,13 @@ partial class Server
 
 		if ( string.IsNullOrEmpty( name ) )
 		{
-			Log.Info( "Couldn't open banned config file, no file name specified.\n" );
+			Con.Printf( "Couldn't open banned config file, no file name specified.\n" );
 			return;
 		}
 
 		if ( name[0] == '/' || name.Contains( ':' ) || name.Contains( ".." ) || name.Contains( '\\' ) )
 		{
-			Log.Info( $"Couldn't open {name} (contains illegal characters).\n" );
+			Con.Printf( $"Couldn't open {name} (contains illegal characters).\n" );
 			return;
 		}
 
@@ -349,11 +349,11 @@ partial class Server
 
 		if ( System.IO.Path.GetExtension( name ) != ".cfg" )
 		{
-			Log.Info( $"Couldn't open {name} (wrong file extension, must be .cfg).\n" );
+			Con.Printf( $"Couldn't open {name} (wrong file extension, must be .cfg).\n" );
 			return;
 		}
 
-		Log.Info( $"Writing {name}.\n" );
+		Con.Printf( $"Writing {name}.\n" );
 
 		var text = new StringBuilder();
 

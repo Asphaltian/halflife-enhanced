@@ -254,7 +254,7 @@ public class Controller : SquadMonster
 				}
 				else
 				{
-					Util.Alert( AlertType.AiConsole, "GetPathToEnemyLKP failed!!" );
+					Util.Alert( AlertType.AiConsole, "GetPathToEnemyLKP failed!!\n" );
 					TaskFail();
 				}
 
@@ -273,7 +273,7 @@ public class Controller : SquadMonster
 				}
 				else
 				{
-					Util.Alert( AlertType.AiConsole, "GetPathToEnemy failed!!" );
+					Util.Alert( AlertType.AiConsole, "GetPathToEnemy failed!!\n" );
 					TaskFail();
 				}
 
@@ -504,7 +504,7 @@ public class Controller : SquadMonster
 
 		if ( RouteIsClear() )
 		{
-			Util.Alert( AlertType.AiConsole, "Tried to move with no route!" );
+			Util.Alert( AlertType.AiConsole, "Tried to move with no route!\n" );
 			TaskFail();
 			return;
 		}
@@ -563,7 +563,7 @@ public class Controller : SquadMonster
 				}
 				else
 				{
-					Util.Alert( AlertType.AiConsole, "Couldn't Triangulate" );
+					Util.Alert( AlertType.AiConsole, "Couldn't Triangulate\n" );
 					Stop();
 
 					if ( MoveWaitTime > 0f )
@@ -574,7 +574,7 @@ public class Controller : SquadMonster
 					else
 					{
 						TaskFail();
-						Util.Alert( AlertType.AiConsole, "Failed to move!" );
+						Util.Alert( AlertType.AiConsole, "Failed to move!\n" );
 					}
 
 					return;

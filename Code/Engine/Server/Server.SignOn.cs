@@ -70,7 +70,7 @@ partial class Server
 			client.Message.WriteString( text );
 		}
 
-		Log.Trace( text );
+		Con.DPrintf( text );
 	}
 
 	[ConCmd( "dropclient" )]
@@ -115,20 +115,20 @@ partial class Server
 	{
 		if ( arguments.Length == 0 )
 		{
-			Log.Info( "Server info settings:\n" );
+			Con.Printf( "Server info settings:\n" );
 			Info.Print( _serverInfo );
 			return;
 		}
 
 		if ( arguments.Length != 2 )
 		{
-			Log.Info( "usage: serverinfo [ <key> <value> ]\n" );
+			Con.Printf( "usage: serverinfo [ <key> <value> ]\n" );
 			return;
 		}
 
 		if ( arguments[0].StartsWith( '*' ) )
 		{
-			Log.Info( "Star variables cannot be changed.\n" );
+			Con.Printf( "Star variables cannot be changed.\n" );
 			return;
 		}
 
@@ -299,13 +299,13 @@ partial class Server
 	{
 		if ( Cmd.Argc != 3 )
 		{
-			Log.Info( "spawn is not valid\n" );
+			Con.Printf( "spawn is not valid\n" );
 			return;
 		}
 
 		if ( !Cmd.FromClient )
 		{
-			Log.Info( "spawn is not valid from the console\n" );
+			Con.Printf( "spawn is not valid from the console\n" );
 			return;
 		}
 
@@ -313,7 +313,7 @@ partial class Server
 
 		if ( client.Spawned )
 		{
-			Log.Info( "spawn is not valid when already spawned\n" );
+			Con.Printf( "spawn is not valid when already spawned\n" );
 			return;
 		}
 
@@ -365,7 +365,7 @@ partial class Server
 		{
 			if ( client.Proxy )
 			{
-				Log.Info( "ERROR! Spectator mode doesn't work with saved game.\n" );
+				Con.Printf( "ERROR! Spectator mode doesn't work with saved game.\n" );
 				return;
 			}
 

@@ -46,7 +46,7 @@ partial class Server
 		if ( _eventDelta is not null )
 			return;
 
-		Log.Trace( "Initializing deltas\n" );
+		Con.DPrintf( "Initializing deltas\n" );
 
 		_deltas.Clear();
 

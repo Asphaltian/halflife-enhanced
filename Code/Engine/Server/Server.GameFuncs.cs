@@ -39,7 +39,7 @@ partial class Server
 		if ( type == AlertType.AiConsole && Host.Developer < 2f )
 			return;
 
-		Log.Info( type switch
+		Con.Printf( type switch
 		{
 			AlertType.Notice => $"NOTE:  {message}",
 			AlertType.Warning => $"WARNING:  {message}",
@@ -54,7 +54,7 @@ partial class Server
 
 		if ( index < 1 || index > MaxClients )
 		{
-			Log.Info( "tried to sprint to a non-client\n" );
+			Con.Printf( "tried to sprint to a non-client\n" );
 			return;
 		}
 
@@ -77,7 +77,7 @@ partial class Server
 				break;
 
 			default:
-				Log.Info( $"invalid PRINT_TYPE {(int)type}\n" );
+				Con.Printf( $"invalid PRINT_TYPE {(int)type}\n" );
 				break;
 		}
 	}

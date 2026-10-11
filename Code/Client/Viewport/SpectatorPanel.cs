@@ -92,7 +92,7 @@ public sealed class SpectatorPanel : Panel
 				break;
 
 			default:
-				Log.Info( $"Unknown SpectatorPanel ActionSingal {cmd}.\n" );
+				GoldSrc.Con.DPrintf( $"Unknown SpectatorPanel ActionSingal {cmd}.\n" );
 				break;
 		}
 	}

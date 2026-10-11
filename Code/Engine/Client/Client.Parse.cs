@@ -65,6 +65,13 @@ partial class Client
 	private const int FinaleMessage = 31;
 	private const int CutsceneMessage = 34;
 	private const int DecalNameMessage = 36;
+	private const int SoundFadeMessage = 48;
+	private const int SendCvarValueMessage = 57;
+	private const int SendCvarValue2Message = 58;
+	private const int CvarValueCommand = 10;
+	private const int CvarValue2Command = 11;
+	private const int MaxQueryCvarName = 255;
+	private const string ProtectedQueryCvar = "sv_downloadurl";
 
 	private const int IntermissionScoreboard = 1;
 	private const int IntermissionFinale = 2;
@@ -167,7 +174,7 @@ partial class Client
 	{
 		var total = 0;
 
-		Log.Info( "-------- Message Load ---------\n" );
+		Con.Printf( "-------- Message Load ---------\n" );
 
 		for ( var i = 0; i < UserMessageBucket; i++ )
 		{
@@ -176,13 +183,13 @@ partial class Client
 
 			var name = i < ServerMessageNames.Length ? ServerMessageNames[i] : "bogus #";
 
-			Log.Info( $"{i}:{name}: {_messageCounts[i]} msgs:{_messageBytes[i] * (1f / 1024f):F2}K\n" );
+			Con.Printf( $"{i}:{name}: {_messageCounts[i]} msgs:{_messageBytes[i] * (1f / 1024f):F2}K\n" );
 
 			total += _messageCounts[i];
 		}
 
-		Log.Info( $"User messages:  {_userMessageCount}:{_messageBytes[UserMessageBucket] * (1f / 1024f):F2}K\n" );
-		Log.Info( $"------ End:  {_userMessageCount + total} Total----\n" );
+		Con.Printf( $"User messages:  {_userMessageCount}:{_messageBytes[UserMessageBucket] * (1f / 1024f):F2}K\n" );
+		Con.Printf( $"------ End:  {_userMessageCount + total} Total----\n" );
 	}
 
 	[ConCmd( "cl_messages" )]
@@ -501,6 +508,38 @@ partial class Client
 					Cvar.SetValue( "room_type", message.ReadShort() );
 					break;
 
+				case SendCvarValueMessage:
+					{
+						var name = message.ReadString();
+
+						_netchan.Message.WriteByte( CvarValueCommand );
+						_netchan.Message.WriteString( QueryCvarValue( name ) );
+						break;
+					}
+
+				case SendCvarValue2Message:
+					{
+						var requestId = message.ReadLong();
+						var name = message.ReadString();
+
+						_netchan.Message.WriteByte( CvarValue2Command );
+						_netchan.Message.WriteLong( requestId );
+						_netchan.Message.WriteString( name );
+						_netchan.Message.WriteString( QueryCvarValue( name ) );
+						break;
+					}
+
+				case SoundFadeMessage:
+					{
+						var percent = message.ReadByte();
+						var holdTime = message.ReadByte();
+						var inTime = message.ReadByte();
+						var outTime = message.ReadByte();
+
+						SetSoundFade( percent, holdTime, outTime, inTime );
+						break;
+					}
+
 				case Server.CrosshairAngleMessage:
 					{
 						var pitch = (float)(message.ReadChar() * 0.2);
@@ -595,7 +634,7 @@ partial class Client
 
 		if ( entity >= _maxEdicts )
 		{
-			Log.Trace( $"CL_Parse_Sound: ent = {entity}, cl.max_edicts {_maxEdicts}\n" );
+			Con.DPrintf( $"CL_Parse_Sound: ent = {entity}, cl.max_edicts {_maxEdicts}\n" );
 			return;
 		}
 
@@ -652,6 +691,23 @@ partial class Client
 		_clientDll.DispatchUserMsg( new UserMessage( userMessage.Id, userMessage.Size, userMessage.Name ), _userMessageData.AsSpan( 0, Math.Max( size, 0 ) ).ToArray() );
 	}
 
+	private static string QueryCvarValue( string name )
+	{
+		if ( name.Length >= MaxQueryCvarName || !Cvar.Exists( name ) )
+			return "Bad CVAR request";
+
+		if ( Cmd.IsPrivilegedCvar( name ) )
+			return "CVAR is privileged";
+
+		if ( Host.IsServerCvar( name ) )
+			return "CVAR is server-only";
+
+		if ( name.Equals( ProtectedQueryCvar, StringComparison.OrdinalIgnoreCase ) )
+			return "CVAR is protected";
+
+		return Cvar.GetString( name );
+	}
+
 	private static void ParseVersion( MessageReader message )
 	{
 		var protocol = message.ReadLong();
@@ -664,7 +720,7 @@ partial class Client
 	{
 		message.ReadString();
 
-		Log.Info( "Server disconnected\n" );
+		Con.Printf( "Server disconnected\n" );
 	}
 
 	private void ParseUpdateUserInfo( MessageReader message )

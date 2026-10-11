@@ -145,7 +145,7 @@ public class Osprey : BaseMonster
 
 		if ( _units == 0 )
 		{
-			Util.Alert( AlertType.Console, "osprey error: no grunts to resupply" );
+			Util.Alert( AlertType.Console, "osprey error: no grunts to resupply\n" );
 			Remove();
 			return;
 		}

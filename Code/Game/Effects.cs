@@ -368,7 +368,7 @@ public class Beam : BaseEntity
 		if ( Owner is BaseEntity owner )
 			owner.Use( other, this, UseType.Toggle, 0f );
 
-		Util.Alert( AlertType.Console, "Firing targets!!!" );
+		Util.Alert( AlertType.Console, "Firing targets!!!\n" );
 	}
 
 	protected BaseEntity RandomTargetname( string name )
@@ -720,7 +720,7 @@ public class Lightning : Beam
 			else if ( RandomTargetname( _startEntity ) is { } source )
 				RandomPoint( source.Origin );
 			else
-				Util.Alert( AlertType.Console, $"env_beam: unknown entity \"{_startEntity}\"" );
+				Util.Alert( AlertType.Console, $"env_beam: unknown entity \"{_startEntity}\"\n" );
 
 			return;
 		}

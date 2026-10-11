@@ -64,7 +64,7 @@ partial class SoundEngine
 
 		if ( loader is null )
 		{
-			Log.Trace( $"S_LoadSound: Couldn't load {path}" );
+			Con.DPrintf( $"S_LoadSound: Couldn't load {path}\n" );
 			return false;
 		}
 
@@ -72,7 +72,7 @@ partial class SoundEngine
 
 		if ( file is null || !file.IsValid )
 		{
-			Log.Trace( $"Failed loading {name}" );
+			Con.DPrintf( $"Failed loading {name}\n" );
 			return false;
 		}
 
@@ -80,25 +80,25 @@ partial class SoundEngine
 
 		if ( !file.IsLoaded )
 		{
-			Log.Trace( $"Failed loading {name}" );
+			Con.DPrintf( $"Failed loading {name}\n" );
 			return false;
 		}
 
 		if ( file.Channels != 1 )
 		{
-			Log.Trace( $"{name} is a stereo sample" );
+			Con.DPrintf( $"{name} is a stereo sample\n" );
 			return false;
 		}
 
 		if ( sfx.Name[0] == '*' && file.BitsPerSample != 8 )
 		{
-			Log.Info( $"{name} is a 16 bit sample" );
+			Con.Printf( $"{name} is a 16 bit sample\n" );
 			return false;
 		}
 
 		if ( sfx.Name[0] == '*' && file.Rate != MixSpeed )
 		{
-			Log.Info( $"{name} ignored, not stored at playback sample rate!" );
+			Con.Printf( $"{name} ignored, not stored at playback sample rate!\n" );
 			return false;
 		}
 

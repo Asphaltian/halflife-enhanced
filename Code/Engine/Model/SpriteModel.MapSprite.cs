@@ -23,7 +23,7 @@ partial class SpriteModel
 
 		if ( data.Length < TgaHeaderSize + 2 )
 		{
-			Log.Info( "LoadTGA: file shorter than TGA file header length\n" );
+			Con.Printf( "LoadTGA: file shorter than TGA file header length\n" );
 			return null;
 		}
 
@@ -34,13 +34,13 @@ partial class SpriteModel
 
 		if ( imageType != 2 && imageType != 10 )
 		{
-			Log.Info( "LoadTGA: Only type 2 and 10 targa RGB images supported\n" );
+			Con.Printf( "LoadTGA: Only type 2 and 10 targa RGB images supported\n" );
 			return null;
 		}
 
 		if ( colorMapType != 0 || (pixelSize != 32 && pixelSize != 24) )
 		{
-			Log.Info( "Texture_LoadTGA: Only 32 or 24 bit images supported (no colormaps)\n" );
+			Con.Printf( "Texture_LoadTGA: Only 32 or 24 bit images supported (no colormaps)\n" );
 			return null;
 		}
 
@@ -51,7 +51,7 @@ partial class SpriteModel
 
 		if ( count * 4 > bufferSize )
 		{
-			Log.Info( $"LoadTGA: texture too large ({width}x{height}>256x256)\n" );
+			Con.Printf( $"LoadTGA: texture too large ({width}x{height}>256x256)\n" );
 			return null;
 		}
 
@@ -63,7 +63,7 @@ partial class SpriteModel
 		{
 			if ( position + (count * bytes) > data.Length )
 			{
-				Log.Info( "LoadTGA: file shorter than length of texture\n" );
+				Con.Printf( "LoadTGA: file shorter than length of texture\n" );
 				return null;
 			}
 
@@ -212,7 +212,7 @@ partial class SpriteModel
 
 			if ( pixels is null )
 			{
-				Log.Info( $"Couldn't open {fileName}\n" );
+				Con.Printf( $"Couldn't open {fileName}\n" );
 				return null;
 			}
 
@@ -229,13 +229,13 @@ partial class SpriteModel
 
 			if ( Server.ReadFile( name ) is not { } data )
 			{
-				Log.Info( $"Couldn't open {name}\n" );
+				Con.Printf( $"Couldn't open {name}\n" );
 				return null;
 			}
 
 			if ( !LoadBmp8( data, out var palette, out var indices, out width, out height ) )
 			{
-				Log.Info( $"Error loading {name}\n" );
+				Con.Printf( $"Error loading {name}\n" );
 				return null;
 			}
 
@@ -260,7 +260,7 @@ partial class SpriteModel
 
 		if ( width * height == 0 || width % MapTileSize != 0 || height % MapTileSize != 0 )
 		{
-			Log.Info( $"Wrong map image dimensions or file could not be loaded in {name}\n" );
+			Con.Printf( $"Wrong map image dimensions or file could not be loaded in {name}\n" );
 			return null;
 		}
 

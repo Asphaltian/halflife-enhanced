@@ -315,7 +315,7 @@ public partial class Player : BaseMonster
 		HackedGunPos = new Vector3( 0f, 32f, 0f );
 
 		if ( PlayerSound == SoundEnt.ListEmpty )
-			Util.Alert( AlertType.Console, "Couldn't alloc player sound slot!" );
+			Util.Alert( AlertType.Console, "Couldn't alloc player sound slot!\n" );
 
 		_noPlayerSound = false;
 
@@ -349,9 +349,9 @@ public partial class Player : BaseMonster
 		if ( graph.GraphPresent && !graph.GraphPointersSet )
 		{
 			if ( !graph.SetGraphPointers() )
-				Util.Alert( AlertType.Console, "**Graph pointers were not set!" );
+				Util.Alert( AlertType.Console, "**Graph pointers were not set!\n" );
 			else
-				Util.Alert( AlertType.Console, "**Graph Pointers Set!" );
+				Util.Alert( AlertType.Console, "**Graph Pointers Set!\n" );
 		}
 
 		GeigerRange = 1000f;
@@ -379,7 +379,7 @@ public partial class Player : BaseMonster
 
 		if ( !saveData.UseLandmark )
 		{
-			Util.Alert( AlertType.Console, $"No Landmark:{saveData.LandmarkName}" );
+			Util.Alert( AlertType.Console, $"No Landmark:{saveData.LandmarkName}\n" );
 
 			var spot = EntSelectSpawnPoint();
 

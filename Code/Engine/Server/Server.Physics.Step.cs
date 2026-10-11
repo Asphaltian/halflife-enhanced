@@ -47,7 +47,7 @@ partial class Server
 					continue;
 
 				if ( touch.Skin is < -100 or > 100 )
-					Log.Info( $"Invalid contents on trigger field: {touch.ClassName}" );
+					Con.DPrintf( $"Invalid contents on trigger field: {touch.ClassName}\n" );
 
 				var hull = HullForBsp( touch, Vector3.Zero, Vector3.Zero, out var offset );
 
@@ -149,24 +149,24 @@ partial class Server
 		{
 			if ( !float.IsFinite( velocity[i] ) )
 			{
-				Log.Info( $"Got a NaN velocity on {edict.ClassName}" );
+				Con.Printf( $"Got a NaN velocity on {edict.ClassName}\n" );
 				velocity[i] = 0f;
 			}
 
 			if ( !float.IsFinite( origin[i] ) )
 			{
-				Log.Info( $"Got a NaN origin on {edict.ClassName}" );
+				Con.Printf( $"Got a NaN origin on {edict.ClassName}\n" );
 				origin[i] = 0f;
 			}
 
 			if ( velocity[i] > maxVelocity )
 			{
-				Log.Trace( $"Got a velocity too high on {edict.ClassName}" );
+				Con.DPrintf( $"Got a velocity too high on {edict.ClassName}\n" );
 				velocity[i] = maxVelocity;
 			}
 			else if ( velocity[i] < -maxVelocity )
 			{
-				Log.Trace( $"Got a velocity too low on {edict.ClassName}" );
+				Con.DPrintf( $"Got a velocity too low on {edict.ClassName}\n" );
 				velocity[i] = -maxVelocity;
 			}
 		}

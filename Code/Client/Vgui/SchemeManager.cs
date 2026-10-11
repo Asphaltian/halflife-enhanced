@@ -82,7 +82,7 @@ public sealed class SchemeManager
 
 		if ( file is null )
 		{
-			Log.Trace( "Unable to find *_textscheme.txt\n" );
+			Con.DPrintf( "Unable to find *_textscheme.txt\n" );
 		}
 		else
 		{
@@ -105,9 +105,9 @@ public sealed class SchemeManager
 				if ( !token.Equals( "=", StringComparison.OrdinalIgnoreCase ) )
 				{
 					if ( scheme is null )
-						Log.Info( $"error parsing font scheme text file at file start - expected '=', found '{token}''\n" );
+						Con.Printf( $"error parsing font scheme text file at file start - expected '=', found '{token}''\n" );
 					else
-						Log.Info( $"error parsing font scheme text file at scheme '{scheme.SchemeName}' - expected '=', found '{token}''\n" );
+						Con.Printf( $"error parsing font scheme text file at scheme '{scheme.SchemeName}' - expected '=', found '{token}''\n" );
 
 					break;
 				}
@@ -153,7 +153,7 @@ public sealed class SchemeManager
 
 				if ( scheme is null )
 				{
-					Log.Info( "font scheme text file MUST start with a 'SchemeName'\n" );
+					Con.Printf( "font scheme text file MUST start with a 'SchemeName'\n" );
 					break;
 				}
 
@@ -246,7 +246,7 @@ public sealed class SchemeManager
 					fontData = Server.ReadFile( fontFileName.Replace( '\\', '/' ) );
 
 					if ( fontData is null )
-						Log.Info( $"Missing bitmap font: {fontFileName}\n" );
+						Con.Printf( $"Missing bitmap font: {fontFileName}\n" );
 				}
 
 				current.Font = new Font( current.FontName, fontData, current.FontSize, 0, 0f, current.FontWeight, false, false, false, false );

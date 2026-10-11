@@ -212,7 +212,7 @@ partial class Server
 			if ( (client.Active || client.Spawned) && GetEdict( client.EdictIndex ) is { } edict )
 				GameDll.ClientDisconnect( edict );
 
-			Log.Info( $"{address}:reconnect\n" );
+			Con.Printf( $"{address}:reconnect\n" );
 		}
 		else
 		{
@@ -264,7 +264,7 @@ partial class Server
 		client.NextMessageInterval = DefaultMessageInterval;
 		client.NextMessageTime = Host.RealTime + DefaultMessageInterval;
 
-		Log.Trace( loopback ? "Local connection.\n" : $"Client {name} connected\nAdr: {address}\n" );
+		Con.DPrintf( loopback ? "Local connection.\n" : $"Client {name} connected\nAdr: {address}\n" );
 
 		client.Active = false;
 		client.Spawned = false;
@@ -342,7 +342,7 @@ partial class Server
 			if ( client.Spawned && GetEdict( client.EdictIndex ) is { } edict )
 				GameDll.ClientDisconnect( edict );
 
-			Log.Trace( $"Dropped {client.Name} from server\nReason:  {reason}\n" );
+			Con.DPrintf( $"Dropped {client.Name} from server\nReason:  {reason}\n" );
 		}
 
 		client.Message.Clear();
@@ -483,14 +483,14 @@ partial class Server
 		if ( value.Length != 0 )
 			client.TopColor = Common.Atoi( value );
 		else
-			Log.Trace( $"topcolor unchanged for {client.Name}\n" );
+			Con.DPrintf( $"topcolor unchanged for {client.Name}\n" );
 
 		value = Info.ValueForKey( client.UserInfo, "bottomcolor" );
 
 		if ( value.Length != 0 )
 			client.BottomColor = Common.Atoi( value );
 		else
-			Log.Trace( $"bottomcolor unchanged for {client.Name}\n" );
+			Con.DPrintf( $"bottomcolor unchanged for {client.Name}\n" );
 
 		value = Info.ValueForKey( client.UserInfo, "cl_updaterate" );
 
@@ -563,7 +563,7 @@ partial class Server
 			if ( client.Datagram.CurSize + _datagram.CurSize < client.Datagram.MaxSize )
 				client.Datagram.Write( _datagram );
 			else
-				Log.Trace( $"Warning:  Ignoring unreliable datagram for {client.Name}, would overflow\n" );
+				Con.DPrintf( $"Warning:  Ignoring unreliable datagram for {client.Name}, would overflow\n" );
 
 			if ( client.Proxy && client.Datagram.CurSize + _spectator.CurSize < client.Datagram.MaxSize )
 				client.Datagram.Write( _spectator );

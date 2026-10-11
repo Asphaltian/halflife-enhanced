@@ -790,7 +790,7 @@ public sealed partial class HalfLifeDll : GameDll
 			if ( edict is BaseEntity entity && (entity.EntityFlags & EntityFlags.Dormant) != EntityFlags.Dormant )
 				entity.Activate();
 			else
-				Util.Alert( AlertType.Console, $"Can't instance {edict.ClassName}" );
+				Util.Alert( AlertType.Console, $"Can't instance {edict.ClassName}\n" );
 		}
 
 		UserMessages.Link();

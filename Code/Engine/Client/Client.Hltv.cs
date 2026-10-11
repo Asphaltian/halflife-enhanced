@@ -35,7 +35,7 @@ partial class Client
 				break;
 
 			default:
-				Log.Info( " CL_Parse_HLTV: unknown HLTV command.\n" );
+				Con.Printf( " CL_Parse_HLTV: unknown HLTV command.\n" );
 				break;
 		}
 	}

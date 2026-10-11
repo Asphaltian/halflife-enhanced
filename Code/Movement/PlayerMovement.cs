@@ -105,7 +105,7 @@ public sealed partial class PlayerMovement
 		switch ( _pmove.MoveType )
 		{
 			default:
-				Log.Trace( $"Bogus pmove player movetype {(int)_pmove.MoveType} on ({(_pmove.Server ? 1 : 0)}) 0=cl 1=sv" );
+				Con.DPrintf( $"Bogus pmove player movetype {(int)_pmove.MoveType} on ({(_pmove.Server ? 1 : 0)}) 0=cl 1=sv\n" );
 				break;
 
 			case MoveType.None:

@@ -79,7 +79,7 @@ public static class Animation
 	{
 		if ( model is null )
 		{
-			Util.Alert( AlertType.Console, "GetEyePosition() Can't get pstudiohdr ptr!" );
+			Util.Alert( AlertType.Console, "GetEyePosition() Can't get pstudiohdr ptr!\n" );
 			return;
 		}
 
@@ -115,7 +115,7 @@ public static class Animation
 				continue;
 
 			if ( sequenceEvent.Options.Length == 0 )
-				Util.Alert( AlertType.Error, $"Bad sound event {sequenceEvent.Index} in sequence {model.Header.Name} :: {sequenceName} (sound is \"{sequenceEvent.Options}\")" );
+				Util.Alert( AlertType.Error, $"Bad sound event {sequenceEvent.Index} in sequence {model.Header.Name} :: {sequenceName} (sound is \"{sequenceEvent.Options}\")\n" );
 
 			server.PrecacheSound( Server.AllocString( sequenceEvent.Options ) );
 		}

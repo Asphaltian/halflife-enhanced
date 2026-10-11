@@ -150,9 +150,9 @@ public static class CdAudio
 
 		if ( command.Equals( "mp3info", StringComparison.OrdinalIgnoreCase ) )
 		{
-			Log.Info( $"Current MP3 Title: {_mp3File}" );
-			Log.Info( $"Current MP3 Track: {_mp3Track}" );
-			Log.Info( $"Current MP3 Volume: {(int)BitConverter.DoubleToInt64Bits( _mp3StreamVolume )}" );
+			Con.Printf( $"Current MP3 Title: {_mp3File}\n" );
+			Con.Printf( $"Current MP3 Track: {_mp3Track}\n" );
+			Con.Printf( $"Current MP3 Volume: {(int)BitConverter.DoubleToInt64Bits( _mp3StreamVolume )}\n" );
 			return;
 		}
 
@@ -232,14 +232,14 @@ public static class CdAudio
 		if ( !command.Equals( "info", StringComparison.OrdinalIgnoreCase ) )
 			return;
 
-		Log.Info( $"{_tracks.Count - 1} tracks" );
+		Con.Printf( $"{_tracks.Count - 1} tracks\n" );
 
 		if ( _playing )
-			Log.Info( $"Currently {(_looping ? "looping" : "playing")} track {_playTrack}" );
+			Con.Printf( $"Currently {(_looping ? "looping" : "playing")} track {_playTrack}\n" );
 		else if ( _wasPlaying )
-			Log.Info( $"Paused {(_looping ? "looping" : "playing")} track {_playTrack}" );
+			Con.Printf( $"Paused {(_looping ? "looping" : "playing")} track {_playTrack}\n" );
 
-		Log.Info( $"Volume is {_volume.ToString( "F6", CultureInfo.InvariantCulture )}" );
+		Con.Printf( $"Volume is {_volume.ToString( "F6", CultureInfo.InvariantCulture )}\n" );
 	}
 
 	public static void Play( int track, bool looping )

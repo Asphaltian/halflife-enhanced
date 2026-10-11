@@ -154,7 +154,7 @@ partial class BaseMonster
 				MovementActivity = MoveType == MoveType.Fly ? Activity.Fly : Activity.Walk;
 
 				if ( !RefreshRoute() )
-					Util.Alert( AlertType.AiConsole, "Can't Create Route!" );
+					Util.Alert( AlertType.AiConsole, "Can't Create Route!\n" );
 
 				SetState( MonsterState.Idle );
 				ChangeSchedule( GetScheduleOfType( ScheduleType.IdleWalk ) );
@@ -282,7 +282,7 @@ partial class BaseMonster
 		ViewOffset = eyePosition;
 
 		if ( MathLib.VectorCompare( ViewOffset, Vector3.Zero ) )
-			Util.Alert( AlertType.AiConsole, $"{ClassName} has no view_ofs!" );
+			Util.Alert( AlertType.AiConsole, $"{ClassName} has no view_ofs!\n" );
 	}
 
 	public override void HandleAnimEvent( MonsterEvent monsterEvent )
@@ -354,7 +354,7 @@ partial class BaseMonster
 				break;
 
 			default:
-				Util.Alert( AlertType.AiConsole, $"Unhandled animation event {monsterEvent.Event} for {ClassName}" );
+				Util.Alert( AlertType.AiConsole, $"Unhandled animation event {monsterEvent.Event} for {ClassName}\n" );
 				break;
 		}
 	}
@@ -373,7 +373,7 @@ partial class BaseMonster
 
 		if ( result == 0 )
 		{
-			Util.Alert( AlertType.AiConsole, $"No Path from {sourceNode} to {destinationNode}!" );
+			Util.Alert( AlertType.AiConsole, $"No Path from {sourceNode} to {destinationNode}!\n" );
 			return false;
 		}
 
@@ -400,7 +400,7 @@ partial class BaseMonster
 
 		if ( !graph.GraphPresent )
 		{
-			Util.Alert( AlertType.AiConsole, "find_hintnode: graph not ready!" );
+			Util.Alert( AlertType.AiConsole, "find_hintnode: graph not ready!\n" );
 			return Graph.NoNode;
 		}
 
@@ -644,13 +644,13 @@ partial class BaseMonster
 	{
 		if ( itemName is null )
 		{
-			Util.Alert( AlertType.Console, "DropItem() - No item name!" );
+			Util.Alert( AlertType.Console, "DropItem() - No item name!\n" );
 			return null;
 		}
 
 		if ( Create( itemName, position, angles, this ) is not { } item )
 		{
-			Util.Alert( AlertType.Console, "DropItem() - Didn't create!" );
+			Util.Alert( AlertType.Console, "DropItem() - Didn't create!\n" );
 			return null;
 		}
 

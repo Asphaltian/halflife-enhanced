@@ -151,7 +151,7 @@ partial class Client
 		Info.SetValueForKey( ref _userInfo, key, value, PlayerInfo.MaxInfoString );
 	}
 
-	private static void SetUserInfo( string key, ref string field, string value )
+	public static void SetUserInfo( string key, ref string field, string value )
 	{
 		var changed = field != value;
 

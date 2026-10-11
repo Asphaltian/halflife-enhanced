@@ -774,13 +774,13 @@ public class ChangeLevel : BaseTrigger
 		{
 			case "map":
 				if ( value.Length >= MapNameMost )
-					Util.Alert( AlertType.Error, $"Map name '{value}' too long (32 chars)" );
+					Util.Alert( AlertType.Error, $"Map name '{value}' too long (32 chars)\n" );
 
 				MapName = value;
 				return true;
 			case "landmark":
 				if ( value.Length >= MapNameMost )
-					Util.Alert( AlertType.Error, $"Landmark name '{value}' too long (32 chars)" );
+					Util.Alert( AlertType.Error, $"Landmark name '{value}' too long (32 chars)\n" );
 
 				LandmarkName = value;
 				return true;
@@ -822,7 +822,7 @@ public class ChangeLevel : BaseTrigger
 				return landmark;
 		}
 
-		Util.Alert( AlertType.Error, $"Can't find landmark {landmarkName}" );
+		Util.Alert( AlertType.Error, $"Can't find landmark {landmarkName}\n" );
 		return null;
 	}
 
@@ -853,7 +853,7 @@ public class ChangeLevel : BaseTrigger
 
 		if ( !InTransitionVolume( Server, player, LandmarkName ) )
 		{
-			Util.Alert( AlertType.AiConsole, $"Player isn't in the transition volume {LandmarkName}, aborting" );
+			Util.Alert( AlertType.AiConsole, $"Player isn't in the transition volume {LandmarkName}, aborting\n" );
 			return;
 		}
 
@@ -878,7 +878,7 @@ public class ChangeLevel : BaseTrigger
 			Server.Globals.LandmarkOffset = landmark.Origin;
 		}
 
-		Util.Alert( AlertType.Console, $"CHANGE LEVEL: {MapName} {nextSpot}" );
+		Util.Alert( AlertType.Console, $"CHANGE LEVEL: {MapName} {nextSpot}\n" );
 		Server.ChangeLevel( MapName, nextSpot );
 	}
 
@@ -1232,7 +1232,7 @@ public static class Triggers
 
 		if ( track is < -1 or > 30 )
 		{
-			Util.Alert( AlertType.Console, "TriggerCDAudio - Track %d out of range" );
+			Util.Alert( AlertType.Console, "TriggerCDAudio - Track %d out of range\n" );
 			return;
 		}
 

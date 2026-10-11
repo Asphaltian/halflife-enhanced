@@ -52,7 +52,7 @@ public sealed class HudServers( Client engine )
 				_serverList = new Request { Context = -1, RemoteAddress = address, Next = _serverList };
 		}
 
-		Log.Info( "got list\n" );
+		Con.Printf( "got list\n" );
 
 		_querying = 1;
 		_activeQueries = 0;
@@ -91,7 +91,7 @@ public sealed class HudServers( Client engine )
 			return;
 
 		if ( response.Type == Client.NetRequestPing )
-			Log.Info( $"ping == {1000.0 * response.Ping:F2}\n" );
+			Con.Printf( $"ping == {1000.0 * response.Ping:F2}\n" );
 	}
 
 	public void RulesResponse( NetResponse response )
@@ -100,7 +100,7 @@ public sealed class HudServers( Client engine )
 			return;
 
 		if ( response.Type == Client.NetRequestRules && response.Response is string text )
-			Log.Info( $"rules {text}\n" );
+			Con.Printf( $"rules {text}\n" );
 	}
 
 	public void PlayersResponse( NetResponse response )
@@ -109,7 +109,7 @@ public sealed class HudServers( Client engine )
 			return;
 
 		if ( response.Type == Client.NetRequestPlayers && response.Response is string text )
-			Log.Info( $"players {text}\n" );
+			Con.Printf( $"players {text}\n" );
 	}
 
 	private static bool CompareServers( ServerEntry p1, ServerEntry p2 )
@@ -429,7 +429,7 @@ public sealed class HudServers( Client engine )
 
 		if ( !LoadMasterAddresses( 1, out _, addresses ) )
 		{
-			Log.Info( "SendRequest:  Unable to read master server addresses\n" );
+			Con.DPrintf( "SendRequest:  Unable to read master server addresses\n" );
 			return;
 		}
 

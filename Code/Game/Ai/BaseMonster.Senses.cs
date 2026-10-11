@@ -127,7 +127,7 @@ partial class BaseMonster
 					case RelationshipAlly:
 						break;
 					default:
-						Util.Alert( AlertType.AiConsole, $"{ClassName} can't assess {sight.ClassName}" );
+						Util.Alert( AlertType.AiConsole, $"{ClassName} can't assess {sight.ClassName}\n" );
 						break;
 				}
 			}
@@ -147,7 +147,7 @@ partial class BaseMonster
 
 		if ( AudibleList == SoundEnt.ListEmpty )
 		{
-			Util.Alert( AlertType.AiConsole, $"ERROR! monster {ClassName} has no audible sounds!" );
+			Util.Alert( AlertType.AiConsole, $"ERROR! monster {ClassName} has no audible sounds!\n" );
 			return null;
 		}
 
@@ -179,7 +179,7 @@ partial class BaseMonster
 
 		if ( AudibleList == SoundEnt.ListEmpty )
 		{
-			Util.Alert( AlertType.AiConsole, "ERROR! PBestScent() has empty soundlist!" );
+			Util.Alert( AlertType.AiConsole, "ERROR! PBestScent() has empty soundlist!\n" );
 			return null;
 		}
 

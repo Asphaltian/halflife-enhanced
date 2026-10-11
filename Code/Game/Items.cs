@@ -30,7 +30,7 @@ public class WorldItem : BaseEntity
 
 		if ( entity is null )
 		{
-			Util.Alert( AlertType.Console, $"unable to create world_item {_type}" );
+			Util.Alert( AlertType.Console, $"unable to create world_item {_type}\n" );
 		}
 		else
 		{

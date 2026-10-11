@@ -73,7 +73,7 @@ partial class Client
 
 			if ( mode < 0 )
 			{
-				Log.Info( "bad filter name" );
+				Con.Printf( "bad filter name\n" );
 				return;
 			}
 

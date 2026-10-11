@@ -29,13 +29,13 @@ partial class Client
 			text.Append( $"({BitConverter.ToDouble( arguments, 4 ),5:F1},{BitConverter.ToDouble( arguments, 12 ),5:F1},{BitConverter.ToDouble( arguments, 20 ),5:F1}) " );
 			text.Append( $"[{BitConverter.ToDouble( arguments, 28 ),5:F1} {BitConverter.ToDouble( arguments, 36 ),5:F1} {BitConverter.ToDouble( arguments, 44 ),5:F1}]\n" );
 
-			Log.Info( text.ToString() );
+			Con.Printf( text.ToString() );
 
 			text.Clear();
 		}
 
 		if ( text.Length != 0 )
-			Log.Info( text.ToString() );
+			Con.Printf( text.ToString() );
 	}
 
 	private void SpecPosCommand( string[] arguments )
@@ -53,7 +53,7 @@ partial class Client
 			yaw = state.Angles.y;
 		}
 
-		Log.Info( $"spec_pos {origin.x:F1} {origin.y:F1} {origin.z:F1} {pitch:F1} {yaw:F1}\n" );
+		Con.Printf( $"spec_pos {origin.x:F1} {origin.y:F1} {origin.z:F1} {pitch:F1} {yaw:F1}\n" );
 	}
 
 	[ConCmd( "entities" )]

@@ -172,7 +172,7 @@ partial class Server
 
 				if ( !position.Active )
 				{
-					Log.Trace( $"tried to store off position of bogus player {j}/{other.Name}\n" );
+					Con.DPrintf( $"tried to store off position of bogus player {j}/{other.Name}\n" );
 					continue;
 				}
 
@@ -233,7 +233,7 @@ partial class Server
 
 			if ( !position.Active )
 			{
-				Log.Trace( $"SV_RestoreMove:  Tried to restore 'inactive' player {i}/{other.Name}\n" );
+				Con.DPrintf( $"SV_RestoreMove:  Tried to restore 'inactive' player {i}/{other.Name}\n" );
 				continue;
 			}
 

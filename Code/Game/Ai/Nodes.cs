@@ -45,7 +45,7 @@ public class NodeEnt : BaseEntity
 
 		if ( graph.NodeCount >= Graph.MaxNodes )
 		{
-			Util.Alert( AlertType.AiConsole, "cNodes > MAX_NODES" );
+			Util.Alert( AlertType.AiConsole, "cNodes > MAX_NODES\n" );
 			return;
 		}
 
@@ -240,7 +240,7 @@ public class TestHull : BaseMonster
 			SetOrigin( source.Origin );
 
 			if ( (EntityFlags & EntityFlags.OnGround) != EntityFlags.OnGround )
-				Util.Alert( AlertType.AiConsole, "OFFGROUND!" );
+				Util.Alert( AlertType.AiConsole, "OFFGROUND!\n" );
 
 			if ( hull == Graph.NodeFlyHull )
 			{
@@ -309,7 +309,7 @@ public class TestHull : BaseMonster
 
 		if ( poolLinks == 0 )
 		{
-			Util.Alert( AlertType.AiConsole, "**ConnectVisibleNodes FAILED!" );
+			Util.Alert( AlertType.AiConsole, "**ConnectVisibleNodes FAILED!\n" );
 
 			SetThink( ShowBadNode );
 			Origin = graph.Nodes[badNode].Origin;
@@ -399,7 +399,7 @@ public class TestHull : BaseMonster
 		report.Append( $"Connection Pool: {Graph.LinkSize * poolLinks} bytes\n" );
 		report.Append( ReportRule ).Append( '\n' );
 
-		Util.Alert( AlertType.AiConsole, $"{graph.NodeCount} Nodes, {poolLinks} Connections" );
+		Util.Alert( AlertType.AiConsole, $"{graph.NodeCount} Nodes, {poolLinks} Connections\n" );
 
 		graph.BuildRegionTables();
 
@@ -416,7 +416,7 @@ public class TestHull : BaseMonster
 		graph.ComputeStaticRoutingTables();
 		graph.SaveGraph( Server.Globals.MapName );
 
-		Util.Alert( AlertType.Console, "Done." );
+		Util.Alert( AlertType.Console, "Done.\n" );
 	}
 }
 
@@ -443,7 +443,7 @@ public class NodeViewer : BaseEntity
 
 		if ( !graph.GraphPresent || !graph.GraphPointersSet )
 		{
-			Util.Alert( AlertType.Console, "Graph not ready!" );
+			Util.Alert( AlertType.Console, "Graph not ready!\n" );
 			Remove();
 			return;
 		}
@@ -471,13 +471,13 @@ public class NodeViewer : BaseEntity
 
 		if ( _baseNode < 0 )
 		{
-			Util.Alert( AlertType.Console, "No nearby node" );
+			Util.Alert( AlertType.Console, "No nearby node\n" );
 			return;
 		}
 
 		_visited = 0;
 
-		Util.Alert( AlertType.AiConsole, $"basenode {_baseNode}" );
+		Util.Alert( AlertType.AiConsole, $"basenode {_baseNode}\n" );
 
 		if ( graph.NodeCount < MaxVisited )
 		{
@@ -502,7 +502,7 @@ public class NodeViewer : BaseEntity
 			while ( end != _visited );
 		}
 
-		Util.Alert( AlertType.AiConsole, $"{_visited} nodes" );
+		Util.Alert( AlertType.AiConsole, $"{_visited} nodes\n" );
 
 		_draw = 0;
 

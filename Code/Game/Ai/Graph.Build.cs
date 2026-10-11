@@ -31,7 +31,7 @@ partial class Graph
 
 		if ( NodeCount <= 0 )
 		{
-			Util.Alert( AlertType.AiConsole, "No Nodes!" );
+			Util.Alert( AlertType.AiConsole, "No Nodes!\n" );
 			return 0;
 		}
 

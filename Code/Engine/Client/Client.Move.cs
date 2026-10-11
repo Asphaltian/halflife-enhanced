@@ -60,7 +60,7 @@ partial class Client
 	{
 		if ( _pushed )
 		{
-			Log.Info( "CL_PushPMStates called with pushed stack" );
+			Con.Printf( "CL_PushPMStates called with pushed stack\n" );
 			return;
 		}
 
@@ -73,7 +73,7 @@ partial class Client
 	{
 		if ( !_pushed )
 		{
-			Log.Info( "CL_PopPMStates called without stack" );
+			Con.Printf( "CL_PopPMStates called without stack\n" );
 			return;
 		}
 
@@ -257,7 +257,7 @@ partial class Client
 				if ( _pmove.MoveEnts.Count < PlayerMove.MaxMoveEnts )
 					_pmove.MoveEnts.Add( physEnt );
 				else
-					Log.Trace( "CL_SetSolidEntities:  pmove->nummoveent >= MAX_MOVEENTS\n" );
+					Con.DPrintf( "CL_SetSolidEntities:  pmove->nummoveent >= MAX_MOVEENTS\n" );
 			}
 			else if ( _pmove.PhysEnts.Count < PlayerMove.MaxPhysEnts )
 			{
@@ -265,7 +265,7 @@ partial class Client
 			}
 			else
 			{
-				Log.Trace( "CL_SetSolidEntities:  pmove->numphysent >= MAX_PHYSENTS\n" );
+				Con.DPrintf( "CL_SetSolidEntities:  pmove->numphysent >= MAX_PHYSENTS\n" );
 			}
 		}
 	}

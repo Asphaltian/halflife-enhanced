@@ -261,6 +261,7 @@ partial class Client
 	private int _forceTrack;
 	private readonly byte[] _demoClientDataImage = new byte[DemoClientDataSize];
 	private readonly byte[] _demoCommandImage = new byte[DemoCommandSize];
+	private readonly byte[] _demoUserBuffer = new byte[MaxDemoBuffer];
 
 	private DemoFile _demoFile;
 	private DemoFile _demoHeaderFile;
@@ -579,7 +580,7 @@ partial class Client
 	{
 		_demoHeaderFile = new DemoFile( "demoheader.dmf" );
 
-		Log.Trace( "Spooling demo header.\n" );
+		Con.DPrintf( "Spooling demo header.\n" );
 	}
 
 	private void WriteDemoInfo( DemoFile file )
@@ -779,12 +780,11 @@ partial class Client
 
 	private void ReadDemoUserBuffer()
 	{
-		var buffer = new byte[MaxDemoBuffer];
 		var size = (int)Math.Min( (uint)_demoFile.ReadInt(), (uint)MaxDemoBuffer );
 
-		_demoFile.Read( buffer.AsSpan( 0, size ) );
+		_demoFile.Read( _demoUserBuffer.AsSpan( 0, size ) );
 
-		_clientDll.DemoReadBuffer( size, buffer );
+		_clientDll.DemoReadBuffer( size, _demoUserBuffer );
 	}
 
 	private void DemoScreenFade( int duration, int holdTime, int flags )
@@ -802,7 +802,7 @@ partial class Client
 
 	private void EndGame( string message )
 	{
-		Log.Trace( $"Host_EndGame: {message}\n" );
+		Con.DPrintf( $"Host_EndGame: {message}\n" );
 
 		var demoNum = _demoNum;
 
@@ -848,7 +848,7 @@ partial class Client
 
 			DisconnectCommand();
 
-			Log.Info( "Tried to read a demo message with no demo file\n" );
+			Con.Printf( "Tried to read a demo message with no demo file\n" );
 
 			return false;
 		}
@@ -1153,7 +1153,7 @@ partial class Client
 			for ( var i = 0; i < _gameGaugeCount; i++ )
 				report.Append( $"{_gameGaugeSeconds[i]} Second {i + 1}\n" );
 
-			Log.Info( report.ToString() );
+			Con.Printf( report.ToString() );
 
 			Server.WriteFile( "fps.txt", Encoding.Latin1.GetBytes( report.ToString() ) );
 
@@ -1171,7 +1171,7 @@ partial class Client
 			if ( time == 0f )
 				time = 1f;
 
-			Log.Info( $"{frames} frames {Fixed( time, 3 ),5} seconds {Fixed( frames / time, 3 ),5} fps\n" );
+			Con.Printf( $"{frames} frames {Fixed( time, 3 ),5} seconds {Fixed( frames / time, 3 ),5} fps\n" );
 		}
 
 		Cmd.AddText( "cd stop\n" );
@@ -1218,7 +1218,7 @@ partial class Client
 
 			if ( string.IsNullOrEmpty( _demos[0] ) )
 			{
-				Log.Info( "No demos listed with startdemos\n" );
+				Con.Printf( "No demos listed with startdemos\n" );
 
 				_demoNum = -1;
 
@@ -1237,37 +1237,37 @@ partial class Client
 
 		if ( count < 2 )
 		{
-			Log.Info( "record <demoname> <cd>\n" );
+			Con.Printf( "record <demoname> <cd>\n" );
 			return;
 		}
 
 		if ( _demoRecording )
 		{
-			Log.Info( "Already recording.\n" );
+			Con.Printf( "Already recording.\n" );
 			return;
 		}
 
 		if ( _demoPlayback )
 		{
-			Log.Info( "Can't record during demo playback.\n" );
+			Con.Printf( "Can't record during demo playback.\n" );
 			return;
 		}
 
 		if ( _demoHeaderFile is null || _state != ClientState.Active )
 		{
-			Log.Info( $"You must be in an active map spawned on a machine that allows creation of files in {Server.GameDirectory}\n" );
+			Con.Printf( $"You must be in an active map spawned on a machine that allows creation of files in {Server.GameDirectory}\n" );
 			return;
 		}
 
 		if ( count != 2 && count != 3 )
 		{
-			Log.Info( "record <demoname> <cd track>\n" );
+			Con.Printf( "record <demoname> <cd track>\n" );
 			return;
 		}
 
 		if ( arguments[0].Contains( ".." ) )
 		{
-			Log.Info( "Relative pathnames are not allowed.\n" );
+			Con.Printf( "Relative pathnames are not allowed.\n" );
 			return;
 		}
 
@@ -1277,18 +1277,18 @@ partial class Client
 		{
 			track = Common.Atoi( arguments[1] );
 
-			Log.Info( $"Forcing CD track to {track}\n" );
+			Con.Printf( $"Forcing CD track to {track}\n" );
 		}
 
 		var name = FixExtension( arguments[0], ".dem" );
 
 		if ( !HasExtension( name, "dem" ) )
 		{
-			Log.Info( $"Error: couldn't open demo file {name}\n" );
+			Con.Printf( $"Error: couldn't open demo file {name}\n" );
 			return;
 		}
 
-		Log.Info( $"recording to {name}.\n" );
+		Con.Printf( $"recording to {name}.\n" );
 
 		_demoFile = new DemoFile( name );
 
@@ -1355,7 +1355,7 @@ partial class Client
 
 		if ( !_demoRecording )
 		{
-			Log.Info( "Not recording a demo.\n" );
+			Con.Printf( "Not recording a demo.\n" );
 			return;
 		}
 
@@ -1389,7 +1389,7 @@ partial class Client
 
 		if ( _demoAppending )
 		{
-			Log.Info( "Replacing old demo with appended version.\n" );
+			Con.Printf( "Replacing old demo with appended version.\n" );
 
 			Server.WriteFile( _demoFileName, file.ToArray() );
 		}
@@ -1398,8 +1398,8 @@ partial class Client
 			CloseDemoForWrite( file );
 		}
 
-		Log.Info( "Completed demo\n" );
-		Log.Trace( $"Recording time {Fixed( time - _demoStartTime, 2 )}\nHost frames {_timeDemoLastFrame - _timeDemoStartFrame}\n" );
+		Con.Printf( "Completed demo\n" );
+		Con.DPrintf( $"Recording time {Fixed( time - _demoStartTime, 2 )}\nHost frames {_timeDemoLastFrame - _timeDemoStartFrame}\n" );
 	}
 
 	private void PlayDemo( string[] arguments )
@@ -1408,8 +1408,8 @@ partial class Client
 
 		if ( count != 2 && count != 3 )
 		{
-			Log.Info( "playdemo <demoname> <replayspeed>: plays a demo\n" );
-			Log.Info( "replayspeed == 1.0 default\n" );
+			Con.Printf( "playdemo <demoname> <replayspeed>: plays a demo\n" );
+			Con.Printf( "replayspeed == 1.0 default\n" );
 			return;
 		}
 
@@ -1422,20 +1422,20 @@ partial class Client
 			if ( _demoTimeScale <= MinDemoTimeScale )
 				_demoTimeScale = 1f;
 
-			Log.Info( $"Playdemo:  Time scale {Fixed( _demoTimeScale, 6 )}\n" );
+			Con.Printf( $"Playdemo:  Time scale {Fixed( _demoTimeScale, 6 )}\n" );
 		}
 
 		Disconnect();
 
 		var name = Common.DefaultExtension( arguments[0].Length > 0xfb ? arguments[0][..0xfb] : arguments[0], ".dem" );
 
-		Log.Info( $"Playing demo from {name}.\n" );
+		Con.Printf( $"Playing demo from {name}.\n" );
 
 		_demoFile = OpenDemoForRead( name );
 
 		if ( _demoFile is null )
 		{
-			Log.Info( "ERROR: couldn't open.\n" );
+			Con.Printf( "ERROR: couldn't open.\n" );
 
 			_demoNum = -1;
 
@@ -1446,7 +1446,7 @@ partial class Client
 
 		if ( !_demoHeader.IsDemo )
 		{
-			Log.Info( $"{name} is not a demo file\n" );
+			Con.Printf( $"{name} is not a demo file\n" );
 
 			_demoFile = null;
 			_demoNum = -1;
@@ -1455,7 +1455,7 @@ partial class Client
 		}
 
 		if ( _demoHeader.NetProtocol != Host.ProtocolVersion || _demoHeader.DemoProtocol != DemoProtocol )
-			Log.Info( $"WARNING! demo protocol outdated.\nDemo file protocols {_demoHeader.NetProtocol}:{_demoHeader.DemoProtocol}, Engine protocol is at {Host.ProtocolVersion}:{DemoProtocol}\n" );
+			Con.Printf( $"WARNING! demo protocol outdated.\nDemo file protocols {_demoHeader.NetProtocol}:{_demoHeader.DemoProtocol}, Engine protocol is at {Host.ProtocolVersion}:{DemoProtocol}\n" );
 
 		_demoFile.Position = _demoHeader.DirectoryOffset;
 
@@ -1503,7 +1503,7 @@ partial class Client
 	{
 		if ( arguments.Length + 1 != 2 )
 		{
-			Log.Info( "timedemo <demoname>: gets demo speeds\n" );
+			Con.Printf( "timedemo <demoname>: gets demo speeds\n" );
 			return;
 		}
 
@@ -1519,7 +1519,7 @@ partial class Client
 	{
 		if ( arguments.Length + 1 != 2 )
 		{
-			Log.Info( "gg <demoname> : Game Gauge 99\n" );
+			Con.Printf( "gg <demoname> : Game Gauge 99\n" );
 			return;
 		}
 
@@ -1542,19 +1542,19 @@ partial class Client
 	{
 		if ( _demoRecording || _demoPlayback )
 		{
-			Log.Info( "Listdemo only available when not running or recording.\n" );
+			Con.Printf( "Listdemo only available when not running or recording.\n" );
 			return;
 		}
 
 		var name = Common.DefaultExtension( arguments.Length > 0 ? arguments[0] : "", ".dem" );
 
-		Log.Info( $"Demo contents for {name}.\n" );
+		Con.Printf( $"Demo contents for {name}.\n" );
 
 		var file = OpenDemoForRead( name );
 
 		if ( file is null )
 		{
-			Log.Info( "ERROR: couldn't open.\n" );
+			Con.Printf( "ERROR: couldn't open.\n" );
 			return;
 		}
 
@@ -1562,13 +1562,13 @@ partial class Client
 
 		if ( !header.IsDemo )
 		{
-			Log.Info( $"{name} is not a demo file\n" );
+			Con.Printf( $"{name} is not a demo file\n" );
 			return;
 		}
 
-		Log.Info( $"Demo file protocols {header.NetProtocol}N:{header.DemoProtocol}D\nServer protocols at {Host.ProtocolVersion}N:{DemoProtocol}D\n" );
-		Log.Info( $"Map name :  {header.MapName}\n" );
-		Log.Info( $"Game .dll:  {header.GameDirectory}\n" );
+		Con.Printf( $"Demo file protocols {header.NetProtocol}N:{header.DemoProtocol}D\nServer protocols at {Host.ProtocolVersion}N:{DemoProtocol}D\n" );
+		Con.Printf( $"Map name :  {header.MapName}\n" );
+		Con.Printf( $"Game .dll:  {header.GameDirectory}\n" );
 
 		file.Position = header.DirectoryOffset;
 
@@ -1576,45 +1576,45 @@ partial class Client
 
 		if ( (uint)(count - 1) >= MaxDemoEntries )
 		{
-			Log.Info( $"ERROR: demo had bogus # of directory entries:  {count}\n" );
+			Con.Printf( $"ERROR: demo had bogus # of directory entries:  {count}\n" );
 			return;
 		}
 
 		var entries = ReadDirectory( file, count );
 
-		Log.Info( "\n" );
+		Con.Printf( "\n" );
 
 		for ( var i = 0; i < entries.Count; i++ )
 		{
 			var entry = entries[i];
 			var type = entry.Type == 0 ? "Start segment" : "Normal segment";
 
-			Log.Info( $"{i + 1}:  {type}\n  \"{entry.Description,20}\"\nTime:  {Fixed( entry.TrackTime, 2 )} s.\nFrames:  {entry.Frames}\nSize:  {Fixed( entry.Length * 0.0009765625, 2 )}K\n" );
+			Con.Printf( $"{i + 1}:  {type}\n  \"{entry.Description,20}\"\nTime:  {Fixed( entry.TrackTime, 2 )} s.\nFrames:  {entry.Frames}\nSize:  {Fixed( entry.Length * 0.0009765625, 2 )}K\n" );
 
 			if ( entry.Flags != 0 )
 			{
-				Log.Info( "  Flags:\n" );
+				Con.Printf( "  Flags:\n" );
 
 				if ( (entry.Flags & DemoEntry.FlagTitle) != 0 )
-					Log.Info( $"     Title \"{entry.Description}\"\n" );
+					Con.Printf( $"     Title \"{entry.Description}\"\n" );
 
 				if ( (entry.Flags & DemoEntry.FlagPlay) != 0 )
-					Log.Info( $"     Play {entry.CdTrack}\n" );
+					Con.Printf( $"     Play {entry.CdTrack}\n" );
 
 				if ( (entry.Flags & DemoEntry.FlagFadeInSlow) != 0 )
-					Log.Info( "     Fade in slow\n" );
+					Con.Printf( "     Fade in slow\n" );
 
 				if ( (entry.Flags & DemoEntry.FlagFadeInFast) != 0 )
-					Log.Info( "     Fade in fast\n" );
+					Con.Printf( "     Fade in fast\n" );
 
 				if ( (entry.Flags & DemoEntry.FlagFadeOutSlow) != 0 )
-					Log.Info( "     Fade out slow\n" );
+					Con.Printf( "     Fade out slow\n" );
 
 				if ( (entry.Flags & DemoEntry.FlagFadeOutFast) != 0 )
-					Log.Info( "     Fade out fast\n" );
+					Con.Printf( "     Fade out fast\n" );
 			}
 
-			Log.Info( "\n" );
+			Con.Printf( "\n" );
 		}
 	}
 
@@ -1645,7 +1645,7 @@ partial class Client
 		if ( header.NetProtocol == Host.ProtocolVersion && header.DemoProtocol == DemoProtocol )
 			return true;
 
-		Log.Info( $"ERROR: demo protocol outdated\nDemo file protocols {header.NetProtocol}N:{header.DemoProtocol}D\nServer protocol is at {Host.ProtocolVersion}N:{DemoProtocol}D\n" );
+		Con.Printf( $"ERROR: demo protocol outdated\nDemo file protocols {header.NetProtocol}N:{header.DemoProtocol}D\nServer protocol is at {Host.ProtocolVersion}N:{DemoProtocol}D\n" );
 
 		return false;
 	}
@@ -1654,13 +1654,13 @@ partial class Client
 	{
 		if ( _demoRecording || _demoPlayback )
 		{
-			Log.Info( "Appenddemo only available when not running or recording a demo.\n" );
+			Con.Printf( "Appenddemo only available when not running or recording a demo.\n" );
 			return;
 		}
 
 		if ( _state != ClientState.Active )
 		{
-			Log.Info( $"You must be in an active map spawned on a machine that allows creation of files in {Server.GameDirectory}\n" );
+			Con.Printf( $"You must be in an active map spawned on a machine that allows creation of files in {Server.GameDirectory}\n" );
 			return;
 		}
 
@@ -1668,13 +1668,13 @@ partial class Client
 
 		if ( count != 2 && count != 3 )
 		{
-			Log.Info( "appenddemo <demoname> <cd track>\n" );
+			Con.Printf( "appenddemo <demoname> <cd track>\n" );
 			return;
 		}
 
 		if ( arguments[0].Contains( ".." ) )
 		{
-			Log.Info( "Relative pathnames are not allowed.\n" );
+			Con.Printf( "Relative pathnames are not allowed.\n" );
 			return;
 		}
 
@@ -1684,18 +1684,18 @@ partial class Client
 		{
 			track = Common.Atoi( arguments[1] );
 
-			Log.Info( $"Forcing CD track to {track}\n" );
+			Con.Printf( $"Forcing CD track to {track}\n" );
 		}
 
 		var name = Common.DefaultExtension( arguments[0], ".dem" );
 
 		if ( !HasExtension( name, "dem" ) )
 		{
-			Log.Info( $"Error: couldn't open {name}, demo files must have .dem extension.\n" );
+			Con.Printf( $"Error: couldn't open {name}, demo files must have .dem extension.\n" );
 			return;
 		}
 
-		Log.Info( $"Appending to demo {name}.\n" );
+		Con.Printf( $"Appending to demo {name}.\n" );
 
 		_demoFileName = name;
 
@@ -1703,7 +1703,7 @@ partial class Client
 
 		if ( input is null )
 		{
-			Log.Info( $"Error:  couldn't open demo file {name} for appending.\n" );
+			Con.Printf( $"Error:  couldn't open demo file {name} for appending.\n" );
 			return;
 		}
 
@@ -1718,7 +1718,7 @@ partial class Client
 
 		if ( !_demoHeader.IsDemo )
 		{
-			Log.Info( $"{name} is not a demo file\n" );
+			Con.Printf( $"{name} is not a demo file\n" );
 
 			_demoFile = null;
 
@@ -1727,7 +1727,7 @@ partial class Client
 
 		if ( !_demoHeader.MapName.Equals( Common.FileBase( _levelName ), StringComparison.OrdinalIgnoreCase ) )
 		{
-			Log.Info( $"{name} was recorded on a different map, cannot append.\n" );
+			Con.Printf( $"{name} was recorded on a different map, cannot append.\n" );
 
 			_demoFile = null;
 
@@ -1746,7 +1746,7 @@ partial class Client
 
 		if ( (uint)(entries - 1) >= MaxDemoEntries )
 		{
-			Log.Info( $"ERROR: demo had bogus # of directory entries:  {entries}\n" );
+			Con.Printf( $"ERROR: demo had bogus # of directory entries:  {entries}\n" );
 
 			_demoFile = null;
 
@@ -1784,19 +1784,19 @@ partial class Client
 	{
 		if ( _demoRecording || _demoPlayback )
 		{
-			Log.Info( "Removedemo only available when not running or recording a demo.\n" );
+			Con.Printf( "Removedemo only available when not running or recording a demo.\n" );
 			return;
 		}
 
 		if ( arguments.Length + 1 != 3 )
 		{
-			Log.Info( "removedemo <demoname> <segment to remove>\nSegment 1 cannot be removed\n" );
+			Con.Printf( "removedemo <demoname> <segment to remove>\nSegment 1 cannot be removed\n" );
 			return;
 		}
 
 		if ( arguments[0].Contains( ".." ) )
 		{
-			Log.Info( "Relative pathnames are not allowed.\n" );
+			Con.Printf( "Relative pathnames are not allowed.\n" );
 			return;
 		}
 
@@ -1804,7 +1804,7 @@ partial class Client
 
 		if ( segment < 2 )
 		{
-			Log.Info( "Cannot remove the STARTUP segment.\n" );
+			Con.Printf( "Cannot remove the STARTUP segment.\n" );
 			return;
 		}
 
@@ -1812,17 +1812,17 @@ partial class Client
 
 		if ( !HasExtension( name, "dem" ) )
 		{
-			Log.Info( $"Error: couldn't open demo file {name}, demo files must have .dem extension.\n" );
+			Con.Printf( $"Error: couldn't open demo file {name}, demo files must have .dem extension.\n" );
 			return;
 		}
 
-		Log.Info( $"Removing segment {segment} from demo {name}.\n" );
+		Con.Printf( $"Removing segment {segment} from demo {name}.\n" );
 
 		var input = OpenDemoForRead( name );
 
 		if ( input is null )
 		{
-			Log.Info( $"Error: couldn't open demo file {name} for segment removal.\n" );
+			Con.Printf( $"Error: couldn't open demo file {name} for segment removal.\n" );
 			return;
 		}
 
@@ -1833,7 +1833,7 @@ partial class Client
 
 		if ( !header.IsDemo )
 		{
-			Log.Info( $"{name} is not a demo file\n" );
+			Con.Printf( $"{name} is not a demo file\n" );
 			return;
 		}
 
@@ -1846,13 +1846,13 @@ partial class Client
 
 		if ( (uint)(count - 1) >= MaxDemoEntries )
 		{
-			Log.Info( $"ERROR: demo had bogus # of directory entries:  {count}\n" );
+			Con.Printf( $"ERROR: demo had bogus # of directory entries:  {count}\n" );
 			return;
 		}
 
 		if ( count == 1 )
 		{
-			Log.Info( "ERROR: Can't remove last directory entry.\n" );
+			Con.Printf( "ERROR: Can't remove last directory entry.\n" );
 			return;
 		}
 
@@ -1894,7 +1894,7 @@ partial class Client
 
 		header.Write( output );
 
-		Log.Info( "Replacing old demo with edited version.\n" );
+		Con.Printf( "Replacing old demo with edited version.\n" );
 
 		CloseDemoForWrite( output );
 	}
@@ -1903,19 +1903,19 @@ partial class Client
 	{
 		if ( _demoRecording || _demoPlayback )
 		{
-			Log.Info( "Swapdemo only available when not running or recording a demo.\n" );
+			Con.Printf( "Swapdemo only available when not running or recording a demo.\n" );
 			return;
 		}
 
 		if ( arguments.Length + 1 != 4 )
 		{
-			Log.Info( "Swapdemo <demoname> <seg#> <seg#>\nSwaps segments, segment 1 cannot be moved\n" );
+			Con.Printf( "Swapdemo <demoname> <seg#> <seg#>\nSwaps segments, segment 1 cannot be moved\n" );
 			return;
 		}
 
 		if ( arguments[0].Contains( ".." ) )
 		{
-			Log.Info( "Relative pathnames are not allowed.\n" );
+			Con.Printf( "Relative pathnames are not allowed.\n" );
 			return;
 		}
 
@@ -1923,7 +1923,7 @@ partial class Client
 
 		if ( first < 2 )
 		{
-			Log.Info( "Cannot swap the STARTUP segment.\n" );
+			Con.Printf( "Cannot swap the STARTUP segment.\n" );
 			return;
 		}
 
@@ -1932,23 +1932,23 @@ partial class Client
 
 		if ( !HasExtension( name, "dem" ) )
 		{
-			Log.Info( $"Error: couldn't open {name}, demo files must have .dem extension.\n" );
+			Con.Printf( $"Error: couldn't open {name}, demo files must have .dem extension.\n" );
 			return;
 		}
 
-		Log.Info( $"Swapping segment {first} for {second} from demo {name}.\n" );
+		Con.Printf( $"Swapping segment {first} for {second} from demo {name}.\n" );
 
 		var input = OpenDemoForEdit( name, out var output, out var header );
 
 		if ( input is null )
 		{
-			Log.Info( $"Error: couldn't open demo file {name} for swapping.\n" );
+			Con.Printf( $"Error: couldn't open demo file {name} for swapping.\n" );
 			return;
 		}
 
 		if ( !header.IsDemo )
 		{
-			Log.Info( $"{name} is not a demo file\n" );
+			Con.Printf( $"{name} is not a demo file\n" );
 			return;
 		}
 
@@ -1961,7 +1961,7 @@ partial class Client
 
 		if ( (uint)(count - 1) >= MaxDemoEntries )
 		{
-			Log.Info( $"ERROR: demo had bogus # of directory entries:  {count}\n" );
+			Con.Printf( $"ERROR: demo had bogus # of directory entries:  {count}\n" );
 			return;
 		}
 
@@ -1970,7 +1970,7 @@ partial class Client
 
 		if ( first - 1 >= count || second - 1 >= count )
 		{
-			Log.Info( $"ERROR: demo only has {count} entries\n" );
+			Con.Printf( $"ERROR: demo only has {count} entries\n" );
 			return;
 		}
 
@@ -1982,7 +1982,7 @@ partial class Client
 
 		WriteDirectory( output, entries );
 
-		Log.Info( "Replacing old demo with edited version.\n" );
+		Con.Printf( "Replacing old demo with edited version.\n" );
 
 		CloseDemoForWrite( output );
 	}
@@ -1991,23 +1991,23 @@ partial class Client
 	{
 		if ( _demoRecording || _demoPlayback )
 		{
-			Log.Info( "Setdemoinfo only available when not running or recording a demo.\n" );
+			Con.Printf( "Setdemoinfo only available when not running or recording a demo.\n" );
 			return;
 		}
 
 		if ( arguments.Length + 1 < 3 )
 		{
-			Log.Info( "Setdemoinfo <demoname> <seg#> <info ...>\n" );
-			Log.Info( "   title \"text\"\n" );
-			Log.Info( "   play tracknum\n" );
-			Log.Info( "   fade <in | out> <fast | slow>\n\n" );
-			Log.Info( "Use -option to disable, e.g., -title\n" );
+			Con.Printf( "Setdemoinfo <demoname> <seg#> <info ...>\n" );
+			Con.Printf( "   title \"text\"\n" );
+			Con.Printf( "   play tracknum\n" );
+			Con.Printf( "   fade <in | out> <fast | slow>\n\n" );
+			Con.Printf( "Use -option to disable, e.g., -title\n" );
 			return;
 		}
 
 		if ( arguments[0].Contains( ".." ) )
 		{
-			Log.Info( "Relative pathnames are not allowed.\n" );
+			Con.Printf( "Relative pathnames are not allowed.\n" );
 			return;
 		}
 
@@ -2015,7 +2015,7 @@ partial class Client
 
 		if ( segment < 2 )
 		{
-			Log.Info( "Cannot Setdemoinfo the STARTUP segment.\n" );
+			Con.Printf( "Cannot Setdemoinfo the STARTUP segment.\n" );
 			return;
 		}
 
@@ -2023,23 +2023,23 @@ partial class Client
 
 		if ( !HasExtension( name, "dem" ) )
 		{
-			Log.Info( $"Error: couldn't open file {name}, demo files must have .dem extension.\n" );
+			Con.Printf( $"Error: couldn't open file {name}, demo files must have .dem extension.\n" );
 			return;
 		}
 
-		Log.Info( $"Setting info for segment {segment} in demo {name}.\n" );
+		Con.Printf( $"Setting info for segment {segment} in demo {name}.\n" );
 
 		var input = OpenDemoForEdit( name, out var output, out var header );
 
 		if ( input is null )
 		{
-			Log.Info( $"Error: couldn't open demo file {name} for Setdemoinfo.\n" );
+			Con.Printf( $"Error: couldn't open demo file {name} for Setdemoinfo.\n" );
 			return;
 		}
 
 		if ( !header.IsDemo )
 		{
-			Log.Info( $"{name} is not a demo file\n" );
+			Con.Printf( $"{name} is not a demo file\n" );
 			return;
 		}
 
@@ -2052,7 +2052,7 @@ partial class Client
 
 		if ( (uint)(count - 1) >= MaxDemoEntries )
 		{
-			Log.Info( $"ERROR: demo had bogus # of directory entries:  {count}\n" );
+			Con.Printf( $"ERROR: demo had bogus # of directory entries:  {count}\n" );
 			return;
 		}
 
@@ -2094,7 +2094,7 @@ partial class Client
 
 				if ( title.Length == 0 )
 				{
-					Log.Info( "Title flag requires a double-quoted value.\n" );
+					Con.Printf( "Title flag requires a double-quoted value.\n" );
 				}
 				else
 				{
@@ -2110,7 +2110,7 @@ partial class Client
 
 				if ( track.Length == 0 )
 				{
-					Log.Info( "Play flag requires a cd track #.\n" );
+					Con.Printf( "Play flag requires a cd track #.\n" );
 				}
 				else
 				{
@@ -2126,7 +2126,7 @@ partial class Client
 
 				if ( direction.Length == 0 )
 				{
-					Log.Info( "Fade flag requires a direction and speed (in fast, e.g.)\n" );
+					Con.Printf( "Fade flag requires a direction and speed (in fast, e.g.)\n" );
 
 					index += 2;
 
@@ -2137,7 +2137,7 @@ partial class Client
 
 				if ( !fadeIn && !direction.Equals( "OUT", StringComparison.OrdinalIgnoreCase ) )
 				{
-					Log.Info( "Fade flag requires a direction (in or out).\n" );
+					Con.Printf( "Fade flag requires a direction (in or out).\n" );
 
 					index += 2;
 
@@ -2151,13 +2151,13 @@ partial class Client
 				else if ( speed.Equals( "SLOW", StringComparison.OrdinalIgnoreCase ) )
 					entry.Flags |= fadeIn ? DemoEntry.FlagFadeInSlow : DemoEntry.FlagFadeOutSlow;
 				else
-					Log.Info( "Fade flag requires a speed (fast or slow).\n" );
+					Con.Printf( "Fade flag requires a speed (fast or slow).\n" );
 
 				index += 3;
 			}
 			else
 			{
-				Log.Info( $"Setdemoinfo, unrecognized flag:  {option}\n" );
+				Con.Printf( $"Setdemoinfo, unrecognized flag:  {option}\n" );
 				break;
 			}
 		}
@@ -2166,7 +2166,7 @@ partial class Client
 
 		WriteDirectory( output, entries );
 
-		Log.Info( "Replacing old demo with edited version.\n" );
+		Con.Printf( "Replacing old demo with edited version.\n" );
 
 		CloseDemoForWrite( output );
 	}
@@ -2176,7 +2176,7 @@ partial class Client
 		if ( _state == ClientState.Dedicated )
 		{
 			if ( Server.Get( Scene ) is not { Active: true } )
-				Log.Info( "Cannot play demos on a dedicated server.\n" );
+				Con.Printf( "Cannot play demos on a dedicated server.\n" );
 
 			return;
 		}
@@ -2185,12 +2185,12 @@ partial class Client
 
 		if ( count > MaxDemos )
 		{
-			Log.Info( $"Max {MaxDemos} demos in demoloop\n" );
+			Con.Printf( $"Max {MaxDemos} demos in demoloop\n" );
 
 			count = MaxDemos;
 		}
 
-		Log.Info( $"{count} demo(s) in loop\n" );
+		Con.Printf( $"{count} demo(s) in loop\n" );
 
 		for ( var i = 0; i < count; i++ )
 		{

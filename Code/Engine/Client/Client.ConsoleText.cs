@@ -95,23 +95,7 @@ partial class Client
 		height = EngineFontTall;
 	}
 
-	private readonly System.Text.StringBuilder _consoleLine = new();
-
-	public void ConsolePrint( string text )
-	{
-		_consoleLine.Append( text );
-
-		var end = text.LastIndexOf( '\n' );
-
-		if ( end < 0 )
-			return;
-
-		var pending = _consoleLine.Length - (text.Length - end);
-
-		Log.Info( _consoleLine.ToString( 0, pending ) );
-
-		_consoleLine.Remove( 0, pending + 1 );
-	}
+	public void ConsolePrint( string text ) => Con.Printf( text );
 
 	private const int MaxDebugLines = 32;
 	private const int MaxDebugLineLength = 79;

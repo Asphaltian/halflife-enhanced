@@ -65,7 +65,7 @@ partial class Server
 	{
 		if ( _nextUserMessage > 255 )
 		{
-			Log.Info( $"Not enough room to register message {name}" );
+			Con.Printf( $"Not enough room to register message {name}\n" );
 			return 0;
 		}
 
@@ -74,7 +74,7 @@ partial class Server
 
 		if ( name.Length >= 12 )
 		{
-			Log.Info( $"Message name too long: {name}" );
+			Con.Printf( $"Message name too long: {name}\n" );
 			return 0;
 		}
 
@@ -178,7 +178,7 @@ partial class Server
 		{
 			if ( FindUserMessage( _messageType ) is not { } message )
 			{
-				Log.Info( $"PF_MessageEnd_I:  Unknown User Msg {_messageType}" );
+				Con.DPrintf( $"PF_MessageEnd_I:  Unknown User Msg {_messageType}\n" );
 				return;
 			}
 
@@ -276,7 +276,7 @@ partial class Server
 		}
 		else
 		{
-			Log.Info( $"MULTICAST: Error {to}!\n" );
+			Con.Printf( $"MULTICAST: Error {to}!\n" );
 			return false;
 		}
 

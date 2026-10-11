@@ -17,7 +17,7 @@ partial class SoundEngine
 		{
 			_vox.Sentences.Clear();
 
-			Log.Info( $"VOX_ReadSentenceFile: Couldn't load {SentenceFile}" );
+			Con.DPrintf( $"VOX_ReadSentenceFile: Couldn't load {SentenceFile}\n" );
 			return;
 		}
 
@@ -53,7 +53,7 @@ partial class SoundEngine
 				return i;
 		}
 
-		Log.Info( "Sentence or Pitch shift ignored. > 16 playing!" );
+		Con.DPrintf( "Sentence or Pitch shift ignored. > 16 playing!\n" );
 
 		return -1;
 	}
@@ -92,7 +92,7 @@ partial class SoundEngine
 
 		if ( found is null )
 		{
-			Log.Info( $"VOX_LoadSound: no sentence named {name}" );
+			Con.DPrintf( $"VOX_LoadSound: no sentence named {name}\n" );
 			return false;
 		}
 

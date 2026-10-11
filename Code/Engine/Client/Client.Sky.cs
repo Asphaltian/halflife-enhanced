@@ -29,7 +29,7 @@ partial class Client
 
 		if ( path is null )
 		{
-			Log.Info( $"R_LoadSkys: Couldn't load {SkyDirectory}/{name}rt.tga\n" );
+			Con.Printf( $"R_LoadSkys: Couldn't load {SkyDirectory}/{name}rt.tga\n" );
 
 			if ( name == DefaultSky )
 				return;
@@ -40,7 +40,7 @@ partial class Client
 
 			if ( path is null )
 			{
-				Log.Info( $"R_LoadSkys: Couldn't load {SkyDirectory}/{DefaultSky}rt.tga\n" );
+				Con.Printf( $"R_LoadSkys: Couldn't load {SkyDirectory}/{DefaultSky}rt.tga\n" );
 				return;
 			}
 		}

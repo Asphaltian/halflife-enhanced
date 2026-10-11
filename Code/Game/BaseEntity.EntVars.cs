@@ -255,7 +255,7 @@ partial class BaseEntity
 			case "aiment":
 			case "owner":
 			case "groundentity":
-				Util.Alert( AlertType.Error, "Bad field in entity!!" );
+				Util.Alert( AlertType.Error, "Bad field in entity!!\n" );
 				break;
 			default:
 				return false;

@@ -37,7 +37,7 @@ public sealed class CustomDecalWad
 	{
 		if ( data is null || size < HeaderSize || data[0] != 'W' || data[1] != 'A' || data[2] != 'D' || data[3] != '3' )
 		{
-			Log.Info( "Custom file doesn't have WAD3 id\n" );
+			Con.Printf( "Custom file doesn't have WAD3 id\n" );
 			return null;
 		}
 
@@ -46,19 +46,19 @@ public sealed class CustomDecalWad
 
 		if ( lumps != 1 )
 		{
-			Log.Info( $"Custom file has wrong number of lumps {lumps}\n" );
+			Con.Printf( $"Custom file has wrong number of lumps {lumps}\n" );
 			return null;
 		}
 
 		if ( infoTable < 1 )
 		{
-			Log.Info( $"Custom file has bogus infotableofs {infoTable}\n" );
+			Con.Printf( $"Custom file has bogus infotableofs {infoTable}\n" );
 			return null;
 		}
 
 		if ( infoTable + LumpInfoSize != size )
 		{
-			Log.Info( $"Custom file has bogus infotableofs ( {infoTable + LumpInfoSize} > {size} )\n" );
+			Con.Printf( $"Custom file has bogus infotableofs ( {infoTable + LumpInfoSize} > {size} )\n" );
 			return null;
 		}
 
@@ -71,25 +71,25 @@ public sealed class CustomDecalWad
 
 		if ( wad._lumpSize != wad._lumpDiskSize )
 		{
-			Log.Info( $"Custom file has mismatched lump size ( {wad._lumpSize} vs. {wad._lumpDiskSize} )\n" );
+			Con.Printf( $"Custom file has mismatched lump size ( {wad._lumpSize} vs. {wad._lumpDiskSize} )\n" );
 			return null;
 		}
 
 		if ( wad._lumpDiskSize < 1 )
 		{
-			Log.Info( $"Custom file has bogus lump size {wad._lumpDiskSize}\n" );
+			Con.Printf( $"Custom file has bogus lump size {wad._lumpDiskSize}\n" );
 			return null;
 		}
 
 		if ( (uint)wad._lumpOffset < HeaderSize )
 		{
-			Log.Info( $"Custom file has bogus lump offset {wad._lumpOffset}\n" );
+			Con.Printf( $"Custom file has bogus lump offset {wad._lumpOffset}\n" );
 			return null;
 		}
 
 		if ( wad._lumpDiskSize + wad._lumpOffset > infoTable )
 		{
-			Log.Info( "Custom file has bogus lump 0\n" );
+			Con.Printf( "Custom file has bogus lump 0\n" );
 			return null;
 		}
 
@@ -142,7 +142,7 @@ public sealed class CustomDecalWad
 	{
 		if ( _lumpDiskSize < MipTexSize )
 		{
-			Log.Info( $"Draw_ValidateCustomLogo: Bad cached wad {Name}\n" );
+			Con.Printf( $"Draw_ValidateCustomLogo: Bad cached wad {Name}\n" );
 			return false;
 		}
 
@@ -151,7 +151,7 @@ public sealed class CustomDecalWad
 
 		if ( width == 0 || height == 0 || width > MaxTextureSize || height > MaxTextureSize )
 		{
-			Log.Info( $"Draw_ValidateCustomLogo: Bad cached wad tex size {width}x{height} on {Name}\n" );
+			Con.Printf( $"Draw_ValidateCustomLogo: Bad cached wad tex size {width}x{height} on {Name}\n" );
 			return false;
 		}
 
@@ -159,7 +159,7 @@ public sealed class CustomDecalWad
 		var size = MipChainSize( pixels );
 
 		if ( _lumpSize + TextureHeaderSize <= size + MipTexSize )
-			Log.Info( $"Draw_ValidateCustomLogo: Bad cached wad size {size + MipTexSize}/{_lumpSize + TextureHeaderSize} on {Name}\n" );
+			Con.Printf( $"Draw_ValidateCustomLogo: Bad cached wad size {size + MipTexSize}/{_lumpSize + TextureHeaderSize} on {Name}\n" );
 
 		Span<int> offsets = stackalloc int[MipLevels];
 
@@ -171,7 +171,7 @@ public sealed class CustomDecalWad
 			if ( offsets[i] + pixels == offsets[i + 1] )
 				continue;
 
-			Log.Info( $"Draw_ValidateCustomLogo: Bad cached wad {Name}\n" );
+			Con.Printf( $"Draw_ValidateCustomLogo: Bad cached wad {Name}\n" );
 			return false;
 		}
 
@@ -179,14 +179,14 @@ public sealed class CustomDecalWad
 
 		if ( count > PaletteColors )
 		{
-			Log.Info( $"Draw_ValidateCustomLogo: Bad cached wad palette size {count} on {Name}\n" );
+			Con.Printf( $"Draw_ValidateCustomLogo: Bad cached wad palette size {count} on {Name}\n" );
 			return false;
 		}
 
 		if ( offsets[0] >= MipTexSize && (uint)(offsets[0] + size + (count * 3) + 2) <= (uint)_lumpDiskSize )
 			return true;
 
-		Log.Info( $"Draw_ValidateCustomLogo: Bad cached wad {Name}\n" );
+		Con.Printf( $"Draw_ValidateCustomLogo: Bad cached wad {Name}\n" );
 
 		return false;
 	}

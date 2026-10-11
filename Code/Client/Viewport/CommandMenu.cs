@@ -673,7 +673,7 @@ public class MenuHandlerStringCommandClassSelect : MenuHandlerStringCommand
 	{
 		base.ActionPerformed( panel );
 
-		if ( Hud.ClassAutoKill != 0f && VguiUtil.Dll.PlayerClass != 0 )
+		if ( Common.Atof( Hud.ClassAutoKill ) != 0f && VguiUtil.Dll.PlayerClass != 0 )
 			Client.ClientCmd( "kill" );
 	}
 }
@@ -780,7 +780,7 @@ public class ClassButton : CommandButton
 		if ( (viewPort.GetValidClasses( 0 ) & TeamFortress.ValidClassInts[_classPlayerClass]) != 0 || (viewPort.GetValidClasses( team ) & TeamFortress.ValidClassInts[_classPlayerClass]) != 0 )
 			return true;
 
-		if ( Hud.ClassAutoKill != 0f )
+		if ( Common.Atof( Hud.ClassAutoKill ) != 0f )
 		{
 			if ( (viewPort.IsRandomPC() != 0 && _classPlayerClass == TeamFortress.PcRandom) || (viewPort.IsRandomPC() == 0 && _classPlayerClass == VguiUtil.Dll.PlayerClass) )
 				return true;

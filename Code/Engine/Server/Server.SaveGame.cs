@@ -102,31 +102,31 @@ partial class Server
 	{
 		if ( !Active )
 		{
-			Log.Info( "Not playing a local game." );
+			Con.Printf( "Not playing a local game.\n" );
 			return false;
 		}
 
 		if ( MaxClients != 1 )
 		{
-			Log.Info( "Can't save multiplayer games." );
+			Con.Printf( "Can't save multiplayer games.\n" );
 			return false;
 		}
 
 		if ( HasPendingChangeLevel || Client.Current is not { InLevel: true } )
 		{
-			Log.Info( "Can't save during transition." );
+			Con.Printf( "Can't save during transition.\n" );
 			return false;
 		}
 
 		if ( Client.Current is { Intermission: true } )
 		{
-			Log.Info( "Can't save in intermission." );
+			Con.Printf( "Can't save in intermission.\n" );
 			return false;
 		}
 
 		if ( _clients[0].Active && GetEdict( 1 ).Health <= 0f )
 		{
-			Log.Info( "Can't savegame with a dead player" );
+			Con.Printf( "Can't savegame with a dead player\n" );
 			return false;
 		}
 
@@ -173,7 +173,7 @@ partial class Server
 
 		var name = $"{SaveDirectory}{saveName}.sav";
 
-		Log.Info( $"Saving game to {name}..." );
+		Con.DPrintf( $"Saving game to {name}...\n" );
 
 		FileSystem.Data.CreateDirectory( SaveDirectory );
 
@@ -216,7 +216,7 @@ partial class Server
 	{
 		var name = $"{SaveDirectory}{saveName}.sav";
 
-		Log.Info( $"Loading game from {name}..." );
+		Con.Printf( $"Loading game from {name}...\n" );
 
 		if ( !FileSystem.Data.FileExists( name ) )
 			return null;

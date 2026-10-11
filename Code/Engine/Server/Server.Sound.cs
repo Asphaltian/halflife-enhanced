@@ -119,25 +119,25 @@ partial class Server
 	{
 		if ( volume < 0 || volume > 255 )
 		{
-			Log.Trace( $"SV_StartSound: volume = {volume}" );
+			Con.Printf( $"SV_StartSound: volume = {volume}" );
 			volume = volume < 0 ? 0 : 255;
 		}
 
 		if ( attenuation < 0f || attenuation > 4f )
 		{
-			Log.Trace( $"SV_StartSound: attenuation = {attenuation}" );
+			Con.Printf( $"SV_StartSound: attenuation = {attenuation}" );
 			attenuation = attenuation < 0f ? 0f : 4f;
 		}
 
 		if ( channel < 0 || channel > 7 )
 		{
-			Log.Trace( $"SV_StartSound: channel = {channel}" );
+			Con.Printf( $"SV_StartSound: channel = {channel}" );
 			channel = channel < 0 ? 0 : 7;
 		}
 
 		if ( pitch < 0 || pitch > 255 )
 		{
-			Log.Trace( $"SV_StartSound: pitch = {pitch}" );
+			Con.Printf( $"SV_StartSound: pitch = {pitch}" );
 			pitch = pitch < 0 ? 0 : 7;
 		}
 
@@ -149,7 +149,7 @@ partial class Server
 
 			if ( index >= MaxSentenceNumber )
 			{
-				Log.Info( $"invalid sentence number: {sample[1..]}" );
+				Con.Printf( $"invalid sentence number: {sample[1..]}" );
 				return false;
 			}
 
@@ -166,7 +166,7 @@ partial class Server
 
 			if ( index == 0 )
 			{
-				Log.Info( $"SV_StartSound: {sample} not precached ({index})\n" );
+				Con.Printf( $"SV_StartSound: {sample} not precached ({index})\n" );
 				return false;
 			}
 		}
@@ -231,7 +231,7 @@ partial class Server
 
 			if ( index >= MaxSentenceNumber )
 			{
-				Log.Trace( $"invalid sentence number: {sample[1..]}" );
+				Con.Printf( $"invalid sentence number: {sample[1..]}" );
 				return;
 			}
 		}
@@ -241,7 +241,7 @@ partial class Server
 
 			if ( index < 0 )
 			{
-				Log.Trace( $"no precache: {sample}" );
+				Con.Printf( $"no precache: {sample}\n" );
 				return;
 			}
 		}

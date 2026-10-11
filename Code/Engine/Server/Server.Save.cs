@@ -48,13 +48,13 @@ partial class Server
 
 		if ( !Active )
 		{
-			Log.Info( "Only the server may changelevel" );
+			Con.Printf( "Only the server may changelevel\n" );
 			return;
 		}
 
 		if ( MaxClients > 1 )
 		{
-			Log.Info( "changelevel2 <levelname> : not for use with multiplayer games" );
+			Con.Printf( "changelevel2 <levelname> : not for use with multiplayer games\n" );
 			return;
 		}
 
@@ -155,9 +155,11 @@ partial class Server
 
 	private SaveRestoreData LoadSaveData( string level )
 	{
+		Con.Printf( $"Loading game from {SaveDirectory}{level}.HL1...\n" );
+
 		if ( !_saveDirectory.TryGetValue( level, out var saved ) )
 		{
-			Log.Trace( $"Couldn't open save data file SAVE/{level}.HL1." );
+			Con.Printf( "ERROR: couldn't open.\n" );
 			return null;
 		}
 
@@ -379,14 +381,14 @@ partial class Server
 
 			if ( (entry.Flags & EntityTable.Global) != 0 )
 			{
-				Log.Trace( $"Merging changes for global: {entry.ClassName}" );
+				Con.DPrintf( $"Merging changes for global: {entry.ClassName}\n" );
 
 				edict.DispatchRestore( data, true );
 				FreeEdict( edict );
 				continue;
 			}
 
-			Log.Trace( $"Transferring {entry.ClassName} ({edict.Index})" );
+			Con.DPrintf( $"Transferring {entry.ClassName} ({edict.Index})\n" );
 
 			if ( edict.DispatchRestore( data, false ) < 0 )
 			{
@@ -401,7 +403,7 @@ partial class Server
 			if ( (entry.Flags & EntityTable.Player) == 0 && !followsClient
 				&& PointContents( (edict.AbsMin + edict.AbsMax) * 0.5f ) == (int)Contents.Solid )
 			{
-				Log.Trace( $"Suppressing {entry.ClassName}" );
+				Con.DPrintf( $"Suppressing {entry.ClassName}\n" );
 				FreeEdict( edict );
 				continue;
 			}

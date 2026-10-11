@@ -120,7 +120,7 @@ partial class Client
 
 		if ( model is not BrushModel brush || textureIndex >= DecalWad.Textures.Length )
 		{
-			Log.Info( "Decals must hit mod_brush!\n" );
+			Con.DPrintf( "Decals must hit mod_brush!\n" );
 			return;
 		}
 

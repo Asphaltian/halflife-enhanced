@@ -166,13 +166,13 @@ partial class Server
 
 		if ( eventIndex < 1 || eventIndex >= MaxEvents )
 		{
-			Log.Trace( $"EV_Playback:  index out of range {eventIndex}\n" );
+			Con.DPrintf( $"EV_Playback:  index out of range {eventIndex}\n" );
 			return;
 		}
 
 		if ( eventIndex >= _events.Count )
 		{
-			Log.Trace( $"EV_Playback:  no event for index {eventIndex}\n" );
+			Con.DPrintf( $"EV_Playback:  no event for index {eventIndex}\n" );
 			return;
 		}
 

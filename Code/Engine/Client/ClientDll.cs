@@ -90,13 +90,13 @@ public abstract class ClientDll
 		if ( _eventHooks.TryGetValue( queued.Name, out var hook ) )
 			hook( queued.Args );
 		else
-			Log.Info( $"CL_FireEvents:  Unknown event {queued.Index}:{queued.Name}" );
+			Con.DPrintf( $"CL_FireEvents:  Unknown event {queued.Index}:{queued.Name}\n" );
 	}
 
 	public void DispatchUserMsg( UserMessage message, byte[] data )
 	{
 		if ( !DispatchUserMsg( message.Name, data ) )
-			Log.Trace( $"UserMsg: No pfn {message.Name} {message.Id}\n" );
+			Con.DPrintf( $"UserMsg: No pfn {message.Name} {message.Id}\n" );
 	}
 
 	public bool DispatchUserMsg( string name, byte[] data )

@@ -93,7 +93,7 @@ partial class Client
 		} );
 
 		if ( request is < NetRequestServerList or > NetRequestDetails )
-			Log.Info( $"Unknown request type:  {request}\n" );
+			Con.Printf( $"Unknown request type:  {request}\n" );
 	}
 
 	public void NetCancelRequest( int context )

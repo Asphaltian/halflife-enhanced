@@ -107,7 +107,7 @@ partial class Server
 		WriteEntitiesToClient( client, message );
 
 		if ( client.Datagram.Overflowed )
-			Log.Info( $"WARNING: datagram overflowed for {client.Name}\n" );
+			Con.Printf( $"WARNING: datagram overflowed for {client.Name}\n" );
 		else
 			message.Write( client.Datagram );
 
@@ -115,7 +115,7 @@ partial class Server
 
 		if ( message.Overflowed )
 		{
-			Log.Info( $"WARNING: msg overflowed for {client.Name}\n" );
+			Con.Printf( $"WARNING: msg overflowed for {client.Name}\n" );
 			message.Clear();
 		}
 

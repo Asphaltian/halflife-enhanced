@@ -486,7 +486,7 @@ public static class Util
 	{
 		if ( Server.CreateNamedEntity( className ) is not BaseEntity entity )
 		{
-			Util.Alert( AlertType.Console, "NULL Ent in UTIL_PrecacheOther" );
+			Util.Alert( AlertType.Console, "NULL Ent in UTIL_PrecacheOther\n" );
 			return;
 		}
 

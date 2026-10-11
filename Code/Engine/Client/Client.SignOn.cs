@@ -80,6 +80,7 @@ partial class Client
 	private int _maxClients;
 	private int _maxEdicts;
 	private string _levelName = "";
+	private string _serverInfo = "";
 
 	public string LevelName => _state < ClientState.Connected ? "" : _levelName;
 
@@ -90,7 +91,6 @@ partial class Client
 	public bool Connected => _state >= ClientState.Connected;
 
 	public bool CanForwardToServer => _state is ClientState.Connected or ClientState.Uninitialized or ClientState.Active;
-	private string _serverInfo = "";
 
 	public bool InLevel => _state == ClientState.Active && _signon == SignOns;
 
@@ -144,7 +144,7 @@ partial class Client
 
 		_connectTime = Host.RealTime;
 
-		Log.Info( _connectRetry == 0 ? $"Connecting to {Connection.Host.Address}...\n" : $"Retrying {Connection.Host.Address}...\n" );
+		Con.Printf( _connectRetry == 0 ? $"Connecting to {Connection.Host.Address}...\n" : $"Retrying {Connection.Host.Address}...\n" );
 
 		_connectRetry++;
 
@@ -162,14 +162,14 @@ partial class Client
 				if ( _state == ClientState.Connected )
 				{
 					if ( !_demoPlayback )
-						Log.Trace( "Duplicate connect ack. received.  Ignored.\n" );
+						Con.DPrintf( "Duplicate connect ack. received.  Ignored.\n" );
 
 					return;
 				}
 
 				_netchan.Setup( true, false, Connection.Host.Address, Net.SendPacketToServer, BlockSize );
 
-				Log.Info( $"Connection accepted by {Connection.Host.Address}\n" );
+				Con.Printf( $"Connection accepted by {Connection.Host.Address}\n" );
 
 				ConnectionAccepted();
 				return;
@@ -178,11 +178,11 @@ partial class Client
 				if ( _state != ClientState.Connecting )
 					return;
 
-				Log.Info( packet.AsSpan( 1 ).StartsWith( Server.BadPassword ) ? packet[(1 + Server.BadPassword.Length)..] : packet[1..] );
+				Con.Printf( packet.AsSpan( 1 ).StartsWith( Server.BadPassword ) ? packet[(1 + Server.BadPassword.Length)..] : packet[1..] );
 
 				ExplainDisconnection( false, "#GameUI_ServerConnectionFailedBadPassword" );
 
-				Log.Info( "Invalid server password.\n" );
+				Con.Printf( "Invalid server password.\n" );
 
 				Disconnect();
 				return;
@@ -216,7 +216,7 @@ partial class Client
 		_netchan.Setup( true, true, slot.Address, slot.Netchan.Incoming.Enqueue, BlockSize );
 		slot.Netchan.Send = _netchan.Incoming.Enqueue;
 
-		Log.Trace( "Connection accepted.\n" );
+		Con.DPrintf( "Connection accepted.\n" );
 
 		ConnectionAccepted();
 	}
@@ -350,7 +350,7 @@ partial class Client
 	private static void ExplainDisconnection( bool print, string text )
 	{
 		if ( print && !text.StartsWith( '#' ) )
-			Log.Info( $"{text}\n" );
+			Con.Printf( $"{text}\n" );
 	}
 
 	private static void ForceCvars( bool multiplayer )
@@ -378,7 +378,7 @@ partial class Client
 	{
 		Hpak.CheckSize( "custom" );
 
-		Log.Trace( "Serverinfo packet received.\n" );
+		Con.DPrintf( "Serverinfo packet received.\n" );
 
 		ClearState();
 
@@ -391,7 +391,7 @@ partial class Client
 
 		if ( protocol != Host.ProtocolVersion && !_demoPlayback )
 		{
-			Log.Info( $"Server returned version {protocol}, not {Host.ProtocolVersion}\n" );
+			Con.Printf( $"Server returned version {protocol}, not {Host.ProtocolVersion}\n" );
 			return;
 		}
 
@@ -410,7 +410,7 @@ partial class Client
 
 		if ( _maxClients < 1 || _maxClients > Server.MaxClientsLimit )
 		{
-			Log.Info( $"Bad maxclients ({_maxClients}) from server\n" );
+			Con.Printf( $"Bad maxclients ({_maxClients}) from server\n" );
 			return;
 		}
 
@@ -430,17 +430,17 @@ partial class Client
 
 		if ( gameDirectory.Length == 0 )
 		{
-			Log.Info( "Server didn't specify a gamedir, assuming no change\n" );
+			Con.Printf( "Server didn't specify a gamedir, assuming no change\n" );
 		}
 		else if ( !gameDirectory.Equals( Server.GameDirectory, StringComparison.OrdinalIgnoreCase ) )
 		{
-			Log.Info( $"Server is running game {gameDirectory}.  Restart in that game to connect.\n" );
+			Con.Printf( $"Server is running game {gameDirectory}.  Restart in that game to connect.\n" );
 
 			Host.Disconnect();
 			return;
 		}
 
-		Log.Trace( $"Remote host:  {message.ReadString()}\n" );
+		Con.DPrintf( $"Remote host:  {message.ReadString()}\n" );
 
 		var levelName = message.ReadString();
 
@@ -580,7 +580,7 @@ partial class Client
 		var count = message.ReadByte();
 
 		for ( var i = 0; i < count; i++ )
-			Log.Info( $"Loading decals from {message.ReadString()}\n" );
+			Con.Printf( $"Loading decals from {message.ReadString()}\n" );
 	}
 
 	private void ParseSignonNum( MessageReader message )
@@ -589,7 +589,7 @@ partial class Client
 
 		if ( signon <= _signon )
 		{
-			Log.Info( $"Received signon {signon} when at {_signon}\n" );
+			Con.Printf( $"Received signon {signon} when at {_signon}\n" );
 
 			Host.Disconnect();
 			return;
@@ -602,7 +602,7 @@ partial class Client
 
 	private void SignonReply()
 	{
-		Log.Trace( $"CL_SignonReply: {_signon}\n" );
+		Con.DPrintf( $"CL_SignonReply: {_signon}\n" );
 
 		switch ( _signon )
 		{
@@ -644,7 +644,7 @@ partial class Client
 		if ( ValidStuffText( text ) )
 			Cmd.AddText( text );
 		else
-			Log.Info( $"Server tried to send invalid command:\"{text}\"\n" );
+			Con.Printf( $"Server tried to send invalid command:\"{text}\"\n" );
 	}
 
 	private static bool AtWordStart( string text, int index, bool lineBreaks )
@@ -752,7 +752,7 @@ partial class Client
 	{
 		if ( arguments.Length != 1 )
 		{
-			Log.Info( "usage: fullserverinfo <complete info string>\n" );
+			Con.Printf( "usage: fullserverinfo <complete info string>\n" );
 			return;
 		}
 
@@ -766,13 +766,13 @@ partial class Client
 	{
 		if ( _state is ClientState.Dedicated or ClientState.Disconnected )
 		{
-			Log.Info( "custom resource list not valid -- not connected\n" );
+			Con.Printf( "custom resource list not valid -- not connected\n" );
 			return;
 		}
 
 		if ( message.ReadLong() != _serverCount && !_demoPlayback )
 		{
-			Log.Info( "CL_SendResourceListBlock_f from different level\n" );
+			Con.Printf( "CL_SendResourceListBlock_f from different level\n" );
 			return;
 		}
 
@@ -780,7 +780,7 @@ partial class Client
 
 		if ( start < 0 || start > _customResources.Count )
 		{
-			Log.Info( "custom resource list request out of range\n" );
+			Con.Printf( "custom resource list request out of range\n" );
 			return;
 		}
 

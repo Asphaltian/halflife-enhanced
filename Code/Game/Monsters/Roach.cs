@@ -264,7 +264,7 @@ public class Roach : BaseMonster
 					break;
 
 				default:
-					Util.Alert( AlertType.Console, $"{ClassName} can't asses {sight.ClassName}" );
+					Util.Alert( AlertType.Console, $"{ClassName} can't asses {sight.ClassName}\n" );
 					break;
 			}
 		}

@@ -254,7 +254,7 @@ partial class Client
 
 			if ( model is null )
 			{
-				Log.Info( $"Tried to link edict {entity.Index} without model\n" );
+				Con.Printf( $"Tried to link edict {entity.Index} without model\n" );
 				continue;
 			}
 
@@ -282,7 +282,7 @@ partial class Client
 				if ( _beamEntities.Count < MaxBeamEntityList )
 					_beamEntities.Add( entity );
 				else
-					Log.Trace( "Overflow beam entity list!\n" );
+					Con.DPrintf( "Overflow beam entity list!\n" );
 
 				continue;
 			}

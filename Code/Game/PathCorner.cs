@@ -255,7 +255,7 @@ public class PathTrack : PointEntity
 			}
 			else
 			{
-				Util.Alert( AlertType.Console, $"Dead end link {Target}" );
+				Util.Alert( AlertType.Console, $"Dead end link {Target}\n" );
 			}
 		}
 

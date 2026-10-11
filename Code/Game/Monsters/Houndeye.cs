@@ -371,7 +371,7 @@ public class Houndeye : SquadMonster
 					(red, green, blue) = (62, 33, 211);
 					break;
 				default:
-					Util.Alert( AlertType.AiConsole, "Unsupported Houndeye SquadSize!" );
+					Util.Alert( AlertType.AiConsole, "Unsupported Houndeye SquadSize!\n" );
 					break;
 			}
 		}

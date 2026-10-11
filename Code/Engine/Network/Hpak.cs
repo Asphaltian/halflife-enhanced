@@ -174,13 +174,13 @@ public static class Hpak
 	{
 		if ( !IsPak( file ) )
 		{
-			Log.Info( $"{fileName} is not an HPAK file\n" );
+			Con.Printf( $"{fileName} is not an HPAK file\n" );
 			return null;
 		}
 
 		if ( BitConverter.ToInt32( file, 4 ) != Version )
 		{
-			Log.Info( "HPAK_List:  version mismatch\n" );
+			Con.Printf( "HPAK_List:  version mismatch\n" );
 			return null;
 		}
 
@@ -188,7 +188,7 @@ public static class Hpak
 
 		if ( count < 1 || count > MaxEntries )
 		{
-			Log.Info( $"ERROR: HPAK had bogus # of directory entries:  {count}\n" );
+			Con.Printf( $"ERROR: HPAK had bogus # of directory entries:  {count}\n" );
 			return null;
 		}
 
@@ -201,7 +201,7 @@ public static class Hpak
 
 		if ( size < MinLumpSize || size > MaxLumpSize )
 		{
-			Log.Info( $"HPAK_AddLump called with bogus lump, size:  {size}\n" );
+			Con.Printf( $"HPAK_AddLump called with bogus lump, size:  {size}\n" );
 			return;
 		}
 
@@ -209,10 +209,10 @@ public static class Hpak
 
 		if ( !resource.Md5.AsSpan().SequenceEqual( hash ) )
 		{
-			Log.Info( "HPAK_AddLump called with bogus lump, md5 mismatch\n" );
-			Log.Info( $"Purported:  {Md5Print( resource.Md5 )}\n" );
-			Log.Info( $"Actual   :  {Md5Print( hash )}\n" );
-			Log.Info( "Ignoring lump addition\n" );
+			Con.Printf( "HPAK_AddLump called with bogus lump, md5 mismatch\n" );
+			Con.Printf( $"Purported:  {Md5Print( resource.Md5 )}\n" );
+			Con.Printf( $"Actual   :  {Md5Print( hash )}\n" );
+			Con.Printf( "Ignoring lump addition\n" );
 
 			return;
 		}
@@ -233,7 +233,7 @@ public static class Hpak
 
 		if ( BitConverter.ToInt32( file, 4 ) != Version )
 		{
-			Log.Info( "Invalid .hpk version in HPAK_AddLump\n" );
+			Con.Printf( "Invalid .hpk version in HPAK_AddLump\n" );
 			return;
 		}
 
@@ -242,7 +242,7 @@ public static class Hpak
 
 		if ( (uint)count > MaxEntries )
 		{
-			Log.Info( $"ERROR: .hpk had bogus # of directory entries:  {count}\n" );
+			Con.Printf( $"ERROR: .hpk had bogus # of directory entries:  {count}\n" );
 			return;
 		}
 
@@ -265,7 +265,7 @@ public static class Hpak
 
 	private static void CreatePak( string fileName, Resource resource, byte[] data )
 	{
-		Log.Info( $"Creating HPAK {fileName}.\n" );
+		Con.Printf( $"Creating HPAK {fileName}.\n" );
 
 		var size = resource.DownloadSize;
 		var lumps = new byte[HeaderSize + size];
@@ -319,7 +319,7 @@ public static class Hpak
 
 		if ( Server.ReadFile( fileName ) is not { } file )
 		{
-			Log.Info( $"ERROR: couldn't open {fileName}.\n" );
+			Con.Printf( $"ERROR: couldn't open {fileName}.\n" );
 			return false;
 		}
 
@@ -335,7 +335,7 @@ public static class Hpak
 	{
 		if ( string.IsNullOrEmpty( pakName ) || resource is null )
 		{
-			Log.Info( "HPAK_RemoveLump:  Invalid arguments\n" );
+			Con.Printf( "HPAK_RemoveLump:  Invalid arguments\n" );
 			return;
 		}
 
@@ -345,19 +345,19 @@ public static class Hpak
 
 		if ( Server.ReadFile( fileName ) is not { } file )
 		{
-			Log.Info( $"Error:  couldn't open HPAK file {fileName} for removal.\n" );
+			Con.Printf( $"Error:  couldn't open HPAK file {fileName} for removal.\n" );
 			return;
 		}
 
 		if ( !IsPak( file ) )
 		{
-			Log.Info( $"{fileName} is not an HPAK file\n" );
+			Con.Printf( $"{fileName} is not an HPAK file\n" );
 			return;
 		}
 
 		if ( BitConverter.ToInt32( file, 4 ) != Version )
 		{
-			Log.Info( "ERROR: HPAK version outdated\n" );
+			Con.Printf( "ERROR: HPAK version outdated\n" );
 			return;
 		}
 
@@ -365,13 +365,13 @@ public static class Hpak
 
 		if ( count < 1 || count > MaxEntries )
 		{
-			Log.Info( $"ERROR: HPAK had bogus # of directory entries:  {count}\n" );
+			Con.Printf( $"ERROR: HPAK had bogus # of directory entries:  {count}\n" );
 			return;
 		}
 
 		if ( count == 1 )
 		{
-			Log.Info( $"Removing final lump from HPAK, deleting HPAK:\n  {fileName}\n" );
+			Con.Printf( $"Removing final lump from HPAK, deleting HPAK:\n  {fileName}\n" );
 
 			Server.RemoveFile( fileName );
 			return;
@@ -381,11 +381,11 @@ public static class Hpak
 
 		if ( FindResource( entries, resource.Md5 ) is null )
 		{
-			Log.Info( $"ERROR: HPAK doesn't contain specified lump:  {resource.Name}\n" );
+			Con.Printf( $"ERROR: HPAK doesn't contain specified lump:  {resource.Name}\n" );
 			return;
 		}
 
-		Log.Info( $"Removing {resource.Name} from HPAK {fileName}.\n" );
+		Con.Printf( $"Removing {resource.Name} from HPAK {fileName}.\n" );
 
 		using var lumps = new MemoryStream();
 
@@ -425,7 +425,7 @@ public static class Hpak
 
 		if ( MaxSize < 0f )
 		{
-			Log.Info( "hpk_maxsize < 0, setting to 0\n" );
+			Con.Printf( "hpk_maxsize < 0, setting to 0\n" );
 
 			Cvar.Set( "hpk_maxsize", "0" );
 			return;
@@ -437,7 +437,7 @@ public static class Hpak
 		if ( size < MaxSize * 1000000f )
 			return;
 
-		Log.Info( $"Server: Size of {fileName} > {MaxSize:F6} MB, deleting.\n" );
+		Con.Printf( $"Server: Size of {fileName} > {MaxSize:F6} MB, deleting.\n" );
 		Server.LogPrintf( $"Server: Size of {fileName} > {MaxSize:F6} MB, deleting.\n" );
 
 		Server.RemoveFile( fileName );

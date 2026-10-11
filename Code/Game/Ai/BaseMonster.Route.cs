@@ -290,7 +290,7 @@ partial class BaseMonster
 		if ( RouteIndex == RouteSize - 1 )
 		{
 			if ( !RefreshRoute() )
-				Util.Alert( AlertType.AiConsole, "Can't Refresh Route!!" );
+				Util.Alert( AlertType.AiConsole, "Can't Refresh Route!!\n" );
 
 			return;
 		}
@@ -466,7 +466,7 @@ partial class BaseMonster
 	{
 		if ( RouteIsClear() && (MovementGoal == MoveGoalType.None || !RefreshRoute()) )
 		{
-			Util.Alert( AlertType.AiConsole, "Tried to move with no route!" );
+			Util.Alert( AlertType.AiConsole, "Tried to move with no route!\n" );
 			TaskFail();
 			return;
 		}
@@ -535,7 +535,7 @@ partial class BaseMonster
 				else
 				{
 					TaskFail();
-					Util.Alert( AlertType.AiConsole, $"{ClassName} Failed to move ({(HasMemory( MemoryMoveFailed ) ? 1 : 0)})!" );
+					Util.Alert( AlertType.AiConsole, $"{ClassName} Failed to move ({(HasMemory( MemoryMoveFailed ) ? 1 : 0)})!\n" );
 				}
 
 				return;
@@ -596,7 +596,7 @@ partial class BaseMonster
 				break;
 
 			case TaskState.RunningTask:
-				Util.Alert( AlertType.Error, "Movement completed twice!" );
+				Util.Alert( AlertType.Error, "Movement completed twice!\n" );
 				break;
 		}
 
@@ -622,7 +622,7 @@ partial class BaseMonster
 
 		if ( !graph.GraphPresent || !graph.GraphPointersSet )
 		{
-			Util.Alert( AlertType.AiConsole, "Graph not ready for findcover!" );
+			Util.Alert( AlertType.AiConsole, "Graph not ready for findcover!\n" );
 			return false;
 		}
 
@@ -632,7 +632,7 @@ partial class BaseMonster
 
 		if ( myNode == Graph.NoNode )
 		{
-			Util.Alert( AlertType.AiConsole, $"FindCover() - {ClassName} has no nearest node!" );
+			Util.Alert( AlertType.AiConsole, $"FindCover() - {ClassName} has no nearest node!\n" );
 			return false;
 		}
 
@@ -676,7 +676,7 @@ partial class BaseMonster
 
 		if ( !graph.GraphPresent || !graph.GraphPointersSet )
 		{
-			Util.Alert( AlertType.AiConsole, "Graph not ready for BuildNearestRoute!" );
+			Util.Alert( AlertType.AiConsole, "Graph not ready for BuildNearestRoute!\n" );
 			return false;
 		}
 
@@ -685,7 +685,7 @@ partial class BaseMonster
 
 		if ( myNode == Graph.NoNode )
 		{
-			Util.Alert( AlertType.AiConsole, $"BuildNearestRoute() - {ClassName} has no nearest node!" );
+			Util.Alert( AlertType.AiConsole, $"BuildNearestRoute() - {ClassName} has no nearest node!\n" );
 			return false;
 		}
 

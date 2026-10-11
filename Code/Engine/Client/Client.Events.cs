@@ -133,7 +133,7 @@ partial class Client
 			}
 			else if ( args.EntIndex == 0 )
 			{
-				Log.Trace( "CL_ParseEvent:  Received non-packet entity index 0 for event\n" );
+				Con.DPrintf( "CL_ParseEvent:  Received non-packet entity index 0 for event\n" );
 			}
 			else if ( IsPlayerIndex( args.EntIndex ) )
 			{

@@ -461,7 +461,7 @@ public class DeadBarney : BaseMonster
 		Sequence = LookupSequence( Poses[_pose] );
 
 		if ( Sequence == -1 )
-			Util.Alert( AlertType.Console, "Dead barney with bad pose" );
+			Util.Alert( AlertType.Console, "Dead barney with bad pose\n" );
 
 		Health = 8f;
 

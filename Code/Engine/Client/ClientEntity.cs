@@ -374,7 +374,7 @@ public sealed partial class ClientEntity : Component
 			return;
 
 		if ( RenderMode == RenderMode.Glow && sprite is null )
-			Log.Info( "Non-sprite set to glow!" );
+			Con.DPrintf( "Non-sprite set to glow!\n" );
 
 		if ( sprite is not null )
 		{

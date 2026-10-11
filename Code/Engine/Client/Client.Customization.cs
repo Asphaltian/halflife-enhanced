@@ -86,7 +86,7 @@ partial class Client
 		for ( var i = 0; i < _customResources.Count; i++ )
 		{
 			if ( !Customization.Create( list, _customResources[i], _playerNum, 0, out _ ) )
-				Log.Trace( $"Problem with client customization {i}, ignoring..." );
+				Con.DPrintf( $"Problem with client customization {i}, ignoring..." );
 		}
 	}
 
@@ -115,13 +115,13 @@ partial class Client
 
 		if ( AllowDownload == 0f )
 		{
-			Log.Trace( "Refusing new resource, cl_allow_download set to 0\n" );
+			Con.DPrintf( "Refusing new resource, cl_allow_download set to 0\n" );
 			return;
 		}
 
 		if ( _state == ClientState.Active && DownloadInGame == 0f )
 		{
-			Log.Trace( "Refusing new resource, cl_download_ingame set to 0\n" );
+			Con.DPrintf( "Refusing new resource, cl_download_ingame set to 0\n" );
 			return;
 		}
 
@@ -143,16 +143,16 @@ partial class Client
 
 			_resourcesNeeded.Add( resource );
 
-			Log.Info( $"Requesting {resource.Name} from server\n" );
+			Con.Printf( $"Requesting {resource.Name} from server\n" );
 
 			StartResourceDownloading( "Custom resource propagation...\n", true );
 			return;
 		}
 
 		if ( duplicate )
-			Log.Trace( "Duplicate resource ignored for local client\n" );
+			Con.DPrintf( "Duplicate resource ignored for local client\n" );
 		else if ( !Customization.Create( list, resource, player, Customization.FromHpak, out _ ) )
-			Log.Trace( "Error loading customization\n" );
+			Con.DPrintf( "Error loading customization\n" );
 	}
 
 	private void ProcessCustomizationFile( Resource resource )
@@ -162,7 +162,7 @@ partial class Client
 
 		if ( resource.DownloadSize != data.Length )
 		{
-			Log.Info( $"CL_ProcessFile:  Downloaded {data.Length} bytes for purported {resource.DownloadSize} byte file, ignoring download\n" );
+			Con.Printf( $"CL_ProcessFile:  Downloaded {data.Length} bytes for purported {resource.DownloadSize} byte file, ignoring download\n" );
 			return;
 		}
 
@@ -174,9 +174,9 @@ partial class Client
 		var list = GetPlayerInfo( resource.PlayerNum ).Customizations;
 
 		if ( list.Exists( x => x.Resource.Md5.AsSpan().SequenceEqual( resource.Md5 ) ) )
-			Log.Trace( "Duplicate resource received and ignored.\n" );
+			Con.DPrintf( "Duplicate resource received and ignored.\n" );
 		else if ( !Customization.Create( list, resource, resource.PlayerNum, Customization.FromHpak, out _ ) )
-			Log.Info( $"Unable to create custom decal for player {resource.PlayerNum}\n" );
+			Con.Printf( $"Unable to create custom decal for player {resource.PlayerNum}\n" );
 	}
 
 	[ConCmd( "upload" )]
@@ -186,19 +186,19 @@ partial class Client
 	{
 		if ( name.Length == 0 )
 		{
-			Log.Info( "Upload without filename\n" );
+			Con.Printf( "Upload without filename\n" );
 			return;
 		}
 
 		if ( AllowUpload == 0f )
 		{
-			Log.Info( "Ingoring decal upload ( cl_allow_upload is 0 )\n" );
+			Con.Printf( "Ingoring decal upload ( cl_allow_upload is 0 )\n" );
 			return;
 		}
 
 		if ( name.Length != CustomizationNameLength || !name.StartsWith( CustomizationPrefix, StringComparison.OrdinalIgnoreCase ) )
 		{
-			Log.Info( "Ingoring upload of non-customization\n" );
+			Con.Printf( "Ingoring upload of non-customization\n" );
 			return;
 		}
 
@@ -210,7 +210,7 @@ partial class Client
 		{
 			if ( !hash.AsSpan().SequenceEqual( resource.Md5 ) )
 			{
-				Log.Trace( "Bogus data retrieved from custom.hpk, attempting to delete entry\n" );
+				Con.DPrintf( "Bogus data retrieved from custom.hpk, attempting to delete entry\n" );
 
 				Hpak.RemoveLump( name, resource );
 				return;
@@ -222,10 +222,10 @@ partial class Client
 
 				if ( !actual.AsSpan().SequenceEqual( resource.Md5 ) )
 				{
-					Log.Info( "HPAK_AddLump called with bogus lump, md5 mismatch\n" );
-					Log.Info( $"Purported:  {Hpak.Md5Print( resource.Md5 )}\n" );
-					Log.Info( $"Actual   :  {Hpak.Md5Print( actual )}\n" );
-					Log.Info( "Removing conflicting lump\n" );
+					Con.Printf( "HPAK_AddLump called with bogus lump, md5 mismatch\n" );
+					Con.Printf( $"Purported:  {Hpak.Md5Print( resource.Md5 )}\n" );
+					Con.Printf( $"Actual   :  {Hpak.Md5Print( actual )}\n" );
+					Con.Printf( "Removing conflicting lump\n" );
 
 					Hpak.RemoveLump( name, resource );
 					return;
@@ -235,7 +235,7 @@ partial class Client
 
 		if ( data is not { Length: > 0 } )
 		{
-			Log.Info( "Ingoring customization upload, couldn't find decal locally\n" );
+			Con.Printf( "Ingoring customization upload, couldn't find decal locally\n" );
 			return;
 		}
 

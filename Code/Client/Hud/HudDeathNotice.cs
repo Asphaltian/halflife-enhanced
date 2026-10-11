@@ -34,7 +34,7 @@ public sealed class HudDeathNotice( Hud hud ) : HudBase( hud )
 	private int _displayTime = 6;
 	private int _skull;
 
-	[ConVar( "hud_deathnotice_time" )]
+	[ConVar( "hud_deathnotice_time", ConVarFlags.Saved )]
 	private static float DeathNoticeTime { get; set; } = 6f;
 
 	public override void Init()

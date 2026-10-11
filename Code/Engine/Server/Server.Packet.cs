@@ -149,7 +149,7 @@ partial class Server
 
 			if ( pack.Count >= MaxPacketEntities )
 			{
-				Log.Trace( "Too many entities in visible packet list.\n" );
+				Con.DPrintf( "Too many entities in visible packet list.\n" );
 				break;
 			}
 

@@ -32,8 +32,8 @@ partial class Server
 	{
 		if ( arguments.Length != 1 )
 		{
-			Log.Info( "usage:  log < on | off >\n" );
-			Log.Info( _logActive ? "currently logging\n" : "not currently logging\n" );
+			Con.Printf( "usage:  log < on | off >\n" );
+			Con.Printf( _logActive ? "currently logging\n" : "not currently logging\n" );
 			return;
 		}
 
@@ -45,7 +45,7 @@ partial class Server
 			if ( _logFile is not null )
 				LogClose();
 
-			Log.Info( "Server logging disabled.\n" );
+			Con.Printf( "Server logging disabled.\n" );
 
 			_logActive = false;
 			return;
@@ -59,7 +59,7 @@ partial class Server
 			return;
 		}
 
-		Log.Info( $"log:  unknown parameter {arguments[0]}, 'on' and 'off' are valid\n" );
+		Con.Printf( $"log:  unknown parameter {arguments[0]}, 'on' and 'off' are valid\n" );
 	}
 
 	private static void LogClose()
@@ -77,7 +77,7 @@ partial class Server
 
 		if ( MpLogFile == 0f )
 		{
-			Log.Info( "Server logging data to console.\n" );
+			Con.Printf( "Server logging data to console.\n" );
 			return;
 		}
 
@@ -104,7 +104,7 @@ partial class Server
 			if ( !FileSystem.Data.FileExists( candidate ) )
 				break;
 
-			Log.Info( $"Server logging data to file {candidate}\n" );
+			Con.Printf( $"Server logging data to file {candidate}\n" );
 
 			fileName = candidate;
 			break;
@@ -112,7 +112,7 @@ partial class Server
 
 		if ( fileName is null )
 		{
-			Log.Info( $"Unable to open logfiles under {baseName}\nLogging disabled\n" );
+			Con.Printf( $"Unable to open logfiles under {baseName}\nLogging disabled\n" );
 
 			_logActive = false;
 			return;
@@ -138,7 +138,7 @@ partial class Server
 			return;
 
 		if ( MpLogEcho != 0f )
-			Log.Info( line );
+			Con.Printf( line );
 
 		if ( _logFile is null || MpLogFile == 0f )
 			return;

@@ -219,6 +219,47 @@ public sealed class Delta
 		return new Delta { Fields = fields };
 	}
 
+	[ConCmd( "delta_stats" )]
+	private static void StatsCommand()
+	{
+		Con.Printf( "Delta Stats\n" );
+
+		foreach ( var (name, delta) in Registry )
+		{
+			if ( delta is null )
+				continue;
+
+			Con.Printf( $"Stats for '{name}'\n" );
+
+			for ( var i = 0; i < delta.Fields.Length; i++ )
+			{
+				var field = delta.Fields[i];
+
+				Con.Printf( $"  {i + 1:D2} {field.Name,10}:  s {field.SendCount,5} r {field.ReceivedCount,5}\n" );
+			}
+
+			Con.Printf( "\n" );
+		}
+	}
+
+	[ConCmd( "delta_clear" )]
+	private static void ClearStatsCommand()
+	{
+		Con.Printf( "Clearing delta stats\n" );
+
+		foreach ( var (_, delta) in Registry )
+		{
+			if ( delta is null )
+				continue;
+
+			foreach ( var field in delta.Fields )
+			{
+				field.SendCount = 0;
+				field.ReceivedCount = 0;
+			}
+		}
+	}
+
 	public static Delta LookupRegistration( string name )
 	{
 		foreach ( var (registeredName, delta) in Registry )
@@ -322,7 +363,7 @@ public sealed class Delta
 			{
 				if ( !tokens.Is( "{" ) )
 				{
-					Log.Info( $"DELTA_ParseDescription:  Expecting {{, got {tokens.Token}\n" );
+					Con.Printf( $"DELTA_ParseDescription:  Expecting {{, got {tokens.Token}\n" );
 					return null;
 				}
 
@@ -404,7 +445,7 @@ public sealed class Delta
 		{
 			if ( tokens.Token.Length < 1 )
 			{
-				Log.Info( "DELTA_ParseField:  Expecting fieldtype info\n" );
+				Con.Printf( "DELTA_ParseField:  Expecting fieldtype info\n" );
 				return false;
 			}
 
@@ -464,7 +505,7 @@ public sealed class Delta
 
 		if ( !tokens.Is( ")" ) )
 		{
-			Log.Info( $"DELTA_ParseField:  Expecting ), got {tokens.Token}\n" );
+			Con.Printf( $"DELTA_ParseField:  Expecting ), got {tokens.Token}\n" );
 			return false;
 		}
 
@@ -484,7 +525,7 @@ public sealed class Delta
 				return field;
 		}
 
-		Log.Info( $"DELTA_FindField:  Warning, couldn't find {name}\n" );
+		Con.Printf( $"DELTA_FindField:  Warning, couldn't find {name}\n" );
 
 		return null;
 	}
@@ -497,7 +538,7 @@ public sealed class Delta
 				return i;
 		}
 
-		Log.Info( $"DELTA_FindFieldIndex:  Warning, couldn't find {name}\n" );
+		Con.Printf( $"DELTA_FindFieldIndex:  Warning, couldn't find {name}\n" );
 
 		return -1;
 	}
@@ -598,7 +639,7 @@ public sealed class Delta
 					break;
 
 				default:
-					Log.Info( $"Bad field type {field.Type & int.MaxValue}\n" );
+					Con.Printf( $"Bad field type {field.Type & int.MaxValue}\n" );
 					changed = false;
 					break;
 			}
@@ -754,7 +795,7 @@ public sealed class Delta
 					break;
 
 				default:
-					Log.Info( "unknown send field type\n" );
+					Con.Printf( "unknown send field type\n" );
 					break;
 			}
 		}
@@ -801,7 +842,7 @@ public sealed class Delta
 						break;
 
 					default:
-						Log.Info( $"unparseable field type {type}\n" );
+						Con.Printf( $"unparseable field type {type}\n" );
 						break;
 				}
 
@@ -950,7 +991,7 @@ public sealed class Delta
 					break;
 
 				default:
-					Log.Info( $"unparseable field type {type}\n" );
+					Con.Printf( $"unparseable field type {type}\n" );
 					break;
 			}
 		}
@@ -1011,7 +1052,7 @@ public sealed class Delta
 					}
 
 				default:
-					Log.Info( $"Bad field type {field.Type & int.MaxValue}\n" );
+					Con.Printf( $"Bad field type {field.Type & int.MaxValue}\n" );
 					continue;
 			}
 

@@ -241,7 +241,7 @@ partial class Server
 
 		if ( !loopback && SvPassword.Length != 0 && !SvPassword.Equals( "none", StringComparison.OrdinalIgnoreCase ) && SvPassword != Info.ValueForKey( userInfo, "password" ) )
 		{
-			Log.Info( $"{address}:  password failed\n" );
+			Con.Printf( $"{address}:  password failed\n" );
 
 			rejectReason = BadPassword;
 			return false;

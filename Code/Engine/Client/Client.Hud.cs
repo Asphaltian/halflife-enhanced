@@ -148,7 +148,7 @@ partial class Client
 
 		if ( GetSpriteFrame( sprite, frame ) is not { } spriteFrame )
 		{
-			Log.Trace( $"Client.dll {function} error:  invalid frame" );
+			Con.DPrintf( $"Client.dll {function} error:  invalid frame\n" );
 			return;
 		}
 
@@ -274,7 +274,7 @@ partial class Client
 		if ( !CanForwardToServer )
 		{
 			if ( !Cmd.Argv( 0 ).Equals( "setinfo", StringComparison.OrdinalIgnoreCase ) )
-				Log.Info( $"Can't \"{Cmd.Argv( 0 )}\", not connected" );
+				Con.Printf( $"Can't \"{Cmd.Argv( 0 )}\", not connected\n" );
 
 			return;
 		}

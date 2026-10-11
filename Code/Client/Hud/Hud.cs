@@ -109,26 +109,37 @@ public sealed class Hud( HalfLifeClientDll dll )
 	public readonly TeamInfo[] TeamInfo = new TeamInfo[MaxTeams + 1];
 	public readonly int[] IsSpectator = new int[MaxPlayers + 1];
 
-	[ConVar( "hud_classautokill" )]
-	public static float ClassAutoKill { get; set; } = 1f;
+	private static string _classAutoKill = "1";
+	private static string _autoWeaponSwitch = "1";
 
-	[ConVar( "hud_takesshots" )]
+	[ConVar( "hud_classautokill", ConVarFlags.Saved | ConVarFlags.UserInfo )]
+	public static string ClassAutoKill
+	{
+		get => _classAutoKill;
+		set => Client.SetUserInfo( "hud_classautokill", ref _classAutoKill, value );
+	}
+
+	[ConVar( "hud_takesshots", ConVarFlags.Saved )]
 	private static float TakeScreenshots { get; set; } = 0f;
 
-	[ConVar( "zoom_sensitivity_ratio" )]
+	[ConVar( "zoom_sensitivity_ratio", ConVarFlags.Saved )]
 	private static float ZoomSensitivityRatio { get; set; } = 1.2f;
 
-	[ConVar( "cl_autowepswitch" )]
-	private static float AutoWeaponSwitch { get; set; } = 1f;
+	[ConVar( "cl_autowepswitch", ConVarFlags.Saved | ConVarFlags.UserInfo )]
+	private static string AutoWeaponSwitch
+	{
+		get => _autoWeaponSwitch;
+		set => Client.SetUserInfo( "cl_autowepswitch", ref _autoWeaponSwitch, value );
+	}
 
 	private static float DefaultFov => Preferences.FieldOfView;
 
 	public float MouseSensitivity { get; private set; }
 
-	[ConVar( "hud_capturemouse" )]
+	[ConVar( "hud_capturemouse", ConVarFlags.Saved )]
 	public static float CaptureMouse { get; set; } = 1f;
 
-	[ConVar( "hud_draw" )]
+	[ConVar( "hud_draw", ConVarFlags.Saved )]
 	public static float DrawHud { get; set; } = 1f;
 	private ClientSprite[] _spriteList;
 	private int[] _sprites;
@@ -601,7 +612,7 @@ public sealed class Hud( HalfLifeClientDll dll )
 				break;
 
 			default:
-				Log.Trace( "Unknown demo buffer type, skipping." );
+				Con.DPrintf( "Unknown demo buffer type, skipping.\n" );
 				break;
 		}
 	}

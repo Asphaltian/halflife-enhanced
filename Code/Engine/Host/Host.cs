@@ -6,6 +6,10 @@ namespace GoldSrc;
 
 public static partial class Host
 {
+	private const int MaxMapCommandLength = 54;
+	private const int MaxSaveSlotDigits = 5;
+	private const int MaxSaveSlot = 12;
+
 	private static bool _bound;
 
 	[ConVar( "developer" )]
@@ -43,12 +47,12 @@ public static partial class Host
 	{
 		if ( Server.Current is not { Active: true } )
 		{
-			Log.Info( "Usage:\nSetmaster unavailable, start a server first.\n" );
+			Con.Printf( "Usage:\nSetmaster unavailable, start a server first.\n" );
 			return;
 		}
 
 		if ( arguments.Length is < 1 or > 4 )
-			Log.Info( "Usage:\nSetmaster <enable | disable>\n" );
+			Con.Printf( "Usage:\nSetmaster <enable | disable>\n" );
 	}
 
 	[ConCmd( "maxplayers" )]
@@ -59,13 +63,13 @@ public static partial class Host
 
 		if ( arguments.Length != 1 )
 		{
-			Log.Info( $"\"maxplayers\" is \"{server.MaxClients}\"" );
+			Con.Printf( $"\"maxplayers\" is \"{server.MaxClients}\"\n" );
 			return;
 		}
 
 		if ( server.Active )
 		{
-			Log.Info( "maxplayers cannot be changed while a server is running." );
+			Con.Printf( "maxplayers cannot be changed while a server is running.\n" );
 			return;
 		}
 
@@ -73,7 +77,7 @@ public static partial class Host
 
 		if ( count > Server.MaxClientsLimit )
 		{
-			Log.Info( $"\"maxplayers\" set to \"{Server.MaxClientsLimit}\"" );
+			Con.Printf( $"\"maxplayers\" set to \"{Server.MaxClientsLimit}\"\n" );
 
 			count = Server.MaxClientsLimit;
 		}
@@ -83,8 +87,6 @@ public static partial class Host
 		Cvar.SetValue( "deathmatch", count == 1 ? 0f : 1f );
 	}
 
-	private const int MaxMapCommandLength = 54;
-
 	[ConCmd( "map" )]
 	public static void MapCommand( string mapName = null )
 	{
@@ -93,13 +95,13 @@ public static partial class Host
 
 		if ( mapName is null )
 		{
-			Log.Info( "map <levelname> : changes server to specified map" );
+			Con.Printf( "map <levelname> : changes server to specified map\n" );
 			return;
 		}
 
 		if ( mapName.Length > MaxMapCommandLength )
 		{
-			Log.Info( "map change failed: command string is too long." );
+			Con.Printf( "map change failed: command string is too long.\n" );
 			return;
 		}
 
@@ -111,7 +113,7 @@ public static partial class Host
 
 		if ( Server.FindMountPath( $"maps/{mapName}.bsp" ) is null )
 		{
-			Log.Info( $"map change failed: '{mapName}' not found on server." );
+			Con.Printf( $"map change failed: '{mapName}' not found on server.\n" );
 			return;
 		}
 
@@ -129,19 +131,19 @@ public static partial class Host
 
 		if ( saveName is null )
 		{
-			Log.Info( "save <savename> : save a game" );
+			Con.Printf( "save <savename> : save a game\n" );
 			return;
 		}
 
 		if ( saveName.StartsWith( '/' ) || saveName.Contains( ".." ) || saveName.Contains( ':' ) || saveName.Contains( '\\' ) )
 		{
-			Log.Info( $"Couldn't open {saveName} (contains illegal characters)." );
+			Con.Printf( $"Couldn't open {saveName} (contains illegal characters).\n" );
 			return;
 		}
 
 		if ( SaveFileBase( saveName ) is not { } fileBase )
 		{
-			Log.Info( $"Couldn't open {saveName} (wrong file extension, must be .sav)" );
+			Con.Printf( $"Couldn't open {saveName} (wrong file extension, must be .sav)\n" );
 			return;
 		}
 
@@ -176,12 +178,12 @@ public static partial class Host
 
 		if ( saveName is null )
 		{
-			Log.Info( "load <savename> : load a game" );
+			Con.Printf( "load <savename> : load a game\n" );
 			return;
 		}
 
 		if ( !Load( server, saveName ) )
-			Log.Info( "Error loading saved game" );
+			Con.Printf( "Error loading saved game\n" );
 	}
 
 	[ConCmd( "reload" )]
@@ -199,9 +201,6 @@ public static partial class Host
 			_ = Map( server, mapName, false, false, shutdown: true );
 	}
 
-	private const int MaxSaveSlotDigits = 5;
-	private const int MaxSaveSlot = 12;
-
 	private static bool Load( Server server, string saveName )
 	{
 		if ( string.IsNullOrEmpty( saveName ) )
@@ -209,7 +208,7 @@ public static partial class Host
 
 		if ( saveName.Contains( ".." ) )
 		{
-			Log.Info( "Relative pathnames are not allowed." );
+			Con.Printf( "Relative pathnames are not allowed.\n" );
 			return false;
 		}
 
@@ -269,7 +268,7 @@ public static partial class Host
 	{
 		if ( levelName is null )
 		{
-			Log.Info( "changelevel2 <levelname> : continue game on a new level in the unit" );
+			Con.Printf( "changelevel2 <levelname> : continue game on a new level in the unit\n" );
 			return;
 		}
 
@@ -281,19 +280,19 @@ public static partial class Host
 	{
 		if ( levelName is null )
 		{
-			Log.Info( "changelevel <levelname> : continue game on a new level" );
+			Con.Printf( "changelevel <levelname> : continue game on a new level\n" );
 			return;
 		}
 
 		if ( Server.Current is not { Active: true } server || Client.Current is { DemoPlayback: true } )
 		{
-			Log.Info( "Only the server may changelevel" );
+			Con.Printf( "Only the server may changelevel\n" );
 			return;
 		}
 
 		if ( !Server.IsMapValid( levelName ) )
 		{
-			Log.Info( $"changelevel failed: '{levelName}' not found on server." );
+			Con.Printf( $"changelevel failed: '{levelName}' not found on server.\n" );
 			return;
 		}
 
@@ -449,7 +448,7 @@ public static partial class Host
 	[ConCmd( "echo" )]
 	public static void Echo( params string[] arguments )
 	{
-		Log.Info( string.Concat( arguments.Select( argument => $"{argument} " ) ) );
+		Con.Printf( string.Concat( arguments.Select( argument => $"{argument} " ) ) );
 	}
 
 	[ConCmd( "setinfo" )]
@@ -463,7 +462,7 @@ public static partial class Host
 
 		if ( arguments.Length != 2 )
 		{
-			Log.Info( "usage: setinfo [ <key> <value> ]" );
+			Con.Printf( "usage: setinfo [ <key> <value> ]\n" );
 			return;
 		}
 
@@ -475,6 +474,66 @@ public static partial class Host
 		}
 
 		Server.Current.SetUserInfo( arguments[0], arguments[1] );
+	}
+
+	private static string ReadInfoToken( string info, ref int position )
+	{
+		var start = position;
+
+		while ( position < info.Length && info[position] != '\\' )
+			position++;
+
+		return info[start..position];
+	}
+
+	[ConCmd( "fullinfo" )]
+	public static void FullInfo( params string[] arguments )
+	{
+		if ( arguments.Length != 1 )
+		{
+			Con.Printf( "fullinfo <complete info string>\n" );
+			return;
+		}
+
+		var info = arguments[0];
+		var position = info.StartsWith( '\\' ) ? 1 : 0;
+
+		while ( position < info.Length )
+		{
+			var key = ReadInfoToken( info, ref position );
+
+			if ( position >= info.Length )
+			{
+				Con.Printf( "MISSING VALUE\n" );
+				return;
+			}
+
+			position++;
+
+			var value = ReadInfoToken( info, ref position );
+
+			if ( position < info.Length )
+				position++;
+
+			if ( !Cmd.FromClient )
+			{
+				Client.SetUserInfoKey( key, value );
+				Cmd.ForwardToServer( "fullinfo", arguments );
+				return;
+			}
+
+			Server.Current.SetUserInfo( key, value );
+		}
+	}
+
+	[ConCmd( "shutdownserver" )]
+	public static void ShutdownServerCommand()
+	{
+		if ( Client.Current is { Dedicated: false } client )
+			client.Disconnect();
+
+		if ( Server.Current is { Active: true } server )
+			server.ShutdownServer();
 	}
 
 	[ConCmd( "pause" )]
@@ -558,7 +617,7 @@ public static partial class Host
 			&& !FindPassableSpace( server, player, up, -1f )
 			&& !FindPassableSpace( server, player, forward, -1f ) )
 		{
-			Log.Trace( "Can't find the world\n" );
+			Con.DPrintf( "Can't find the world\n" );
 		}
 
 		player.Origin = player.OldOrigin;

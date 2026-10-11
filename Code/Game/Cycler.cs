@@ -112,7 +112,7 @@ public class Cycler : BaseMonster
 			FrameRate = 1f;
 			StudioFrameAdvance( 0.1f );
 			FrameRate = 0f;
-			Util.Alert( AlertType.Console, $"sequence: {Sequence}, frame {Frame:0}" );
+			Util.Alert( AlertType.Console, $"sequence: {Sequence}, frame {Frame:0}\n" );
 		}
 
 		return false;
@@ -179,7 +179,7 @@ public class CyclerSprite : BaseEntity
 	public override void Use( BaseEntity activator, BaseEntity caller, UseType useType, float value )
 	{
 		_animate = _animate == 0 ? 1 : 0;
-		Util.Alert( AlertType.Console, $"Sprite: {ModelName}" );
+		Util.Alert( AlertType.Console, $"Sprite: {ModelName}\n" );
 	}
 
 	public override bool TakeDamage( BaseEntity inflictor, BaseEntity attacker, float damage, int damageType )

@@ -46,7 +46,7 @@ partial class Client
 	{
 		if ( model is null )
 		{
-			Log.Trace( "temporary ent model invalid" );
+			Con.DPrintf( "temporary ent model invalid\n" );
 			return null;
 		}
 
@@ -68,7 +68,7 @@ partial class Client
 
 			if ( temp is null )
 			{
-				Log.Trace( "Couldn't alloc a high priority TENT!" );
+				Con.DPrintf( "Couldn't alloc a high priority TENT!\n" );
 				return null;
 			}
 		}
@@ -578,7 +578,7 @@ partial class Client
 
 		if ( GetModelByIndex( modelIndex ) is not { } model )
 		{
-			Log.Info( $"No model {modelIndex}!" );
+			Con.Printf( $"No model {modelIndex}!\n" );
 			return null;
 		}
 
@@ -650,7 +650,7 @@ partial class Client
 
 		if ( GetModelByIndex( modelIndex ) is not { } model )
 		{
-			Log.Info( $"No model {modelIndex}!" );
+			Con.Printf( $"No model {modelIndex}!\n" );
 			return;
 		}
 
@@ -745,7 +745,7 @@ partial class Client
 	{
 		if ( client < 0 || client > MaxClients )
 		{
-			Log.Info( "Bad client in R_KillAttachedTents()!" );
+			Con.Printf( "Bad client in R_KillAttachedTents()!\n" );
 			return;
 		}
 
@@ -765,7 +765,7 @@ partial class Client
 
 		if ( spriteIndex == 0 || GetSpriteModel( spriteIndex ) is not { } sprite )
 		{
-			Log.Trace( $"No Sprite {spriteIndex}!" );
+			Con.DPrintf( $"No Sprite {spriteIndex}!\n" );
 			return null;
 		}
 
@@ -885,13 +885,13 @@ partial class Client
 	{
 		if ( modelIndex == 0 )
 		{
-			Log.Trace( "No modelindex for funnel!!" );
+			Con.Printf( "No modelindex for funnel!!\n" );
 			return;
 		}
 
 		if ( GetModelByIndex( modelIndex ) is not { } model )
 		{
-			Log.Trace( $"No model {modelIndex}!" );
+			Con.Printf( $"No model {modelIndex}!\n" );
 			return;
 		}
 

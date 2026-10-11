@@ -108,7 +108,7 @@ partial class Client
 
 		_downloadUrl = url.Length > 127 ? url[..127] : url;
 
-		Log.Trace( $"Using {_downloadUrl} as primary download location\n" );
+		Con.DPrintf( $"Using {_downloadUrl} as primary download location\n" );
 	}
 
 	private void ParseResourceList( MessageReader message )
@@ -152,7 +152,7 @@ partial class Client
 	private void StartResourceDownloading( string text, bool custom )
 	{
 		if ( text is not null )
-			Log.Trace( text );
+			Con.DPrintf( text );
 
 		foreach ( var resource in _resourcesNeeded )
 		{
@@ -187,13 +187,13 @@ partial class Client
 	{
 		if ( AllowDownload == 0f )
 		{
-			Log.Trace( "Download refused, cl_allow_download is 0\n" );
+			Con.DPrintf( "Download refused, cl_allow_download is 0\n" );
 			return true;
 		}
 
 		if ( _state == ClientState.Active && DownloadInGame == 0f )
 		{
-			Log.Trace( "In-game download refused...\n" );
+			Con.DPrintf( "In-game download refused...\n" );
 			return true;
 		}
 
@@ -202,7 +202,7 @@ partial class Client
 
 		if ( _demoPlayback )
 		{
-			Log.Info( $"Warning! File {fileName} missing during demo playback." );
+			Con.Printf( $"Warning! File {fileName} missing during demo playback.\n" );
 			return true;
 		}
 
@@ -231,7 +231,7 @@ partial class Client
 
 			if ( _state == ClientState.Active && DownloadInGame == 0f )
 			{
-				Log.Info( $"Skipping in game download of {resource.Name}\n" );
+				Con.Printf( $"Skipping in game download of {resource.Name}\n" );
 
 				MoveToOnHandList( resource );
 				continue;
@@ -241,7 +241,7 @@ partial class Client
 			{
 				_resourcesNeeded.Remove( resource );
 
-				Log.Info( $"Invalid file type...skipping download of {resource.Name}\n" );
+				Con.Printf( $"Invalid file type...skipping download of {resource.Name}\n" );
 				continue;
 			}
 
@@ -311,9 +311,9 @@ partial class Client
 	private void ProcessFile( bool successfully, string name )
 	{
 		if ( !successfully )
-			Log.Info( $"Error: server failed to transmit file '{(name[0] == '!' ? "customization" : name)}'\n" );
+			Con.Printf( $"Error: server failed to transmit file '{(name[0] == '!' ? "customization" : name)}'\n" );
 		else if ( name[0] != '!' )
-			Log.Info( $"Processing {name}\n" );
+			Con.Printf( $"Processing {name}\n" );
 
 		var soundName = name.StartsWith( "sound/", StringComparison.OrdinalIgnoreCase ) ? name["sound/".Length..] : name;
 		var hash = name.StartsWith( CustomizationPrefix, StringComparison.OrdinalIgnoreCase ) ? Hpak.HexConvert( soundName[CustomizationPrefix.Length..], Resource.Md5Size * 2 ) : null;
@@ -362,7 +362,7 @@ partial class Client
 		}
 
 		if ( _netchan.TempBuffer is not null )
-			Log.Info( $"CL_ProcessFile: Received a decal {soundName}, but didn't find it in resources needed list!\n" );
+			Con.Printf( $"CL_ProcessFile: Received a decal {soundName}, but didn't find it in resources needed list!\n" );
 
 		_netchan.TempBuffer = null;
 	}
@@ -411,7 +411,7 @@ partial class Client
 					if ( _modelPrecache[resource.Index] is null )
 					{
 						if ( resource.Flags != 0 )
-							Log.Info( $"Model {resource.Name} not found and not available from server\n" );
+							Con.Printf( $"Model {resource.Name} not found and not available from server\n" );
 
 						if ( (resource.Flags & Resource.FatalIfMissing) != 0 )
 						{
@@ -435,7 +435,7 @@ partial class Client
 
 					if ( !Server.FileExists( resource.Name ) )
 					{
-						Log.Info( $"Script {resource.Name} not found and not available from server\n" );
+						Con.Printf( $"Script {resource.Name} not found and not available from server\n" );
 
 						if ( (resource.Flags & Resource.FatalIfMissing) != 0 )
 						{
@@ -449,7 +449,7 @@ partial class Client
 					break;
 
 				default:
-					Log.Trace( "Unknown resource type\n" );
+					Con.DPrintf( "Unknown resource type\n" );
 					break;
 			}
 
@@ -469,7 +469,7 @@ partial class Client
 
 		if ( _modelPrecache[1] is not { } world || _maxClients < 1 )
 		{
-			Log.Info( "Client world model is NULL\n" );
+			Con.Printf( "Client world model is NULL\n" );
 
 			ExplainDisconnection( true, "Client world model is NULL\n" );
 			Disconnect();
@@ -489,7 +489,7 @@ partial class Client
 				if ( _modelPrecache[resource.Index] is not null )
 					continue;
 
-				Log.Info( $"Model {resource.Name} not found\n" );
+				Con.Printf( $"Model {resource.Name} not found\n" );
 
 				if ( (resource.Flags & Resource.FatalIfMissing) != 0 )
 				{
@@ -509,7 +509,7 @@ partial class Client
 		worldEntity.CurState.ModelIndex = 1;
 		worldEntity.PacketState.ModelIndex = 1;
 
-		Log.Trace( "Setting up renderer...\n" );
+		Con.DPrintf( "Setting up renderer...\n" );
 
 		ClearParticles();
 		ClearBeams();

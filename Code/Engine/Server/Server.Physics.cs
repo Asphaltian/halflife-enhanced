@@ -220,7 +220,7 @@ partial class Server
 		var aim = edict.AimEntity;
 		if ( aim is null )
 		{
-			Log.Info( $"{edict.ClassName} movetype FOLLOW with NULL aiment" );
+			Con.DPrintf( $"{edict.ClassName} movetype FOLLOW with NULL aiment\n" );
 			edict.MoveType = MoveType.None;
 			return;
 		}

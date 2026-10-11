@@ -442,7 +442,7 @@ partial class Player
 
 		if ( Util.IsNullEnt( entity ) )
 		{
-			Util.Alert( AlertType.Console, "NULL Ent in GiveNamedItem!" );
+			Util.Alert( AlertType.Console, "NULL Ent in GiveNamedItem!\n" );
 			return;
 		}
 

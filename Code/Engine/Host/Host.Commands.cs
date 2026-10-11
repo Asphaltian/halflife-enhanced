@@ -7,11 +7,17 @@ partial class Host
 {
 	private const int BspVersion = 30;
 	private const int MaxMapPathLength = 64;
+	private const string StatusLogFile = "status.log";
+	private const int GameAppId = 70;
+
+	private const int CvarArchive = 1;
+	private const int CvarUserInfo = 2;
+	private const int CvarServer = 4;
 
 	public static void Version()
 	{
-		Log.Info( $"Protocol version {ProtocolVersion}\nExe version {VersionString()} ({ProductName()})\n" );
-		Log.Info( $"Exe build: 19:06:31 {BuildDate} ({BuildNumber()})\n" );
+		Con.Printf( $"Protocol version {ProtocolVersion}\nExe version {VersionString()} ({ProductName()})\n" );
+		Con.Printf( $"Exe build: 19:06:31 {BuildDate} ({BuildNumber()})\n" );
 	}
 
 	[ConCmd( "maps" )]
@@ -19,7 +25,7 @@ partial class Host
 	{
 		if ( arguments.Length != 1 )
 		{
-			Log.Info( "Usage:  maps <substring>\nmaps * for full listing\n" );
+			Con.Printf( "Usage:  maps <substring>\nmaps * for full listing\n" );
 			return;
 		}
 
@@ -33,7 +39,7 @@ partial class Host
 
 	private static void ListMaps( string substring )
 	{
-		Log.Info( "-------------\n" );
+		Con.Printf( "-------------\n" );
 
 		for ( var showOutdated = 1; showOutdated >= 0; showOutdated-- )
 		{
@@ -46,7 +52,7 @@ partial class Host
 
 				if ( path.Length >= MaxMapPathLength )
 				{
-					Log.Info( $"Map name too long: {name}\n" );
+					Con.Printf( $"Map name too long: {name}\n" );
 					continue;
 				}
 
@@ -55,16 +61,16 @@ partial class Host
 				if ( Server.LoadMountFile( path ) is { Length: >= 4 } data )
 					version = BitConverter.ToInt32( data, 0 );
 				else
-					Log.Info( $"Could not open map {path}\n" );
+					Con.Printf( $"Could not open map {path}\n" );
 
 				if ( version == BspVersion )
 				{
 					if ( showOutdated == 0 )
-						Log.Info( $"{name}\n" );
+						Con.Printf( $"{name}\n" );
 				}
 				else if ( showOutdated != 0 )
 				{
-					Log.Info( $"OUTDATED:  {name}\n" );
+					Con.Printf( $"OUTDATED:  {name}\n" );
 				}
 			}
 		}
@@ -75,26 +81,26 @@ partial class Host
 	{
 		if ( Server.Current is not { Active: true } server )
 		{
-			Log.Info( "Can't 'users', not running a server\n" );
+			Con.Printf( "Can't 'users', not running a server\n" );
 			return;
 		}
 
 		var count = 0;
 
-		Log.Info( "userid : uniqueid : name\n" );
-		Log.Info( "------ : ---------: ----\n" );
+		Con.Printf( "userid : uniqueid : name\n" );
+		Con.Printf( "------ : ---------: ----\n" );
 
 		foreach ( var client in server.Clients )
 		{
 			if ( (!client.Active && !client.Spawned && !client.Connected) || client.FakeClient || client.Name.Length == 0 )
 				continue;
 
-			Log.Info( $"{client.UserId,6} : {server.GetClientIdString( client )} : {client.Name}\n" );
+			Con.Printf( $"{client.UserId,6} : {server.GetClientIdString( client )} : {client.Name}\n" );
 
 			count++;
 		}
 
-		Log.Info( $"{count} users\n" );
+		Con.Printf( $"{count} users\n" );
 	}
 
 	[ConCmd( "user" )]
@@ -102,13 +108,13 @@ partial class Host
 	{
 		if ( Server.Current is not { Active: true } server )
 		{
-			Log.Info( "Can't 'user', not running a server\n" );
+			Con.Printf( "Can't 'user', not running a server\n" );
 			return;
 		}
 
 		if ( arguments.Length != 1 )
 		{
-			Log.Info( "Usage: user <username / userid>\n" );
+			Con.Printf( "Usage: user <username / userid>\n" );
 			return;
 		}
 
@@ -126,13 +132,8 @@ partial class Host
 			}
 		}
 
-		Log.Info( "User not in server.\n" );
+		Con.Printf( "User not in server.\n" );
 	}
-
-	private const string StatusLogFile = "status.log";
-	private const int GameAppId = 70;
-
-	private static StringBuilder _statusLine = new();
 
 	private static void StatusPrintf( Server server, bool conPrint, bool log, string text )
 	{
@@ -142,14 +143,7 @@ partial class Host
 		}
 		else
 		{
-			_statusLine.Append( text );
-
-			if ( text.EndsWith( '\n' ) )
-			{
-				Log.Info( _statusLine.ToString() );
-
-				_statusLine.Clear();
-			}
+			Con.Printf( text );
 		}
 
 		if ( log )
@@ -347,7 +341,7 @@ partial class Host
 	{
 		if ( Cmd.Argc < 2 )
 		{
-			Log.Info( "usage:  kick < name > | < # userid >\n" );
+			Con.Printf( "usage:  kick < name > | < # userid >\n" );
 			return;
 		}
 
@@ -428,7 +422,7 @@ partial class Host
 
 		if ( target.Loopback )
 		{
-			Log.Info( "The local player cannot be kicked!\n" );
+			Con.Printf( "The local player cannot be kicked!\n" );
 			return;
 		}
 
@@ -513,7 +507,7 @@ partial class Host
 	{
 		Client.StudioInterpolation = !Client.StudioInterpolation;
 
-		Log.Info( Client.StudioInterpolation ? "Frame Interpolation ON\n" : "Frame Interpolation OFF\n" );
+		Con.Printf( Client.StudioInterpolation ? "Frame Interpolation ON\n" : "Frame Interpolation OFF\n" );
 	}
 
 	[ConCmd( "sizeup" )]
@@ -529,10 +523,6 @@ partial class Host
 		if ( Client.ViewSize > 30f )
 			Client.ViewSize -= 10f;
 	}
-
-	private const int CvarArchive = 1;
-	private const int CvarUserInfo = 2;
-	private const int CvarServer = 4;
 
 	private static int CompareLowerCase( string a, string b ) => string.CompareOrdinal( a.ToLowerInvariant(), b.ToLowerInvariant() );
 
@@ -574,6 +564,65 @@ partial class Host
 		return cvars;
 	}
 
+	public static bool IsServerCvar( string name ) => CvarFlags().TryGetValue( name, out var flags ) && (flags & CvarServer) != 0;
+
+	[ConCmd( "cmdlist" )]
+	private static void CmdList( params string[] arguments )
+	{
+		const string logFile = "cmdlist.txt";
+
+		string partial = null;
+		var logging = false;
+
+		if ( arguments.Length >= 1 )
+		{
+			if ( arguments[0].Equals( "?", StringComparison.OrdinalIgnoreCase ) )
+			{
+				Con.Printf( "CmdList           : List all commands\nCmdList [Partial] : List commands starting with 'Partial'\nCmdList log [Partial] : Logs commands to file \"cmdlist.txt\" in the gamedir.\n" );
+				return;
+			}
+
+			if ( arguments[0].Equals( "log", StringComparison.OrdinalIgnoreCase ) )
+			{
+				logging = true;
+
+				if ( arguments.Length == 2 )
+					partial = arguments[1];
+			}
+			else
+			{
+				partial = arguments[0];
+			}
+		}
+
+		var count = 0;
+		var log = new StringBuilder();
+
+		Con.Printf( "Command List\n--------------\n" );
+
+		foreach ( var name in Cmd.CommandNames() )
+		{
+			if ( partial is not null && string.Compare( name, 0, partial, 0, partial.Length, StringComparison.OrdinalIgnoreCase ) != 0 )
+				continue;
+
+			var line = $"{(name.Length > 16 ? name[..16] : name),-16}\n";
+
+			Con.Printf( line );
+
+			log.Append( line );
+
+			count++;
+		}
+
+		if ( arguments.Length == 1 && !string.IsNullOrEmpty( partial ) )
+			Con.Printf( $"--------------\n{count,3} Commands for [{partial}]\nCmdList ? for syntax\n" );
+		else
+			Con.Printf( $"--------------\n{count,3} Total Commands\nCmdList ? for syntax\n" );
+
+		if ( logging )
+			FileSystem.Data.WriteAllText( logFile, log.ToString() );
+	}
+
 	[ConCmd( "cvarlist" )]
 	private static void CvarList( params string[] arguments )
 	{
@@ -586,7 +635,7 @@ partial class Host
 		{
 			if ( arguments[0].Equals( "?", StringComparison.OrdinalIgnoreCase ) )
 			{
-				Log.Info( "CvarList           : List all cvars\nCvarList [Partial] : List cvars starting with 'Partial'\nCvarList log [Partial] : Logs cvars to file \"cvarlist.txt\" in the gamedir.\n" );
+				Con.Printf( "CvarList           : List all cvars\nCvarList [Partial] : List cvars starting with 'Partial'\nCvarList log [Partial] : Logs cvars to file \"cvarlist.txt\" in the gamedir.\n" );
 				return;
 			}
 
@@ -605,7 +654,7 @@ partial class Host
 
 					if ( index > 99 )
 					{
-						Log.Info( "Can't cvarlist! Too many existing cvarlist output files in the gamedir!\n" );
+						Con.Printf( "Can't cvarlist! Too many existing cvarlist output files in the gamedir!\n" );
 						return;
 					}
 				}
@@ -630,7 +679,7 @@ partial class Host
 		var count = 0;
 		var log = new StringBuilder();
 
-		Log.Info( "CVar List\n--------------\n" );
+		Con.Printf( "CVar List\n--------------\n" );
 
 		foreach ( var (name, flags) in CvarFlags() )
 		{
@@ -657,7 +706,7 @@ partial class Host
 
 			line += "\n";
 
-			Log.Info( line );
+			Con.Printf( line );
 
 			log.Append( line );
 
@@ -665,15 +714,15 @@ partial class Host
 		}
 
 		if ( arguments.Length == 1 && !string.IsNullOrEmpty( partial ) )
-			Log.Info( $"--------------\n{count,3} CVars for [{partial}]\nCvarList ? for syntax\n" );
+			Con.Printf( $"--------------\n{count,3} CVars for [{partial}]\nCvarList ? for syntax\n" );
 		else
-			Log.Info( $"--------------\n{count,3} Total CVars\nCvarList ? for syntax\n" );
+			Con.Printf( $"--------------\n{count,3} Total CVars\nCvarList ? for syntax\n" );
 
 		if ( logFile is null )
 			return;
 
 		FileSystem.Data.WriteAllText( logFile, log.ToString() );
 
-		Log.Info( $"cvarlist logged to {logFile}\n" );
+		Con.Printf( $"cvarlist logged to {logFile}\n" );
 	}
 }
