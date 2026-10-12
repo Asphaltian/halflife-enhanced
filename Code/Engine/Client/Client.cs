@@ -45,7 +45,9 @@ public sealed partial class Client : GameObjectSystem<Client>
 
 	public Vector3 ViewAngles;
 
-	private readonly bool _editor;
+	private static Client _owner;
+
+	private readonly bool _inert;
 
 	private ClientDll _clientDll;
 	private double _accumulator;
@@ -73,27 +75,41 @@ public sealed partial class Client : GameObjectSystem<Client>
 
 	public Client( Scene scene ) : base( scene )
 	{
-		_editor = scene.IsEditor;
+		_inert = scene.IsEditor || _owner is not null;
+
+		if ( _owner is null )
+		{
+			Cvar.ReadArchive();
+			Keys.ReadArchive();
+			Server.SetGameDirectory();
+		}
+
+		if ( _inert )
+			return;
+
+		_owner = this;
 
 		if ( Application.IsDedicatedServer )
 			_state = ClientState.Dedicated;
+		else
+			CdAudio.Init();
 
 		Listen( Stage.StartUpdate, 0, Frame, "Client" );
 
-		if ( _state != ClientState.Dedicated )
-			CdAudio.Init();
-
-		Cvar.ReadArchive();
-		Keys.ReadArchive();
-		Server.SetGameDirectory();
-
-		if ( !_editor )
-			Delta.InitRegistry();
+		Delta.InitRegistry();
 	}
 
 	public override void Dispose()
 	{
-		if ( !_editor && _state != ClientState.Dedicated )
+		if ( _inert )
+		{
+			base.Dispose();
+			return;
+		}
+
+		_owner = null;
+
+		if ( _state != ClientState.Dedicated )
 		{
 			CdAudio.Shutdown();
 			ClientDll.Unload( this );
@@ -119,7 +135,7 @@ public sealed partial class Client : GameObjectSystem<Client>
 
 	private void Frame()
 	{
-		if ( _editor )
+		if ( _inert )
 			return;
 
 		if ( _state == ClientState.Dedicated )
