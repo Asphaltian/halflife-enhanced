@@ -329,6 +329,8 @@ public sealed partial class ClientEntity : Component
 		if ( player && model is not null )
 			model = client.SetupPlayerModel( playerIndex, model );
 
+		UpdateCollision( client, model );
+
 		var studio = (model as StudioModel)?.File;
 		var sprite = model as SpriteModel;
 

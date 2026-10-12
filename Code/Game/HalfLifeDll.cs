@@ -467,6 +467,8 @@ public sealed partial class HalfLifeDll : GameDll
 
 	public override void ClientDisconnect( Edict entity )
 	{
+		(entity as Player)?.RemoveRagdoll();
+
 		if ( GameOver )
 			return;
 

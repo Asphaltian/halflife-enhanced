@@ -378,12 +378,8 @@ partial class ClientEntity
 		return StudioDrawPlayer( header, entityModel, renderer, playerIndex, ref deadPlayer, false, WorldPosition, _renderAngles );
 	}
 
-	private bool StudioDrawPlayer( Studio.File header, bool entityModel, SkinnedModelRenderer renderer, int playerIndex, ref EntityState playerState, bool doInterp, Vector3 basePosition, Vector3 baseAngles )
+	private void StudioSetupPlayer( Client client, Studio.File header, PlayerInfo playerInfo, ref EntityState playerState, bool doInterp, Vector3 basePosition, Vector3 baseAngles )
 	{
-		var client = Client.Current;
-		var time = client.ClientTime;
-		var playerInfo = client.GetPlayerInfo( playerIndex );
-
 		if ( playerState.GaitSequence != 0 )
 		{
 			var originalAngles = Angles;
@@ -392,23 +388,32 @@ partial class ClientEntity
 
 			playerInfo.GaitSequence = playerState.GaitSequence;
 
-			StudioSetUpTransform( time, Origin, Angles, doInterp );
+			StudioSetUpTransform( client.ClientTime, Origin, Angles, doInterp );
 
 			Angles = originalAngles;
+
+			return;
 		}
-		else
-		{
-			CurState.Controller0 = CenterController;
-			CurState.Controller1 = CenterController;
-			CurState.Controller2 = CenterController;
-			CurState.Controller3 = CenterController;
 
-			CopyController( CurState, _latched.PrevController );
+		CurState.Controller0 = CenterController;
+		CurState.Controller1 = CenterController;
+		CurState.Controller2 = CenterController;
+		CurState.Controller3 = CenterController;
 
-			playerInfo.GaitSequence = 0;
+		CopyController( CurState, _latched.PrevController );
 
-			StudioSetUpTransform( time, basePosition, baseAngles, doInterp );
-		}
+		playerInfo.GaitSequence = 0;
+
+		StudioSetUpTransform( client.ClientTime, basePosition, baseAngles, doInterp );
+	}
+
+	private bool StudioDrawPlayer( Studio.File header, bool entityModel, SkinnedModelRenderer renderer, int playerIndex, ref EntityState playerState, bool doInterp, Vector3 basePosition, Vector3 baseAngles )
+	{
+		var client = Client.Current;
+		var time = client.ClientTime;
+		var playerInfo = client.GetPlayerInfo( playerIndex );
+
+		StudioSetupPlayer( client, header, playerInfo, ref playerState, doInterp, basePosition, baseAngles );
 
 		if ( doInterp )
 			_renderAngles = Angles;

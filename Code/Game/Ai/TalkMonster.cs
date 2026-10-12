@@ -475,8 +475,7 @@ public abstract class TalkMonster : BaseMonster
 
 		TargetEntity = null;
 
-		if ( !ShouldBecomeRagdoll( gib ) )
-			StopTalking();
+		StopTalking();
 
 		SetUse( null );
 

@@ -254,6 +254,8 @@ public class HalfLifeMultiplay : GameRules
 			Server.WriteShort( 0 );
 			Server.WriteShort( GetTeamIndex( other.TeamName ) + 1 );
 			Server.MessageEnd();
+
+			other.SendRagdoll( player );
 		}
 
 		if ( !HalfLifeDll.GameOver )

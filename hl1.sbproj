@@ -14,6 +14,10 @@
     "opfor"
   ],
   "IsStandaloneOnly": false,
+  "AI": {
+    "WriteAgentInstructions": true,
+    "EnableMcpCommunication": true
+  },
   "Metadata": {
     "MaxPlayers": 32,
     "MinPlayers": 1,

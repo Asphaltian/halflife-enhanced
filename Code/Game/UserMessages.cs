@@ -49,6 +49,8 @@ public static class UserMessages
 	public static int RagdollImpact { get; private set; }
 	public static int BoltImpact { get; private set; }
 	public static int RagdollExplosion { get; private set; }
+	public static int PlayerRagdoll { get; private set; }
+	public static int PlayerRagdollRemove { get; private set; }
 
 	public static void Link()
 	{
@@ -94,5 +96,7 @@ public static class UserMessages
 		RagdollImpact = Server.RegUserMsg( "RagImpact", 12 );
 		BoltImpact = Server.RegUserMsg( "BoltImpact", 18 );
 		RagdollExplosion = Server.RegUserMsg( "RagExplode", 10 );
+		PlayerRagdoll = Server.RegUserMsg( "PlayerRag", 7 );
+		PlayerRagdollRemove = Server.RegUserMsg( "PlayerRagRm", 1 );
 	}
 }

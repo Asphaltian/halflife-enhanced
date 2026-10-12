@@ -630,7 +630,7 @@ public abstract class BaseTurret : BaseMonster
 		Combat.AddMultiDamage( attacker, this, damage, damageType );
 	}
 
-	protected bool Die( Action deathThink )
+	protected bool Die( Action deathThink, BaseEntity inflictor, BaseEntity attacker, float damage, int damageType )
 	{
 		if ( Health > 0f )
 			return false;
@@ -646,8 +646,18 @@ public abstract class BaseTurret : BaseMonster
 		UseTargets( this, UseType.On, 0f );
 		NextThink = (float)(Server.Globals.Time + 0.1);
 
+		if ( !ShouldBecomeRagdoll( GibNever ) )
+			return true;
+
+		SetDamageForce( inflictor, attacker, damage, damageType );
+		DeathSounds();
+		RagdollEffects();
+		BecomeRagdoll();
+
 		return true;
 	}
+
+	protected virtual void RagdollEffects() { }
 
 	public override bool TakeDamage( BaseEntity inflictor, BaseEntity attacker, float damage, int damageType )
 	{
@@ -659,7 +669,7 @@ public abstract class BaseTurret : BaseMonster
 
 		Health -= damage;
 
-		if ( Die( TurretDeath ) )
+		if ( Die( TurretDeath, inflictor, attacker, damage, damageType ) )
 			return false;
 
 		if ( Health <= 10f && On != 0 )
@@ -980,7 +990,24 @@ public class Sentry : BaseTurret
 
 		Health -= damage;
 
-		return !Die( SentryDeath );
+		return !Die( SentryDeath, inflictor, attacker, damage, damageType );
+	}
+
+	protected override void RagdollEffects()
+	{
+		var source = Server.GetAttachment( this, 1 );
+
+		Server.MessageBegin( MessageDest.Pvs, Server.TempEntityMessage, source );
+		Server.WriteByte( TempEntity.Smoke );
+		Server.WriteCoord( source.x );
+		Server.WriteCoord( source.y );
+		Server.WriteCoord( source.z );
+		Server.WriteShort( GameModels.Smoke );
+		Server.WriteByte( 25 );
+		Server.WriteByte( 10 );
+		Server.MessageEnd();
+
+		Util.Sparks( source );
 	}
 
 	public void SentryTouch( BaseEntity other )

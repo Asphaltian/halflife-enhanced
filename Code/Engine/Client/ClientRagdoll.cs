@@ -8,6 +8,7 @@ public sealed class ClientRagdoll : Component
 
 	private const float OpaqueAlpha = 255f;
 	private const float ImpactStrength = 4000f;
+	private const float ExplosionStrength = 500f;
 	private const float SleepTolerance = 1f;
 	private const double TickInterval = 0.015;
 
@@ -33,10 +34,14 @@ public sealed class ClientRagdoll : Component
 
 	internal double CreateTime { get; private set; }
 
+	internal bool Player { get; private set; }
+
 	internal Vector3 Origin => _physics.Bodies[0].Component.WorldPosition;
 
-	internal void Init( SkinnedModelRenderer renderer, Studio.File header, Effects effects, int lightMultiplier, Transform[] previous, Transform[] current, float boneTime, Vector3 force, int forceBone )
+	internal void Init( SkinnedModelRenderer renderer, Studio.File header, Effects effects, int lightMultiplier, Transform[] previous, Transform[] current, float boneTime, Vector3 force, int forceBone, bool player )
 	{
+		Player = player;
+
 		_renderer = renderer;
 		_header = header;
 		_effects = effects;
@@ -118,9 +123,9 @@ public sealed class ClientRagdoll : Component
 		_lastOriginChangeTime = Client.Current.ClientTime;
 	}
 
-	internal void Explode( Vector3 force )
+	internal void Explode( Vector3 blast )
 	{
-		_physics.Bodies[0].Component.ApplyImpulse( force );
+		_physics.Bodies[0].Component.ApplyImpulse( blast * (Player ? ImpactStrength : ExplosionStrength) );
 
 		_lastOriginChangeTime = Client.Current.ClientTime;
 	}
@@ -170,6 +175,27 @@ public sealed class ClientRagdoll : Component
 		}
 	}
 
+	protected override void OnFixedUpdate()
+	{
+		var client = Client.Current;
+		var gravity = client.Gravity / Scene.PhysicsWorld.Gravity.Length;
+
+		foreach ( var body in _physics.Bodies )
+		{
+			var rigidbody = body.Component;
+
+			rigidbody.GravityScale = gravity;
+
+			if ( rigidbody.Sleeping )
+				continue;
+
+			var bounds = rigidbody.PhysicsBody.GetBounds();
+
+			if ( client.WaterSurface( bounds ) is { } level )
+				rigidbody.ApplyBuoyancy( new Plane( bounds.Center.WithZ( level ), Vector3.Up ), Time.Delta );
+		}
+	}
+
 	protected override void OnUpdate()
 	{
 		CheckSettle();
@@ -177,7 +203,7 @@ public sealed class ClientRagdoll : Component
 		if ( !_fadingOut )
 			return;
 
-		_alpha = MathF.Max( _alpha - (Client.RagdollFadeSpeed * Time.Delta), 0f );
+		_alpha = (int)MathF.Max( _alpha - ((int)Client.RagdollFadeSpeed * Time.Delta), 0f );
 
 		if ( _alpha == 0f )
 			GameObject.Destroy();

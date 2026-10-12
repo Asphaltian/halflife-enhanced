@@ -69,19 +69,17 @@ public class CrossbowBolt : BaseEntity
 		SetTouch( null );
 		SetThink( null );
 
-		Combat.ClearMultiDamage();
-		ScenePhysicsDamage.MeleeImpact( Globals.Trace, HalfLifeDll.SkillData.PlrDmgCrossbowMonster, Velocity );
-
 		if ( other.DamageMode != DamageNo )
 		{
 			var trace = Globals.Trace;
 			var owner = Owner as BaseEntity;
 			var direction = Util.Normalize( Velocity );
+			var damage = other.IsPlayer ? HalfLifeDll.SkillData.PlrDmgCrossbowClient : HalfLifeDll.SkillData.PlrDmgCrossbowMonster;
 
-			if ( other.IsPlayer )
-				other.TraceAttack( owner, HalfLifeDll.SkillData.PlrDmgCrossbowClient, direction, trace, DamageNeverGib );
-			else
-				other.TraceAttack( owner, HalfLifeDll.SkillData.PlrDmgCrossbowMonster, direction, trace, DamageBullet | DamageNeverGib );
+			Combat.ClearMultiDamage();
+			ScenePhysicsDamage.MeleeImpact( trace, damage, Velocity );
+
+			other.TraceAttack( owner, damage, direction, trace, other.IsPlayer ? DamageNeverGib : DamageBullet | DamageNeverGib );
 
 			Combat.ApplyMultiDamage( this, owner );
 

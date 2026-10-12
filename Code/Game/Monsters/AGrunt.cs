@@ -295,8 +295,6 @@ public class AGrunt : SquadMonster
 
 	public override int Classify() => ClassAlienMilitary;
 
-	public override bool CanBecomeRagdoll() => true;
-
 	public override void SetYawSpeed()
 	{
 		YawSpeed = Activity is Activity.TurnLeft or Activity.TurnRight ? 110f : 100f;

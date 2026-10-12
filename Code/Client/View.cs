@@ -45,6 +45,9 @@ partial class HalfLifeClientDll
 	private const float IdleYawLevel = 0.3f;
 	private const float IdleRollLevel = 0.1f;
 	private const float IdlePitchLevel = 0.3f;
+	private const float RagdollViewHeight = 14f;
+	private const float RagdollViewDistance = 96f;
+	private const float RagdollViewWallOffset = 6f;
 
 	public float IdleScale { get; set; }
 
@@ -130,7 +133,7 @@ partial class HalfLifeClientDll
 
 		refParams.ViewAngles.z += side;
 
-		if ( refParams.Health <= 0 && refParams.ViewHeight.z != 0f )
+		if ( refParams.Health <= 0 && refParams.ViewHeight.z != 0f && Engine.LocalRagdollOrigin is null )
 			refParams.ViewAngles.z = 80f;
 	}
 
@@ -464,9 +467,21 @@ partial class HalfLifeClientDll
 			LastViewAngles = refParams.ViewAngles;
 		}
 
+		if ( refParams.Health <= 0 && Engine.LocalRagdollOrigin is { } ragdollOrigin )
+			CalcRagdollRefdef( ref refParams, ragdollOrigin );
+
 		_lastTime = refParams.Time;
 
 		LastViewOrigin = refParams.ViewOrigin;
+	}
+
+	private void CalcRagdollRefdef( ref RefParams refParams, Vector3 origin )
+	{
+		origin.z += RagdollViewHeight;
+
+		MathLib.AngleVectors( refParams.ViewAngles, out var forward, out _, out _ );
+
+		refParams.ViewOrigin = Engine.TraceWorldBox( origin, origin - (forward * RagdollViewDistance), RagdollViewWallOffset );
 	}
 
 	private static void DropPunchAngle( float frameTime, ref Vector3 punchAngle )

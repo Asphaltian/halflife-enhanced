@@ -610,8 +610,6 @@ public class HGrunt : SquadMonster
 
 	public override int Classify() => ClassHumanMilitary;
 
-	public override bool CanBecomeRagdoll() => true;
-
 	public override void Killed( BaseEntity attacker, int gib )
 	{
 		if ( ShouldBecomeRagdoll( gib ) && GetBodygroup( GunGroup ) != GunNone )

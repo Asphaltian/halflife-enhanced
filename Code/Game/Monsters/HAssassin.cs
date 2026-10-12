@@ -175,8 +175,6 @@ public class HAssassin : BaseMonster
 
 	public override int Classify() => ClassHumanMilitary;
 
-	public override bool CanBecomeRagdoll() => true;
-
 	public override void SetYawSpeed() => YawSpeed = 360f;
 
 	public void Shoot()

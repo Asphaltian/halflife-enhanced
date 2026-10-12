@@ -32,6 +32,8 @@ partial class Client
 
 	public int FrameCount => _frameCount;
 
+	internal bool HasServer => Server.Get( Scene ) is { Active: true };
+
 	private bool IsSinglePlayerGame => (Server.Get( Scene ) is { Active: true } server ? server.MaxClients : _maxClients) == 1;
 
 	public double OldClientTime => _oldTime;
@@ -155,7 +157,7 @@ partial class Client
 			return state.Model;
 
 		state.Name = model;
-		state.Model = ModelCache.ForName( $"models/player/{model}/{model}.mdl" ) ?? entityModel;
+		state.Model = ModelCache.ForPlayer( model ) ?? entityModel;
 
 		return state.Model;
 	}

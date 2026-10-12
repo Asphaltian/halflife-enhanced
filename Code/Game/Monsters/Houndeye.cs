@@ -164,8 +164,6 @@ public class Houndeye : SquadMonster
 
 	public override int Classify() => ClassAlienMonster;
 
-	public override bool CanBecomeRagdoll() => true;
-
 	public override bool ValidateHintType( short hint )
 	{
 		for ( var i = 0; i < HoundHints.Length; i++ )

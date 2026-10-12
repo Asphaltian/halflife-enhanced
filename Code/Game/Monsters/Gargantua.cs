@@ -641,6 +641,8 @@ public class Gargantua : BaseMonster
 		smoker.NextThink = (float)(Server.Globals.Time + 2.5);
 	}
 
+	public override bool CanBecomeRagdoll() => false;
+
 	public override void Killed( BaseEntity attacker, int gib )
 	{
 		EyeOff();

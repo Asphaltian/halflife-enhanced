@@ -289,6 +289,8 @@ partial class Player
 			return;
 		}
 
+		RemoveRagdoll();
+
 		HalfLifeDll.GameRules.PlayerKilled( this, attacker, HalfLifeDll.LastInflictor );
 
 		if ( Tank is { } tank )
@@ -342,6 +344,9 @@ partial class Player
 			Effects |= Effects.NoDraw;
 			return;
 		}
+
+		if ( CanBecomeRagdoll() )
+			CreateRagdoll();
 
 		DeathSound();
 

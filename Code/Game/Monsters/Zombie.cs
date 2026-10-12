@@ -22,8 +22,6 @@ public class Zombie : BaseMonster
 
 	public override int Classify() => ClassAlienMonster;
 
-	public override bool CanBecomeRagdoll() => true;
-
 	public override void SetYawSpeed() => YawSpeed = 120f;
 
 	public override bool CheckRangeAttack1( float dot, float distance ) => false;

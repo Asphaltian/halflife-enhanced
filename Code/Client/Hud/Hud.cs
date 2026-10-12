@@ -274,6 +274,8 @@ public sealed class Hud( HalfLifeClientDll dll )
 		Dll.HookUserMsg( "RagImpact", MsgFuncRagdollImpact );
 		Dll.HookUserMsg( "BoltImpact", MsgFuncBoltImpact );
 		Dll.HookUserMsg( "RagExplode", MsgFuncRagdollExplosion );
+		Dll.HookUserMsg( "PlayerRag", MsgFuncPlayerRagdoll );
+		Dll.HookUserMsg( "PlayerRagRm", MsgFuncPlayerRagdollRemove );
 		Dll.HookUserMsg( "AllowSpec", MsgFuncAllowSpec );
 		Dll.HookUserMsg( "SpecFade", MsgFuncSpecFade );
 		Dll.HookUserMsg( "ResetFade", MsgFuncResetFade );
@@ -553,6 +555,24 @@ public sealed class Hud( HalfLifeClientDll dll )
 		var magnitude = message.ReadShort();
 
 		Engine.RagdollExplosion( origin, radius, magnitude );
+
+		return true;
+	}
+
+	private bool MsgFuncPlayerRagdoll( string name, byte[] data )
+	{
+		var message = new MessageBuffer( data );
+		var index = message.ReadByte();
+		var origin = new Vector3( message.ReadCoord(), message.ReadCoord(), message.ReadCoord() );
+
+		Engine.CreatePlayerRagdoll( index, origin );
+
+		return true;
+	}
+
+	private bool MsgFuncPlayerRagdollRemove( string name, byte[] data )
+	{
+		Engine.RemovePlayerRagdoll( new MessageBuffer( data ).ReadByte() );
 
 		return true;
 	}

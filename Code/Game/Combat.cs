@@ -593,13 +593,13 @@ partial class BaseMonster
 		IdealMonsterState = MonsterState.Dead;
 	}
 
-	public virtual bool CanBecomeRagdoll() => false;
+	public virtual bool CanBecomeRagdoll() => true;
 
 	private bool RagdollAllowed() => GameCvars.Ragdolls != 0f && CanBecomeRagdoll() && ClientRagdoll.Supports( Server.GetRenderModel( ModelIndex ) );
 
 	protected bool ShouldBecomeRagdoll( int gib ) => RagdollAllowed() && !ShouldGibMonster( gib );
 
-	private void BecomeRagdoll()
+	protected void BecomeRagdoll()
 	{
 		Server.MessageBegin( MessageDest.All, UserMessages.Ragdoll );
 		Server.WriteShort( Index );
@@ -622,6 +622,11 @@ partial class BaseMonster
 
 		SetThink( SubRemove );
 		NextThink = Server.Globals.Time + RagdollRemoveDelay;
+	}
+
+	protected void SetDamageForce( BaseEntity inflictor, BaseEntity attacker, float damage, int damageType )
+	{
+		_damageForce = CalcDamageForceVector( inflictor, attacker, damage, damageType, Combat.DamageForce );
 	}
 
 	private Vector3 CalcDamageForceVector( BaseEntity inflictor, BaseEntity attacker, float damage, int damageType, Vector3 damageForce )
@@ -725,7 +730,7 @@ partial class BaseMonster
 		{
 			HalfLifeDll.LastInflictor = inflictor;
 
-			_damageForce = CalcDamageForceVector( inflictor, attacker, damage, damageType, Combat.DamageForce );
+			SetDamageForce( inflictor, attacker, damage, damageType );
 
 			if ( (damageType & DamageAlwaysGib) != 0 )
 				Killed( attacker, GibAlways );

@@ -24,6 +24,8 @@ public static class ModelCache
 
 	public static void Add( Model model ) => _known[model.Name] = model;
 
+	public static Model ForPlayer( string name ) => ForName( $"models/player/{name}/{name}.mdl" );
+
 	public static Model ForName( string name )
 	{
 		if ( _known.TryGetValue( name, out var model ) )

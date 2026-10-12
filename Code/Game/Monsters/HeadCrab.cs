@@ -53,8 +53,6 @@ public class HeadCrab : BaseMonster
 
 	public override int Classify() => ClassAlienPrey;
 
-	public override bool CanBecomeRagdoll() => true;
-
 	public override Vector3 Center => new( Origin.x, Origin.y, Origin.z + 6f );
 
 	public override Vector3 BodyTarget( Vector3 source ) => Center;

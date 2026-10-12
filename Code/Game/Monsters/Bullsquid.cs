@@ -336,8 +336,6 @@ public class Bullsquid : BaseMonster
 
 	public override int Classify() => ClassAlienPredator;
 
-	public override bool CanBecomeRagdoll() => true;
-
 	public override void IdleSound()
 	{
 		Sound.Emit( this, SoundChannel.Voice, RandomSound( IdleSounds ), 1f, AttenuationIdle );
