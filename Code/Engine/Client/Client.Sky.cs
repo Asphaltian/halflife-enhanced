@@ -7,13 +7,17 @@ partial class Client
 	private const string SkyDirectory = "gfx/env";
 	private const string SkyTexturePrefix = "sky";
 	private const string DefaultSky = "desert";
-	private const string ModelExtension = ".vmdl";
+	private const string SceneExtension = ".scene";
 
 	private GameObject _sky;
 
 	private void ClearSky()
 	{
-		_sky?.Destroy();
+		if ( !_sky.IsValid() )
+			return;
+
+		_sky.Enabled = false;
+		_sky.Destroy();
 		_sky = null;
 	}
 
@@ -25,7 +29,7 @@ partial class Client
 			return;
 
 		var name = _moveVars.SkyName ?? "";
-		var path = Server.FindMountPath( $"{SkyDirectory}/{name}", ModelExtension );
+		var path = Server.FindMountPath( $"{SkyDirectory}/{name}", SceneExtension );
 
 		if ( path is null )
 		{
@@ -36,7 +40,7 @@ partial class Client
 
 			_moveVars.SkyName = DefaultSky;
 
-			path = Server.FindMountPath( $"{SkyDirectory}/{DefaultSky}", ModelExtension );
+			path = Server.FindMountPath( $"{SkyDirectory}/{DefaultSky}", SceneExtension );
 
 			if ( path is null )
 			{
@@ -46,10 +50,6 @@ partial class Client
 		}
 
 		_sky = new GameObject( true, "sky" ) { NetworkMode = NetworkMode.Never };
-
-		var renderer = _sky.AddComponent<ModelRenderer>();
-
-		renderer.Model = Sandbox.Model.Load( $"{path}{ModelExtension}" );
-		renderer.RenderType = ModelRenderer.ShadowRenderType.Off;
+		_sky.AddComponent<Skybox3D>().SkyboxScene = SceneFile.Load( $"{path}{SceneExtension}" );
 	}
 }
