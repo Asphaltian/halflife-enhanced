@@ -15,7 +15,6 @@
   ],
   "IsStandaloneOnly": false,
   "AI": {
-    "WriteAgentInstructions": true,
     "EnableMcpCommunication": true
   },
   "Metadata": {
