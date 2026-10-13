@@ -9,7 +9,7 @@ partial class Client
 	private const int IrradianceChannels = 4;
 	private const int ProbeChannels = 4;
 	private const int MaxLight = 255;
-	private const float SamplerScale = 0.5f * MathF.PI;
+	private const int LightVolumeBakeVersion = 1;
 
 	private readonly record struct LightVolumeProbe( int Index, LightSample Sample, byte[] Styles );
 
@@ -52,6 +52,7 @@ partial class Client
 		var volume = _lightVolumeObject.AddComponent<IndirectLightVolume>();
 
 		volume.Bounds = new BBox( WorldFile.Models[0].Mins, WorldFile.Models[0].Maxs ).Grow( LightVolumeMargin );
+		volume.BakeVersion = LightVolumeBakeVersion;
 		volume.IrradianceTexture = _lightVolume?.Irradiance ?? irradiance;
 		volume.DistanceTexture = Texture.Find( $"{path}/distance.vtex" );
 		volume.RelocationTexture = relocation;
@@ -142,9 +143,9 @@ partial class Client
 
 		Span<ushort> value = stackalloc ushort[3];
 
-		value[0] = BitConverter.HalfToUInt16Bits( (Half)(ScreenToLinear( red * scale ) / SamplerScale) );
-		value[1] = BitConverter.HalfToUInt16Bits( (Half)(ScreenToLinear( green * scale ) / SamplerScale) );
-		value[2] = BitConverter.HalfToUInt16Bits( (Half)(ScreenToLinear( blue * scale ) / SamplerScale) );
+		value[0] = BitConverter.HalfToUInt16Bits( (Half)ScreenToLinear( red * scale ) );
+		value[1] = BitConverter.HalfToUInt16Bits( (Half)ScreenToLinear( green * scale ) );
+		value[2] = BitConverter.HalfToUInt16Bits( (Half)ScreenToLinear( blue * scale ) );
 
 		var x = probe.Index % counts.x;
 		var y = probe.Index / counts.x % counts.y;
