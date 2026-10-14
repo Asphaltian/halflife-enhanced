@@ -480,6 +480,9 @@ public class Scientist : TalkMonster
 	{
 		SetUse( null );
 
+		if ( ShouldBecomeRagdoll( gib ) )
+			_painTime = 0f;
+
 		base.Killed( attacker, gib );
 	}
 
