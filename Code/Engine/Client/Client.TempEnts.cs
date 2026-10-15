@@ -372,14 +372,26 @@ partial class Client
 
 		if ( (effects & Effects.MuzzleFlash) == Effects.MuzzleFlash )
 		{
-			var light = AllocElight( 0 );
+			DLight light;
 
-			light.Origin = attachments[0];
-			light.Radius = 16f;
-			light.Decay = 320f;
+			if ( NewMuzzleFlash == 0f )
+			{
+				light = AllocElight( 0 );
+				light.Origin = attachments[0];
+				light.Radius = 16f;
+				light.Decay = 320f;
+				light.B = 64;
+			}
+			else
+			{
+				light = AllocDlight( 0 );
+				light.Origin = attachments[0];
+				light.Radius = 300f;
+				light.B = 128;
+			}
+
 			light.R = 255;
 			light.G = 192;
-			light.B = 64;
 			light.Die = (float)(ClientTime + 0.05);
 
 			effects &= ~Effects.MuzzleFlash;

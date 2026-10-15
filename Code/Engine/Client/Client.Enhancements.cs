@@ -5,6 +5,9 @@ partial class Client
 	[ConVar( "r_ao", ConVarFlags.Saved )]
 	public static float AmbientOcclusionEnabled { get; set; }
 
+	[ConVar( "r_newmuzzleflash", ConVarFlags.Saved )]
+	public static float NewMuzzleFlash { get; set; }
+
 	private AmbientOcclusion _ambientOcclusion;
 
 	private void UpdateEnhancements( CameraComponent camera )
