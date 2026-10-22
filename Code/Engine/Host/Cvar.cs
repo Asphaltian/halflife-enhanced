@@ -9,6 +9,8 @@ public static class Cvar
 	private const string SensitivityName = "sensitivity";
 	private const string HostNameName = "hostname";
 	private const string VoiceLoopbackName = "voice_loopback";
+	private const string ServerPasswordName = "sv_password";
+	private const string PasswordName = "password";
 
 	public static float GetFloat( string name ) => Common.Atof( GetString( name ) );
 
@@ -24,6 +26,8 @@ public static class Cvar
 			|| name.Equals( SensitivityName, StringComparison.OrdinalIgnoreCase )
 			|| name.Equals( HostNameName, StringComparison.OrdinalIgnoreCase )
 			|| name.Equals( VoiceLoopbackName, StringComparison.OrdinalIgnoreCase )
+			|| name.Equals( ServerPasswordName, StringComparison.OrdinalIgnoreCase )
+			|| name.Equals( PasswordName, StringComparison.OrdinalIgnoreCase )
 			|| ConsoleSystem.GetValue( name ) is not null;
 	}
 
@@ -40,6 +44,12 @@ public static class Cvar
 
 		if ( name.Equals( VoiceLoopbackName, StringComparison.OrdinalIgnoreCase ) )
 			return FormatValue( Client.VoiceLoopback );
+
+		if ( name.Equals( ServerPasswordName, StringComparison.OrdinalIgnoreCase ) )
+			return Server.SvPassword;
+
+		if ( name.Equals( PasswordName, StringComparison.OrdinalIgnoreCase ) )
+			return Client.Password;
 
 		return ConsoleSystem.GetValue( name, "" );
 	}
@@ -71,6 +81,18 @@ public static class Cvar
 		if ( name.Equals( VoiceLoopbackName, StringComparison.OrdinalIgnoreCase ) )
 		{
 			Client.VoiceLoopback = Common.Atof( value );
+			return;
+		}
+
+		if ( name.Equals( ServerPasswordName, StringComparison.OrdinalIgnoreCase ) )
+		{
+			Server.SvPassword = value;
+			return;
+		}
+
+		if ( name.Equals( PasswordName, StringComparison.OrdinalIgnoreCase ) )
+		{
+			Client.Password = value;
 			return;
 		}
 

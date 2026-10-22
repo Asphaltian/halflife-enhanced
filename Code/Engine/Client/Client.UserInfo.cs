@@ -27,8 +27,7 @@ partial class Client
 		set => SetUserInfo( "name", ref _playerName, StripWhitespace( Printable( value ) ) );
 	}
 
-	[ConVar( "password", ConVarFlags.UserInfo )]
-	private static string Password
+	public static string Password
 	{
 		get => _password;
 		set => SetUserInfo( "password", ref _password, value );

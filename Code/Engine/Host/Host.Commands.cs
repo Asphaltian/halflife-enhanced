@@ -533,7 +533,9 @@ partial class Host
 			["volume"] = CvarArchive,
 			["sensitivity"] = CvarArchive,
 			["hostname"] = 0,
-			["voice_loopback"] = 0
+			["voice_loopback"] = 0,
+			["sv_password"] = CvarServer,
+			["password"] = CvarUserInfo
 		};
 
 		foreach ( var type in Game.TypeLibrary.GetTypes() )

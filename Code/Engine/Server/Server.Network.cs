@@ -25,8 +25,7 @@ partial class Server
 	[ConVar( "sv_use_steam_networking" )]
 	private static float SvUseSteamNetworking { get; set; } = 1f;
 
-	[ConVar( "sv_password" )]
-	private static string SvPassword { get; set => Server.SetServerCvar( "sv_password", ref field, value ); } = "";
+	public static string SvPassword { get; set => Server.SetServerCvar( "sv_password", ref field, value ); } = "";
 
 	[ConVar( "sv_proxies", ConVarFlags.Replicated )]
 	private static float SvProxies { get; set => Server.SetServerCvar( "sv_proxies", ref field, value ); } = 1f;

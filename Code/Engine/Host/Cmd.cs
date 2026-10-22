@@ -17,6 +17,7 @@ public static class Cmd
 
 	private static readonly string[] DispatchedCommands = ["+voicerecord", "-voicerecord", "exec", "version", "status", "kick", "disconnect", "connect", "reconnect", "quit", "soundlist"];
 	private static readonly string[] FilteredCommands = ["removedemo", "cd", "say", "setinfo", "timerefresh"];
+	private static readonly string[] GameOwnedCvars = ["sv_password", "password"];
 	private static readonly string[] PrivilegedCvars = ["sv_logsecret", "rcon_address", "rcon_port", "cl_filterstuffcmd", "rcon_password"];
 	private static readonly string[] FilteredCvars = ["sys_ticrate", "fps_max", "developer", "rate", "ex_interp", "volume", "MP3Volume", "speak_enabled", "voice_enable"];
 	private static readonly string[] FilteredPrefixes = ["cl_", "gl_", "m_", "r_", "hud_"];
@@ -273,6 +274,19 @@ public static class Cmd
 				Con.Printf( $"\"hostname\" is \"{Cvar.GetString( "hostname" )}\"\n" );
 			else
 				Cvar.Set( "hostname", Argv( 1 ) );
+
+			return;
+		}
+
+		foreach ( var name in GameOwnedCvars )
+		{
+			if ( !Argv( 0 ).Equals( name, StringComparison.OrdinalIgnoreCase ) )
+				continue;
+
+			if ( Argc == 1 )
+				Con.Printf( $"\"{name}\" is \"{Cvar.GetString( name )}\"\n" );
+			else
+				Cvar.Set( name, Argv( 1 ) );
 
 			return;
 		}
