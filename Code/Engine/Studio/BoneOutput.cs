@@ -181,9 +181,6 @@ public sealed class BoneOutput
 			for ( var i = 1; i < header.Bones.Length; i++ )
 				bounds = bounds.AddPoint( world.PointToWorld( transforms[i].Position ) );
 
-			// Dumb issue: the renderer drops models that get small on screen (r_size_cull_threshold, 0.25%),
-			// which GoldSrc doesn't do so an MP5 grenade blinks out about 350 units away.
-			// Type "r_size_cull_threshold 0" in the console for a workaround
 			_bounds = bounds.Grow( renderer.Model.Bounds.Size.Length );
 			sceneModel.Bounds = _bounds;
 		}
