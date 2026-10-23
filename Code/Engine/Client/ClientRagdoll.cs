@@ -67,8 +67,9 @@ public sealed class ClientRagdoll : Component
 
 		var totalMass = 0f;
 
-		foreach ( var body in _physics.Bodies )
+		for ( var i = 0; i < _physics.Bodies.Count; i++ )
 		{
+			var body = _physics.Bodies[i];
 			var from = previous[body.Bone];
 			var to = current[body.Bone];
 			var rotation = to.Rotation * from.Rotation.Inverse;
@@ -95,8 +96,10 @@ public sealed class ClientRagdoll : Component
 
 		forceBody.ApplyImpulse( force );
 
-		foreach ( var body in _physics.Bodies )
+		for ( var i = 0; i < _physics.Bodies.Count; i++ )
 		{
+			var body = _physics.Bodies[i];
+
 			if ( body.Component != forceBody )
 				body.Component.ApplyImpulseAt( forcePosition, force * (body.Component.Mass / totalMass) );
 		}
@@ -106,8 +109,10 @@ public sealed class ClientRagdoll : Component
 	{
 		for ( ; bone >= 0 && bone < _header.Bones.Length; bone = _header.Bones[bone].Parent )
 		{
-			foreach ( var body in _physics.Bodies )
+			for ( var i = 0; i < _physics.Bodies.Count; i++ )
 			{
+				var body = _physics.Bodies[i];
+
 				if ( body.Bone == bone )
 					return body.Component;
 			}
@@ -164,8 +169,10 @@ public sealed class ClientRagdoll : Component
 		if ( time - _lastOriginChangeTime < Client.RagdollSleepAfterTime )
 			return;
 
-		foreach ( var body in _physics.Bodies )
+		for ( var i = 0; i < _physics.Bodies.Count; i++ )
 		{
+			var body = _physics.Bodies[i];
+
 			if ( body.Component.Sleeping )
 				continue;
 
@@ -180,8 +187,9 @@ public sealed class ClientRagdoll : Component
 		var client = Client.Current;
 		var gravity = client.Gravity / Scene.PhysicsWorld.Gravity.Length;
 
-		foreach ( var body in _physics.Bodies )
+		for ( var i = 0; i < _physics.Bodies.Count; i++ )
 		{
+			var body = _physics.Bodies[i];
 			var rigidbody = body.Component;
 
 			rigidbody.GravityScale = gravity;
